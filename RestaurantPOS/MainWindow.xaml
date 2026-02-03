@@ -5,6 +5,6 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RestaurantPOS"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <ContentControl Content="{Binding CurrentViewModel}" />
+        Title="Restaurant POS by ESP Tech Mirpur" Height="450" Width="800">
+    <ContentControl Content="{Binding}" />
 </Window>

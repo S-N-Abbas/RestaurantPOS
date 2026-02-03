@@ -2,15 +2,16 @@
 using Microsoft.Extensions.DependencyInjection;
 using RestaurantPOS.Infrastructure.Data;
 using RestaurantPOS.Services;
+using RestaurantPOS.ViewModels;
 using RestaurantPOS.ViewModels.Base;
-using RestaurantPOS.ViewModels.Login;
 using RestaurantPOS.ViewModels.Home;
+using RestaurantPOS.ViewModels.Login;
+using RestaurantPOS.ViewModels.Shell;
 using Serilog;
 using System.Configuration;
 using System.Data;
 using System.IO;
 using System.Windows;
-using RestaurantPOS.ViewModels;
 
 namespace RestaurantPOS
 {
@@ -41,7 +42,7 @@ namespace RestaurantPOS
             Log.Information("POS Started");
 
             var mainWindow = Services.GetRequiredService<MainWindow>();
-            mainWindow.DataContext = Services.GetRequiredService<MainViewModel>();
+            mainWindow.DataContext = Services.GetRequiredService<ShellViewModel>();
             mainWindow.Show();
 
         }
@@ -61,6 +62,9 @@ namespace RestaurantPOS
 
             // Navigation
             services.AddSingleton<INavigationService, NavigationService>();
+
+            // Shell
+            services.AddSingleton<ShellViewModel>();
 
             // ViewModels
             services.AddSingleton<MainViewModel>();
