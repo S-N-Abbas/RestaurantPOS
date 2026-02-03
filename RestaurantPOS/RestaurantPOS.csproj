@@ -21,4 +21,15 @@
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="UI\WPF\Controls\" />
+    <Folder Include="UI\WPF\Themes\" />
+    <Folder Include="UI\WPF\Styles\" />
+    <Folder Include="UI\WPF\Views\" />
+    <Folder Include="ViewModels\Login\" />
+    <Folder Include="ViewModels\Home\" />
+    <Folder Include="ViewModels\Orders\" />
+    <Folder Include="ViewModels\Tables\" />
+  </ItemGroup>
+
 </Project>

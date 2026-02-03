@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using RestaurantPOS.ViewModels.Base;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -16,9 +17,10 @@ namespace RestaurantPOS
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        public MainWindow(MainViewModel vm)
         {
             InitializeComponent();
+            DataContext = vm;
         }
     }
 }
