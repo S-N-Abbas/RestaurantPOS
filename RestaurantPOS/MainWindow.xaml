@@ -6,10 +6,5 @@
         xmlns:local="clr-namespace:RestaurantPOS"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        <TextBlock Text="{Binding Title}"
-                   FontSize="28"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center" />
-    </Grid>
+    <ContentControl Content="{Binding CurrentViewModel}" />
 </Window>

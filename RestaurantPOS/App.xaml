@@ -1,8 +1,18 @@
 ﻿<Application x:Class="RestaurantPOS.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:RestaurantPOS">
+             xmlns:local="clr-namespace:RestaurantPOS"
+             xmlns:vmLogin="clr-namespace:RestaurantPOS.ViewModels.Login"
+             xmlns:vmHome="clr-namespace:RestaurantPOS.ViewModels.Home"
+             xmlns:loginViews="clr-namespace:RestaurantPOS.UI.Views.Login"
+             xmlns:homeViews="clr-namespace:RestaurantPOS.UI.Views.Home">
     <Application.Resources>
-         
+        <DataTemplate DataType="{x:Type vmLogin:LoginViewModel}">
+            <loginViews:LoginView />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type vmHome:HomeViewModel}">
+            <homeViews:HomeView />
+        </DataTemplate>
     </Application.Resources>
 </Application>

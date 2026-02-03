@@ -1,12 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using RestaurantPOS.Infrastructure.Data;
+using RestaurantPOS.Services;
 using RestaurantPOS.ViewModels.Base;
+using RestaurantPOS.ViewModels.Login;
+using RestaurantPOS.ViewModels.Home;
 using Serilog;
 using System.Configuration;
 using System.Data;
 using System.IO;
 using System.Windows;
+using RestaurantPOS.ViewModels;
 
 namespace RestaurantPOS
 {
@@ -31,10 +35,14 @@ namespace RestaurantPOS
     .       CreateLogger();
 
 
-            var mainWindow = Services.GetRequiredService<MainWindow>();
-            mainWindow.Show();
+            var navigation = Services.GetRequiredService<INavigationService>();
+            navigation.NavigateTo<LoginViewModel>();
 
             Log.Information("POS Started");
+
+            var mainWindow = Services.GetRequiredService<MainWindow>();
+            mainWindow.DataContext = Services.GetRequiredService<MainViewModel>();
+            mainWindow.Show();
 
         }
 
@@ -50,8 +58,14 @@ namespace RestaurantPOS
             // Windows
             services.AddSingleton<MainWindow>();
 
+
+            // Navigation
+            services.AddSingleton<INavigationService, NavigationService>();
+
             // ViewModels
             services.AddSingleton<MainViewModel>();
+            services.AddTransient<LoginViewModel>();
+            services.AddTransient<HomeViewModel>();
 
             // Services (empty for now)
             // services.AddScoped<IOrderService, OrderService>();

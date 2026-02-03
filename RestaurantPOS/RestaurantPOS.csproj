@@ -22,14 +22,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="UI\WPF\Controls\" />
-    <Folder Include="UI\WPF\Themes\" />
-    <Folder Include="UI\WPF\Styles\" />
-    <Folder Include="UI\WPF\Views\" />
-    <Folder Include="ViewModels\Login\" />
-    <Folder Include="ViewModels\Home\" />
+    <Folder Include="UI\Controls\" />
+    <Folder Include="UI\Themes\" />
+    <Folder Include="UI\Styles\" />
     <Folder Include="ViewModels\Orders\" />
     <Folder Include="ViewModels\Tables\" />
+    <Folder Include="UI\Views\Base\" />
   </ItemGroup>
 
 </Project>

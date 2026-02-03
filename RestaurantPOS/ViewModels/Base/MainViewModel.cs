@@ -1,17 +1,26 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using RestaurantPOS.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using CommunityToolkit.Mvvm.ComponentModel;
-
 namespace RestaurantPOS.ViewModels.Base
 { 
-    public partial class MainViewModel : ObservableObject
+    public partial class MainViewModel : ViewModelBase
     {
-        [ObservableProperty]
-        private string title = "Restaurant POS – Ready";
-    }
+        private readonly INavigationService _navigationService;
 
+        public ViewModelBase CurrentViewModel
+            => _navigationService.CurrentViewModel;
+
+        public MainViewModel(INavigationService navigationService)
+        {
+            _navigationService = navigationService;
+
+            _navigationService.OnCurrentViewModelChanged += () =>
+                OnPropertyChanged(nameof(CurrentViewModel));
+        }
+    }
 }
