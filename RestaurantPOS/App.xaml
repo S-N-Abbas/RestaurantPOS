@@ -9,16 +9,24 @@
              xmlns:loginViews="clr-namespace:RestaurantPOS.UI.Views.Login"
              xmlns:homeViews="clr-namespace:RestaurantPOS.UI.Views.Home">
     <Application.Resources>
-        <DataTemplate DataType="{x:Type vmShell:ShellViewModel}">
-            <shellViews:ShellView />
-        </DataTemplate>
 
-        <DataTemplate DataType="{x:Type vmLogin:LoginViewModel}">
-            <loginViews:LoginView />
-        </DataTemplate>
-
-        <DataTemplate DataType="{x:Type vmHome:HomeViewModel}">
-            <homeViews:HomeView />
-        </DataTemplate>
+        <!-- Buttons Style -->
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="UI/Styles/Buttons.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            
+            <DataTemplate DataType="{x:Type vmShell:ShellViewModel}">
+                <shellViews:ShellView />
+            </DataTemplate>
+            
+            <DataTemplate DataType="{x:Type vmLogin:LoginViewModel}">
+                <loginViews:LoginView />
+            </DataTemplate>
+            
+            <DataTemplate DataType="{x:Type vmHome:HomeViewModel}">
+                <homeViews:HomeView />
+            </DataTemplate>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

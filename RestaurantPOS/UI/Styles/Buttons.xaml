@@ -1,0 +1,14 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style x:Key="PosTileButton" TargetType="Button">
+        <Setter Property="FontSize" Value="22"/>
+        <Setter Property="Height" Value="140"/>
+        <Setter Property="Margin" Value="10"/>
+        <Setter Property="Background" Value="#2D89EF"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+
+</ResourceDictionary>

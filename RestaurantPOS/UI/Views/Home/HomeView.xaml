@@ -6,10 +6,21 @@
              xmlns:local="clr-namespace:RestaurantPOS.UI.Views.Home"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-        <TextBlock Text="HOME SCREEN"
-                   FontSize="32"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center" />
+    <Grid Margin="20">
+        <UniformGrid Columns="3">
+
+            <Button Content="DINE IN"
+                    Style="{StaticResource PosTileButton}"
+                    Command="{Binding DineInCommand}" />
+
+            <Button Content="TAKEAWAY"
+                    Style="{StaticResource PosTileButton}"
+                    Command="{Binding TakeawayCommand}" />
+
+            <Button Content="DELIVERY"
+                    Style="{StaticResource PosTileButton}"
+                    Command="{Binding DeliveryCommand}" />
+
+        </UniformGrid>
     </Grid>
 </UserControl>

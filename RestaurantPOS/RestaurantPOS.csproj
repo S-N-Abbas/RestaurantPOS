@@ -24,10 +24,16 @@
   <ItemGroup>
     <Folder Include="UI\Controls\" />
     <Folder Include="UI\Themes\" />
-    <Folder Include="UI\Styles\" />
     <Folder Include="ViewModels\Orders\" />
     <Folder Include="ViewModels\Tables\" />
     <Folder Include="UI\Views\Base\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="UI\Styles\Buttons.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Page>
   </ItemGroup>
 
 </Project>
