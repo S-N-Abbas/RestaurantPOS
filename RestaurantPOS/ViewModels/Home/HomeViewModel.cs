@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using RestaurantPOS.Services;
 using RestaurantPOS.ViewModels.Base;
+using RestaurantPOS.ViewModels.Tables;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,9 @@ namespace RestaurantPOS.ViewModels.Home
         {
             _navigationService = navigationService;
 
-            DineInCommand = new RelayCommand(() => Navigate("DineIn"));
+            DineInCommand = new RelayCommand(() =>
+                _navigationService.NavigateTo<TablesViewModel>());
+
             TakeawayCommand = new RelayCommand(() => Navigate("Takeaway"));
             DeliveryCommand = new RelayCommand(() => Navigate("Delivery"));
         }
