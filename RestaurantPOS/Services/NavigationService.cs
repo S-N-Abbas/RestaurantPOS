@@ -34,5 +34,13 @@ namespace RestaurantPOS.Services
         {
             CurrentViewModel = _serviceProvider.GetRequiredService<T>();
         }
+
+        public void NavigateTo<T>(Action<T> initialize)
+            where T : ViewModelBase
+        {
+            var vm = _serviceProvider.GetRequiredService<T>();
+            initialize(vm);
+            CurrentViewModel = vm;
+        }
     }
 }

@@ -16,15 +16,18 @@
 
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Border Margin="10"
-                            CornerRadius="10"
-                            Background="{Binding IsOccupied, Converter={StaticResource BoolToBrushConverter}}">
+                    <Button Command="{Binding SelectTableCommand}"
+                            Margin="10"
+                            Height="140"
+                            Background="{Binding IsOccupied, Converter={StaticResource BoolToBrushConverter}}"
+                            BorderThickness="0">
+
                         <TextBlock Text="{Binding TableNumber}"
                                    FontSize="32"
                                    Foreground="White"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center" />
-                    </Border>
+                    </Button>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
 

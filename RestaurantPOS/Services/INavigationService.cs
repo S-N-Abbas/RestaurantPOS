@@ -13,5 +13,7 @@ namespace RestaurantPOS.Services
 
         event Action OnCurrentViewModelChanged;
         void NavigateTo<T>() where T : ViewModelBase;
+        void NavigateTo<T>(Action<T> initialize)
+            where T : ViewModelBase;
     }
 }

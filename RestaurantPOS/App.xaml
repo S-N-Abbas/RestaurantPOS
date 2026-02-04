@@ -10,7 +10,9 @@
              xmlns:vmTables="clr-namespace:RestaurantPOS.ViewModels.Tables"
              xmlns:loginViews="clr-namespace:RestaurantPOS.UI.Views.Login"
              xmlns:homeViews="clr-namespace:RestaurantPOS.UI.Views.Home"
-             xmlns:tablesViews="clr-namespace:RestaurantPOS.UI.Views.Tables">
+             xmlns:tablesViews="clr-namespace:RestaurantPOS.UI.Views.Tables"
+             xmlns:vmOrders="clr-namespace:RestaurantPOS.ViewModels.Orders"
+             xmlns:ordersViews="clr-namespace:RestaurantPOS.UI.Views.Orders">
     <Application.Resources>
 
         <!-- Buttons Style -->
@@ -39,6 +41,10 @@
 
             <DataTemplate DataType="{x:Type vmTables:TablesViewModel}">
                 <tablesViews:TablesView />
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type vmOrders:OrderViewModel}">
+                <ordersViews:OrderView />
             </DataTemplate>
 
         </ResourceDictionary>
