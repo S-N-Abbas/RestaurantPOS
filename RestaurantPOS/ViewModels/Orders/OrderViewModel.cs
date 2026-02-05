@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using RestaurantPOS.Services;
 using RestaurantPOS.ViewModels.Base;
 using System;
 using System.Collections.Generic;
@@ -36,14 +37,21 @@ namespace RestaurantPOS.ViewModels.Orders
 
         public ICommand AddItemCommand { get; }
 
-        public OrderViewModel(int tableNumber)
+
+        private readonly OrderStore _orderStore;
+        private readonly OrderState _orderState;
+        public OrderViewModel(int tableNumber, OrderStore orderStore)
         {
             TableNumber = tableNumber;
+            _orderStore = orderStore;
+
+            _orderState = _orderStore.GetOrCreate(tableNumber);
+
+            OrderItems = _orderState.Items;
 
             Categories = new();
             AllItems = new();
             Items = new();
-            OrderItems = new();
 
             AddItemCommand = new RelayCommand<MenuItemViewModel>(AddItem);
 

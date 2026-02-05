@@ -70,6 +70,9 @@ namespace RestaurantPOS
 
             // ViewModels
             services.AddSingleton<MainViewModel>();
+            services.AddSingleton<OrderStore>();
+
+
             services.AddTransient<LoginViewModel>();
             services.AddTransient<HomeViewModel>();
             services.AddTransient<TablesViewModel>();
