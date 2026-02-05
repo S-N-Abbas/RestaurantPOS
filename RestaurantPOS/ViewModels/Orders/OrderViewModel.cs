@@ -15,12 +15,10 @@ namespace RestaurantPOS.ViewModels.Orders
 {
     public class OrderViewModel : ViewModelBase
     {
-        public int TableNumber { get; }
-
         public ObservableCollection<CategoryViewModel> Categories { get; }
         public ObservableCollection<MenuItemViewModel> AllItems { get; }
         public ObservableCollection<MenuItemViewModel> Items { get; }
-        public ObservableCollection<OrderItemViewModel> OrderItems { get; }
+        public ObservableCollection<OrderItemViewModel> OrderItems { get; private set; }
 
         private CategoryViewModel? _selectedCategory;
         public CategoryViewModel? SelectedCategory
@@ -36,34 +34,73 @@ namespace RestaurantPOS.ViewModels.Orders
         public decimal GrandTotal => OrderItems.Sum(i => i.Total);
 
         public ICommand AddItemCommand { get; }
+        public ICommand ChangeTableCommand { get; }
 
-
+        private readonly ITableSessionService _tableSession;
         private readonly OrderStore _orderStore;
-        private readonly OrderState _orderState;
-        public OrderViewModel(int tableNumber, OrderStore orderStore)
+        private OrderState _orderState;
+
+        private int _tableNumber;
+        public int TableNumber
         {
-            TableNumber = tableNumber;
+            get => _tableNumber;
+            private set => SetProperty(ref _tableNumber, value);
+        }
+
+        public OrderViewModel(ITableSessionService tableSession, OrderStore orderStore)
+
+        {
+            _tableSession = tableSession;
             _orderStore = orderStore;
-
-            _orderState = _orderStore.GetOrCreate(tableNumber);
-
-            OrderItems = _orderState.Items;
 
             Categories = new();
             AllItems = new();
             Items = new();
 
-            AddItemCommand = new RelayCommand<MenuItemViewModel>(AddItem);
+            OrderItems = new ObservableCollection<OrderItemViewModel>();
+            OrderItems.CollectionChanged += (_, __) =>
+           OnPropertyChanged(nameof(GrandTotal));
 
-            LoadMockData();
             SelectedCategory = Categories.FirstOrDefault();
 
-            OrderItems.CollectionChanged += (_, __) =>
-                OnPropertyChanged(nameof(GrandTotal));
+            LoadMockData();
+
+            _tableSession.TableChanged += OnTableChanged;
+
+            LoadTable(_tableSession.CurrentTable);
+
+            AddItemCommand = new RelayCommand<MenuItemViewModel>(AddItem);
+
+            ChangeTableCommand = new RelayCommand(() =>
+            {
+                // TEMP: cycle tables for now
+                var next = TableNumber == 5 ? 1 : TableNumber + 1;
+                _tableSession.SwitchTable(next);
+            });
+        }
+
+        private void LoadTable(int tableNumber)
+        {
+            TableNumber = tableNumber;
+
+            if (_orderState != null)
+                _orderState.Items.CollectionChanged -= OrderItems_CollectionChanged;
+
+            _orderState = _orderStore.GetOrCreate(tableNumber);
+
+            OrderItems = _orderState.Items;
+            OnPropertyChanged(nameof(OrderItems));
 
             OrderItems.CollectionChanged += OrderItems_CollectionChanged;
 
+            OnPropertyChanged(nameof(GrandTotal));
         }
+
+        private void OnTableChanged(int tableNumber)
+        {
+            LoadTable(tableNumber);
+        }
+
 
         private void LoadMockData()
         {

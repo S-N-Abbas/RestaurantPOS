@@ -33,7 +33,7 @@ namespace RestaurantPOS.ViewModels.Tables
 
         private void OnSelectTable()
         {
-            _navigationService.NavigateTo<OrderViewModel>(TableNumber);
+            _navigationService.NavigateTo<OrderViewModel>();
         }
     }
 }

@@ -13,10 +13,21 @@
                 Height="60"
                 Background="#1F2937"
                 Padding="16">
-            <TextBlock Text="{Binding TableNumber, StringFormat=Table {0}}"
-                       Foreground="White"
-                       FontSize="22"
-                       FontWeight="SemiBold" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="{Binding TableNumber, StringFormat=Table {0}}"
+                           Foreground="White"
+                           FontSize="22"
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center" />
+                <Button Grid.Column="1"
+                        Content="Change Table"
+                        HorizontalAlignment="Right"
+                        Command="{Binding ChangeTableCommand}" />
+            </Grid>
         </Border>
 
         <!-- Left: Categories -->
