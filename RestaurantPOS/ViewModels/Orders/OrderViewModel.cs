@@ -79,7 +79,7 @@ namespace RestaurantPOS.ViewModels.Orders
 
             LoadMockData();
 
-            //_tableSession.TableChanged += OnTableChanged;
+            _tableSession.TableChanged += OnTableChanged;
 
             TablePicker = new TablePickerViewModel(tableSession, orderStore);
 
