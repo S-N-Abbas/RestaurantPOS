@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using RestaurantPOS.Services;
 using RestaurantPOS.ViewModels.Base;
+using RestaurantPOS.ViewModels.Tables;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -30,6 +31,19 @@ namespace RestaurantPOS.ViewModels.Orders
                     FilterItems();
             }
         }
+
+        private bool _isTablePickerOpen;
+        public bool IsTablePickerOpen
+        {
+            get => _isTablePickerOpen;
+            set => SetProperty(ref _isTablePickerOpen, value);
+        }
+
+        public ICommand OpenTablePickerCommand { get; }
+        public ICommand CloseTablePickerCommand { get; }
+
+        public TablePickerViewModel TablePicker { get; }
+
 
         public decimal GrandTotal => OrderItems.Sum(i => i.Total);
 
@@ -65,7 +79,14 @@ namespace RestaurantPOS.ViewModels.Orders
 
             LoadMockData();
 
-            _tableSession.TableChanged += OnTableChanged;
+            //_tableSession.TableChanged += OnTableChanged;
+
+            TablePicker = new TablePickerViewModel(tableSession, orderStore);
+
+            OpenTablePickerCommand = new RelayCommand(() => IsTablePickerOpen = true);
+            CloseTablePickerCommand = new RelayCommand(() => IsTablePickerOpen = false);
+
+            _tableSession.TableChanged += _ => IsTablePickerOpen = false;
 
             LoadTable(_tableSession.CurrentTable);
 

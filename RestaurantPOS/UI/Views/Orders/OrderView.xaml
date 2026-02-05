@@ -4,120 +4,161 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:RestaurantPOS.UI.Views.Orders"
+             xmlns:converter="clr-namespace:RestaurantPOS.UI.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <DockPanel>
+    <Grid>
+        <DockPanel>
 
-        <!-- Top Bar -->
-        <Border DockPanel.Dock="Top"
-                Height="60"
-                Background="#1F2937"
-                Padding="16">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="{Binding TableNumber, StringFormat=Table {0}}"
-                           Foreground="White"
-                           FontSize="22"
-                           FontWeight="SemiBold"
-                           VerticalAlignment="Center" />
-                <Button Grid.Column="1"
-                        Content="Change Table"
-                        HorizontalAlignment="Right"
-                        Command="{Binding ChangeTableCommand}" />
-            </Grid>
-        </Border>
+            <!-- Top Bar -->
+            <Border DockPanel.Dock="Top"
+                    Height="60"
+                    Background="#1F2937"
+                    Padding="16">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding TableNumber, StringFormat=Table {0}}"
+                               Foreground="White"
+                               FontSize="22"
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Center" />
+                    <Button Grid.Column="1"
+                            Content="Change Table"
+                            HorizontalAlignment="Right"
+                            Command="{Binding OpenTablePickerCommand}" />
+                </Grid>
+            </Border>
 
-        <!-- Left: Categories -->
-        <Border DockPanel.Dock="Left"
-                Width="200"
-                Background="#111827">
-            <ListBox ItemsSource="{Binding Categories}"
-                     SelectedItem="{Binding SelectedCategory}"
-                     DisplayMemberPath="Name" />
-        </Border>
+            <!-- Left: Categories -->
+            <Border DockPanel.Dock="Left"
+                    Width="200"
+                    Background="#111827">
+                <ListBox ItemsSource="{Binding Categories}"
+                         SelectedItem="{Binding SelectedCategory}"
+                         DisplayMemberPath="Name" />
+            </Border>
 
-        <!-- Right: Order Summary -->
-        <Border DockPanel.Dock="Right"
-                Width="320"
-                Padding="12"
-                Background="#F9FAFB">
-            <StackPanel>
+            <!-- Right: Order Summary -->
+            <Border DockPanel.Dock="Right"
+                    Width="320"
+                    Padding="12"
+                    Background="#F9FAFB">
+                <StackPanel>
 
-                <TextBlock Text="Order"
-                           FontSize="20"
-                           FontWeight="Bold" />
+                    <TextBlock Text="Order"
+                               FontSize="20"
+                               FontWeight="Bold" />
 
-                <ListView ItemsSource="{Binding OrderItems}">
-                    <ListView.ItemTemplate>
+                    <ListView ItemsSource="{Binding OrderItems}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Text="{Binding Name}"
+                                               VerticalAlignment="Center" />
+
+                                    <Button Grid.Column="1"
+                                            Content="−"
+                                            Width="32"
+                                            Command="{Binding DecreaseCommand}" />
+
+                                    <TextBlock Grid.Column="2"
+                                               Text="{Binding Quantity}"
+                                               Width="32"
+                                               TextAlignment="Center"
+                                               VerticalAlignment="Center" />
+
+                                    <Button Grid.Column="3"
+                                            Content="+"
+                                            Width="32"
+                                            Command="{Binding IncreaseCommand}" />
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+
+                    <Separator />
+
+                    <TextBlock Text="{Binding GrandTotal, StringFormat=Total: Rs {0}}"
+                               FontSize="18"
+                               FontWeight="Bold" />
+                </StackPanel>
+            </Border>
+
+            <!-- Center: Items -->
+            <ScrollViewer>
+                <ItemsControl ItemsSource="{Binding Items}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="4" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+
+                    <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Grid Margin="4">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-
-                                <TextBlock Text="{Binding Name}"
-                                           VerticalAlignment="Center" />
-
-                                <Button Grid.Column="1"
-                                        Content="−"
-                                        Width="32"
-                                        Command="{Binding DecreaseCommand}" />
-
-                                <TextBlock Grid.Column="2"
-                                           Text="{Binding Quantity}"
-                                           Width="32"
-                                           TextAlignment="Center"
-                                           VerticalAlignment="Center" />
-
-                                <Button Grid.Column="3"
-                                        Content="+"
-                                        Width="32"
-                                        Command="{Binding IncreaseCommand}" />
-                            </Grid>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-
-                <Separator />
-
-                <TextBlock Text="{Binding GrandTotal, StringFormat=Total: Rs {0}}"
-                           FontSize="18"
-                           FontWeight="Bold" />
-            </StackPanel>
-        </Border>
-
-        <!-- Center: Items -->
-        <ScrollViewer>
-            <ItemsControl ItemsSource="{Binding Items}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <UniformGrid Columns="4" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Button Height="100"
-                                Margin="8"
-                                Command="{Binding DataContext.AddItemCommand,
+                            <Button Height="100"
+                                    Margin="8"
+                                    Command="{Binding DataContext.AddItemCommand,
                                           RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                CommandParameter="{Binding}">
-                            <StackPanel>
-                                <TextBlock Text="{Binding Name}"
-                                           FontWeight="SemiBold" />
-                                <TextBlock Text="{Binding Price}" />
-                            </StackPanel>
-                        </Button>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
+                                    CommandParameter="{Binding}">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Name}"
+                                               FontWeight="SemiBold" />
+                                    <TextBlock Text="{Binding Price}" />
+                                </StackPanel>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
 
-    </DockPanel>
+        </DockPanel>
+        <!-- TABLE PICKER OVERLAY -->
+        <Border Background="#AA000000"
+                Visibility="{Binding IsTablePickerOpen,
+                                 Converter={StaticResource BoolToVisibilityConverter}}">
+
+            <Border Width="500"
+                    Height="400"
+                    Background="White"
+                    CornerRadius="12"
+                    Padding="20"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+
+                <ItemsControl ItemsSource="{Binding TablePicker.Tables}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="4" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Height="80"
+                                    Margin="8"
+                                    Command="{Binding DataContext.TablePicker.SelectTableCommand,
+                                                  RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                    CommandParameter="{Binding}">
+                                <TextBlock Text="{Binding Number}"
+                                           FontSize="22"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+            </Border>
+        </Border>
+    </Grid>
 </UserControl>
