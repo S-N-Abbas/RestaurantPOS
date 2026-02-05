@@ -1,9 +1,11 @@
-﻿using RestaurantPOS.ViewModels.Base;
+﻿using CommunityToolkit.Mvvm.Input;
+using RestaurantPOS.ViewModels.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace RestaurantPOS.ViewModels.Orders
 {
@@ -19,6 +21,8 @@ namespace RestaurantPOS.ViewModels.Orders
             get => _quantity;
             set
             {
+                if (value < 1) return;
+
                 if (SetProperty(ref _quantity, value))
                     OnPropertyChanged(nameof(Total));
             }
@@ -26,11 +30,22 @@ namespace RestaurantPOS.ViewModels.Orders
 
         public decimal Total => Quantity * UnitPrice;
 
-        public OrderItemViewModel(MenuItemViewModel item)
+        public ICommand IncreaseCommand { get; }
+        public ICommand DecreaseCommand { get; }
+
+        public OrderItemViewModel(MenuItemViewModel item, Action<OrderItemViewModel> removeCallback)
         {
             ItemId = item.Id;
             Name = item.Name;
             UnitPrice = item.Price;
+
+            IncreaseCommand = new RelayCommand(() => Quantity++);
+            DecreaseCommand = new RelayCommand(() =>
+            {
+                Quantity--;
+                if (Quantity == 0)
+                    removeCallback(this);
+            });
         }
     }
 

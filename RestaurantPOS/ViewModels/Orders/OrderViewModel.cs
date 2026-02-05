@@ -3,6 +3,8 @@ using RestaurantPOS.ViewModels.Base;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -50,6 +52,9 @@ namespace RestaurantPOS.ViewModels.Orders
 
             OrderItems.CollectionChanged += (_, __) =>
                 OnPropertyChanged(nameof(GrandTotal));
+
+            OrderItems.CollectionChanged += OrderItems_CollectionChanged;
+
         }
 
         private void LoadMockData()
@@ -74,17 +79,49 @@ namespace RestaurantPOS.ViewModels.Orders
                 Items.Add(item);
         }
 
-        private void AddItem(MenuItemViewModel? item)
+        private void OrderItems_CollectionChanged(object? sender,
+            NotifyCollectionChangedEventArgs e)
         {
-            if (item == null) return;
+            if (e.NewItems != null)
+            {
+                foreach (OrderItemViewModel item in e.NewItems)
+                    item.PropertyChanged += OrderItem_PropertyChanged;
+            }
 
+            if (e.OldItems != null)
+            {
+                foreach (OrderItemViewModel item in e.OldItems)
+                    item.PropertyChanged -= OrderItem_PropertyChanged;
+            }
+
+            OnPropertyChanged(nameof(GrandTotal));
+        }
+
+        private void OrderItem_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(OrderItemViewModel.Quantity) ||
+                e.PropertyName == nameof(OrderItemViewModel.Total))
+            {
+                OnPropertyChanged(nameof(GrandTotal));
+            }
+        }
+
+
+        private void AddItem(MenuItemViewModel item)
+        {
             var existing = OrderItems.FirstOrDefault(i => i.ItemId == item.Id);
 
             if (existing != null)
                 existing.Quantity++;
             else
-                OrderItems.Add(new OrderItemViewModel(item));
+                OrderItems.Add(new OrderItemViewModel(item, RemoveItem));
 
+            OnPropertyChanged(nameof(GrandTotal));
+        }
+
+        private void RemoveItem(OrderItemViewModel item)
+        {
+            OrderItems.Remove(item);
             OnPropertyChanged(nameof(GrandTotal));
         }
     }
