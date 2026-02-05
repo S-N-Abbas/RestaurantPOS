@@ -144,7 +144,9 @@
 
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Button Height="80"
+                            <Button
+                                Style="{StaticResource TableTileStyle}"
+                                Height="80"
                                     Margin="8"
                                     Command="{Binding DataContext.TablePicker.SelectTableCommand,
                                                   RelativeSource={RelativeSource AncestorType=ItemsControl}}"

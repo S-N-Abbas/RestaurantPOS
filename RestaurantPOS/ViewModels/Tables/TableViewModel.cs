@@ -1,4 +1,5 @@
-﻿using RestaurantPOS.ViewModels.Base;
+﻿using RestaurantPOS.Services;
+using RestaurantPOS.ViewModels.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,13 @@ namespace RestaurantPOS.ViewModels.Tables
     {
         public int Number { get; }
 
+        private bool _isActive;
+        public bool IsActive
+        {
+            get => _isActive;
+            set => SetProperty(ref _isActive, value);
+        }
+
         private bool _hasOrder;
         public bool HasOrder
         {
@@ -18,9 +26,12 @@ namespace RestaurantPOS.ViewModels.Tables
             set => SetProperty(ref _hasOrder, value);
         }
 
-        public TableViewModel(int number)
+        public TableViewModel(int number, ITableSessionService tableSession)
         {
             Number = number;
+
+            tableSession.TableChanged += t =>
+                IsActive = (t == Number);
         }
     }
 }

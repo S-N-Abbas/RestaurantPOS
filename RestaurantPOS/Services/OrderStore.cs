@@ -10,15 +10,23 @@ namespace RestaurantPOS.Services
     {
         private readonly Dictionary<int, OrderState> _orders = new();
 
+        public event Action<int>? OrderStateChanged;
         public OrderState GetOrCreate(int tableNumber)
         {
             if (!_orders.TryGetValue(tableNumber, out var order))
             {
                 order = new OrderState(tableNumber);
                 _orders[tableNumber] = order;
+                OrderStateChanged?.Invoke(tableNumber);
             }
 
             return order;
+        }
+
+        public void CloseOrder(int tableNumber)
+        {
+            if (_orders.Remove(tableNumber))
+                OrderStateChanged?.Invoke(tableNumber);
         }
     }
 }
