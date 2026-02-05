@@ -11,36 +11,35 @@ namespace RestaurantPOS.Services
     public class NavigationService : INavigationService
     {
         private readonly IServiceProvider _serviceProvider;
-        private ViewModelBase _currentViewModel;
 
+        private ViewModelBase _currentViewModel;
         public ViewModelBase CurrentViewModel
         {
             get => _currentViewModel;
             private set
             {
                 _currentViewModel = value;
-                OnCurrentViewModelChanged?.Invoke();
+                CurrentViewModelChanged?.Invoke();
             }
         }
 
-        public event Action OnCurrentViewModelChanged;
+        public event Action? CurrentViewModelChanged;
 
         public NavigationService(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
         }
 
-        public void NavigateTo<T>() where T : ViewModelBase
+        public void NavigateTo<TViewModel>() where TViewModel : ViewModelBase
         {
-            CurrentViewModel = _serviceProvider.GetRequiredService<T>();
+            CurrentViewModel = _serviceProvider.GetRequiredService<TViewModel>();
         }
 
-        public void NavigateTo<T>(Action<T> initialize)
-            where T : ViewModelBase
+        public void NavigateTo<TViewModel>(object parameter)
+            where TViewModel : ViewModelBase
         {
-            var vm = _serviceProvider.GetRequiredService<T>();
-            initialize(vm);
-            CurrentViewModel = vm;
+            CurrentViewModel = (ViewModelBase)ActivatorUtilities
+                .CreateInstance(_serviceProvider, typeof(TViewModel), parameter);
         }
     }
 }

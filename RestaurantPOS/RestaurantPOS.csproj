@@ -24,7 +24,6 @@
   <ItemGroup>
     <Folder Include="UI\Controls\" />
     <Folder Include="UI\Themes\" />
-    <Folder Include="ViewModels\Orders\" />
     <Folder Include="UI\Views\Base\" />
   </ItemGroup>
 

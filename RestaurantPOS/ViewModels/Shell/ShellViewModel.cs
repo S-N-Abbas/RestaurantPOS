@@ -23,7 +23,7 @@ namespace RestaurantPOS.ViewModels.Shell
         {
             _navigationService = navigationService;
 
-            _navigationService.OnCurrentViewModelChanged += () =>
+            _navigationService.CurrentViewModelChanged += () =>
                 OnPropertyChanged(nameof(CurrentViewModel));
 
             LogoutCommand = new RelayCommand(OnLogout);

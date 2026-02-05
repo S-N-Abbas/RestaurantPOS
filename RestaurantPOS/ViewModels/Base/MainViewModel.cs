@@ -12,15 +12,13 @@ namespace RestaurantPOS.ViewModels.Base
     {
         private readonly INavigationService _navigationService;
 
-        public ViewModelBase CurrentViewModel
-            => _navigationService.CurrentViewModel;
+        public ViewModelBase CurrentViewModel => _navigationService.CurrentViewModel;
 
         public MainViewModel(INavigationService navigationService)
         {
             _navigationService = navigationService;
-
-            _navigationService.OnCurrentViewModelChanged += () =>
-                OnPropertyChanged(nameof(CurrentViewModel));
+            _navigationService.CurrentViewModelChanged +=
+                () => OnPropertyChanged(nameof(CurrentViewModel));
         }
     }
 }
