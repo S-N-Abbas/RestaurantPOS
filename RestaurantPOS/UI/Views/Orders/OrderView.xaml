@@ -6,80 +6,33 @@
              xmlns:local="clr-namespace:RestaurantPOS.UI.Views.Orders"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <DockPanel LastChildFill="True">
+    <DockPanel>
 
         <!-- Top Bar -->
         <Border DockPanel.Dock="Top"
                 Height="60"
                 Background="#1F2937"
                 Padding="16">
-
-            <DockPanel>
-                <TextBlock Text="{Binding TableNumber, StringFormat=Table {0}}"
-                           Foreground="White"
-                           FontSize="22"
-                           FontWeight="SemiBold" />
-
-                <StackPanel Orientation="Horizontal"
-                            DockPanel.Dock="Right">
-                    <Button Content="Hold"
-                            Margin="0,0,12,0" />
-                    <Button Content="Clear"
-                            Margin="0,0,12,0" />
-                    <Button Content="Print" />
-                </StackPanel>
-            </DockPanel>
+            <TextBlock Text="{Binding TableNumber, StringFormat=Table {0}}"
+                       Foreground="White"
+                       FontSize="22"
+                       FontWeight="SemiBold" />
         </Border>
+
+        <!-- Left: Categories -->
         <Border DockPanel.Dock="Left"
                 Width="200"
                 Background="#111827">
-
-            <ScrollViewer>
-                <ItemsControl ItemsSource="{Binding Categories}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Button Content="{Binding Name}"
-                                    Height="60"
-                                    Margin="8"
-                                    Command="{Binding DataContext.SelectCategoryCommand,
-                                              RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                    CommandParameter="{Binding}" />
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
-
+            <ListBox ItemsSource="{Binding Categories}"
+                     SelectedItem="{Binding SelectedCategory}"
+                     DisplayMemberPath="Name" />
         </Border>
-        <ScrollViewer>
-            <ItemsControl ItemsSource="{Binding Items}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <UniformGrid Columns="4" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
 
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Button Height="100"
-                                Margin="8"
-                                Command="{Binding DataContext.AddItemCommand,
-                                          RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                CommandParameter="{Binding}">
-                            <StackPanel>
-                                <TextBlock Text="{Binding Name}"
-                                           FontWeight="SemiBold" />
-                                <TextBlock Text="{Binding Price, StringFormat=Rs {0}}" />
-                            </StackPanel>
-                        </Button>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
+        <!-- Right: Order Summary -->
         <Border DockPanel.Dock="Right"
                 Width="320"
-                Background="#F9FAFB"
-                Padding="12">
-
+                Padding="12"
+                Background="#F9FAFB">
             <StackPanel>
 
                 <TextBlock Text="Order"
@@ -103,15 +56,35 @@
                 <TextBlock Text="{Binding GrandTotal, StringFormat=Total: Rs {0}}"
                            FontSize="18"
                            FontWeight="Bold" />
-
-                <Button Content="PAY"
-                        Height="60"
-                        Margin="0,12,0,0"
-                        Background="#16A34A"
-                        Foreground="White"
-                        FontSize="20" />
             </StackPanel>
-
         </Border>
+
+        <!-- Center: Items -->
+        <ScrollViewer>
+            <ItemsControl ItemsSource="{Binding Items}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Columns="4" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Height="100"
+                                Margin="8"
+                                Command="{Binding DataContext.AddItemCommand,
+                                          RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                CommandParameter="{Binding}">
+                            <StackPanel>
+                                <TextBlock Text="{Binding Name}"
+                                           FontWeight="SemiBold" />
+                                <TextBlock Text="{Binding Price}" />
+                            </StackPanel>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
     </DockPanel>
 </UserControl>
