@@ -11,6 +11,8 @@ namespace RestaurantPOS.Services
         private readonly Dictionary<int, OrderState> _orders = new();
 
         public event Action<int>? OrderStateChanged;
+        public bool HasOrder(int tableNumber)
+       => _orders.ContainsKey(tableNumber);
         public OrderState GetOrCreate(int tableNumber)
         {
             if (!_orders.TryGetValue(tableNumber, out var order))

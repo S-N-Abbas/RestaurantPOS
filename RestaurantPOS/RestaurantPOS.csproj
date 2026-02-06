@@ -32,6 +32,9 @@
       <Generator>MSBuild:Compile</Generator>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Page>
+    <Page Update="UI\Styles\TableTileStyle.xaml">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Page>
   </ItemGroup>
 
 </Project>

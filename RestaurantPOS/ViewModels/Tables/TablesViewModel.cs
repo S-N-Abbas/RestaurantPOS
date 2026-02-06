@@ -6,23 +6,16 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 namespace RestaurantPOS.ViewModels.Tables
 {
     public class TablesViewModel : ViewModelBase
     {
-        public ObservableCollection<TableItemViewModel> Tables { get; }
+        public ObservableCollection<TableViewModel> Tables { get; }
 
-        public TablesViewModel(INavigationService navigationService)
+        public TablesViewModel(TableStore tableStore)
         {
-            Tables = new ObservableCollection<TableItemViewModel>
-            {
-                new TableItemViewModel(1, false, navigationService),
-                new TableItemViewModel(2, true, navigationService),
-                new TableItemViewModel(3, false, navigationService),
-                new TableItemViewModel(4, false, navigationService),
-                new TableItemViewModel(5, true, navigationService),
-            };
+            Tables = tableStore.Tables;
         }
     }
+
 }

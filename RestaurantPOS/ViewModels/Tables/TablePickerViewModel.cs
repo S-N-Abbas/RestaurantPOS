@@ -31,9 +31,9 @@ namespace RestaurantPOS.ViewModels.Tables
 
             for (int i = 1; i <= 12; i++)
             {
-                var table = new TableViewModel(i, tableSession)
+                var table = new TableViewModel(i, tableSession, orderStore)
                 {
-                    HasOrder = _orderStore.GetOrCreate(i).Items.Any()
+                    HasOrder = _orderStore.GetOrCreate(i).Items.Any(),
                 };
                 Tables.Add(table);
             }

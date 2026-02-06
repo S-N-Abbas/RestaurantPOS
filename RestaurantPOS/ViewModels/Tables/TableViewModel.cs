@@ -26,12 +26,25 @@ namespace RestaurantPOS.ViewModels.Tables
             set => SetProperty(ref _hasOrder, value);
         }
 
-        public TableViewModel(int number, ITableSessionService tableSession)
+        public TableViewModel(
+            int number,
+            ITableSessionService tableSession,
+            OrderStore orderStore)
         {
             Number = number;
 
+            IsActive = tableSession.CurrentTable == number;
+
             tableSession.TableChanged += t =>
                 IsActive = (t == Number);
+
+            HasOrder = orderStore.HasOrder(number);
+
+            orderStore.OrderStateChanged += t =>
+            {
+                if (t == Number)
+                    HasOrder = orderStore.HasOrder(Number);
+            };
         }
     }
 }
