@@ -61,9 +61,15 @@ namespace RestaurantPOS.ViewModels.Orders
             private set => SetProperty(ref _tableNumber, value);
         }
 
-        public OrderViewModel(ITableSessionService tableSession, OrderStore orderStore)
+        private readonly IMenuDataService _menuService;
 
+
+        public OrderViewModel(
+            ITableSessionService tableSession,
+            OrderStore orderStore,
+            IMenuDataService menuService)
         {
+            _menuService = menuService;
             _tableSession = tableSession;
             _orderStore = orderStore;
 
@@ -77,7 +83,7 @@ namespace RestaurantPOS.ViewModels.Orders
 
             SelectedCategory = Categories.FirstOrDefault();
 
-            LoadMockData();
+            _ = LoadMenuAsync();
 
             _tableSession.TableChanged += OnTableChanged;
 
@@ -123,15 +129,21 @@ namespace RestaurantPOS.ViewModels.Orders
         }
 
 
-        private void LoadMockData()
+        private async Task LoadMenuAsync()
         {
-            Categories.Add(new(1, "Drinks"));
-            Categories.Add(new(2, "Food"));
+            var categories = await _menuService.GetCategoriesAsync();
+            var products = await _menuService.GetProductsAsync();
 
-            AllItems.Add(new(1, "Tea", 150, 1));
-            AllItems.Add(new(2, "Coffee", 200, 1));
-            AllItems.Add(new(3, "Burger", 550, 2));
-            AllItems.Add(new(4, "Pizza", 900, 2));
+            Categories.Clear();
+            foreach (var c in categories)
+                Categories.Add(new CategoryViewModel(c.Id, c.Name));
+
+            AllItems.Clear();
+            foreach (var p in products)
+                AllItems.Add(new MenuItemViewModel(p.Id, p.Name, p.Price, p.CategoryId));
+
+            SelectedCategory = Categories.FirstOrDefault();
+            FilterItems();
         }
 
         private void FilterItems()

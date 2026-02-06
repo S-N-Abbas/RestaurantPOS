@@ -65,13 +65,16 @@ namespace RestaurantPOS
             // Navigation
             services.AddSingleton<INavigationService, NavigationService>();
 
+            // Other Services
+            services.AddScoped<IMenuDataService, MenuDataService>();
+            services.AddSingleton<ITableSessionService, TableSessionService>();
+
             // Shell
             services.AddSingleton<ShellViewModel>();
 
             // ViewModels
             services.AddSingleton<MainViewModel>();
             services.AddSingleton<OrderStore>();
-            services.AddSingleton<ITableSessionService, TableSessionService>();
             services.AddSingleton<TableStore>();
 
 
