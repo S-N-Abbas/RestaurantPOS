@@ -68,6 +68,8 @@ namespace RestaurantPOS
             // Other Services
             services.AddScoped<IMenuDataService, MenuDataService>();
             services.AddSingleton<ITableSessionService, TableSessionService>();
+            services.AddScoped<ITableService, TableService>();
+
 
             // Shell
             services.AddSingleton<ShellViewModel>();

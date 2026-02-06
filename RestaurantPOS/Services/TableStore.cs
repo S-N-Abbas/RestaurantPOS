@@ -12,15 +12,35 @@ namespace RestaurantPOS.Services
     {
         public ObservableCollection<TableViewModel> Tables { get; }
 
-        public TableStore(
-            ITableSessionService tableSession,
-            OrderStore orderStore)
-        {
-            Tables = new ObservableCollection<TableViewModel>();
+        private readonly ITableService _tableService;
+        private readonly ITableSessionService _tableSession;
+        private readonly OrderStore _orderStore;
 
-            for (int i = 1; i <= 12; i++)
+        public TableStore(
+            ITableService tableService,
+        ITableSessionService tableSession,
+        OrderStore orderStore)
+        {
+            _tableService = tableService;
+            _tableSession = tableSession;
+            _orderStore = orderStore;
+
+            Tables = new ObservableCollection<TableViewModel>();
+        }
+
+        public async Task LoadAsync()
+        {
+            Tables.Clear();
+
+            var tables = await _tableService.GetAllAsync();
+
+            foreach (var table in tables)
             {
-                Tables.Add(new TableViewModel(i, tableSession, orderStore));
+                Tables.Add(
+                    new TableViewModel(
+                        table.Number,
+                        _tableSession,
+                        _orderStore));
             }
         }
     }

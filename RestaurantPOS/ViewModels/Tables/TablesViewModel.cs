@@ -13,8 +13,9 @@ namespace RestaurantPOS.ViewModels.Tables
 {
     public class TablesViewModel : ViewModelBase
     {
-        public ObservableCollection<TableViewModel> Tables { get; }
+        public ObservableCollection<TableViewModel> Tables => _tableStore.Tables;
 
+        private readonly TableStore _tableStore;
         public ICommand SelectTableCommand { get; }
 
         private readonly ITableSessionService _tableSession;
@@ -25,18 +26,22 @@ namespace RestaurantPOS.ViewModels.Tables
          ITableSessionService tableSession,
          INavigationService navigation)
         {
-            Tables = tableStore.Tables;
+            _tableStore = tableStore;
+            _ = LoadTables();
             _tableSession = tableSession;
             _navigation = navigation;
 
             SelectTableCommand = new RelayCommand<TableViewModel>(OnSelectTable);
         }
 
+        private async Task LoadTables()
+        {
+            await _tableStore.LoadAsync();
+        }
         private void OnSelectTable(TableViewModel table)
         {
             _tableSession.SwitchTable(table.Number);
 
-            // 🔥 THIS is what was missing
             _navigation.NavigateTo<OrderViewModel>();
         }
     }
