@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using RestaurantPOS.Domain.Entities;
 using RestaurantPOS.ViewModels.Base;
 using System;
 using System.Collections.Generic;
@@ -38,6 +39,24 @@ namespace RestaurantPOS.ViewModels.Orders
             ItemId = item.Id;
             Name = item.Name;
             UnitPrice = item.Price;
+
+            IncreaseCommand = new RelayCommand(() => Quantity++);
+            DecreaseCommand = new RelayCommand(() =>
+            {
+                Quantity--;
+                if (Quantity == 0)
+                    removeCallback(this);
+            });
+        }
+
+        public OrderItemViewModel(
+    OrderItem orderItem,
+    Action<OrderItemViewModel> removeCallback)
+        {
+            ItemId = orderItem.ProductId;
+            Name = orderItem.ProductName;
+            UnitPrice = orderItem.UnitPrice;
+            _quantity = orderItem.Quantity;
 
             IncreaseCommand = new RelayCommand(() => Quantity++);
             DecreaseCommand = new RelayCommand(() =>

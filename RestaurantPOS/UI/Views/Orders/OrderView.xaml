@@ -38,14 +38,16 @@
                     Background="#111827">
                 <ListBox ItemsSource="{Binding Categories}"
                          SelectedItem="{Binding SelectedCategory}"
-                         DisplayMemberPath="Name" />
+                         DisplayMemberPath="Name"
+                         ItemContainerStyle="{StaticResource MenuItemTileListBoxItem}" />
             </Border>
 
             <!-- Right: Order Summary -->
             <Border DockPanel.Dock="Right"
                     Width="320"
                     Padding="12"
-                    Background="#F9FAFB">
+                    Background="#F9FAFB"
+                    Style="{StaticResource OrderSummaryPanel}">
                 <StackPanel>
 
                     <TextBlock Text="Order"
@@ -107,6 +109,7 @@
                         <DataTemplate>
                             <Button Height="100"
                                     Margin="8"
+                                    Style="{StaticResource MenuItemTile}"
                                     Command="{Binding DataContext.AddItemCommand,
                                           RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                     CommandParameter="{Binding}">

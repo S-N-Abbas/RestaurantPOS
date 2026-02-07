@@ -22,6 +22,10 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="UI/Styles/Buttons.xaml" />
                 <ResourceDictionary Source="/UI/Styles/TableTileStyle.xaml" />
+                <ResourceDictionary Source="UI/Styles/TopBar.xaml" />
+                <ResourceDictionary Source="UI/Styles/CategoryTile.xaml" />
+                <ResourceDictionary Source="UI/Styles/MenuItemTile.xaml" />
+                <ResourceDictionary Source="UI/Styles/OrderSummary.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <!-- CONVERTERS -->

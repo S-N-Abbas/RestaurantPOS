@@ -1,4 +1,5 @@
-﻿using RestaurantPOS.ViewModels.Orders;
+﻿using RestaurantPOS.Domain.Entities;
+using RestaurantPOS.ViewModels.Orders;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -11,12 +12,26 @@ namespace RestaurantPOS.Services
     public class OrderState
     {
         public int TableNumber { get; }
+        public Order? Order { get; private set; }
+
         public ObservableCollection<OrderItemViewModel> Items { get; }
 
-        public OrderState(int tableNumber)
+        public OrderState(int tableNumber, Order? order,
+            Action<OrderItemViewModel> removeCallback)
         {
             TableNumber = tableNumber;
-            Items = new ObservableCollection<OrderItemViewModel>();
+            Order = order;
+
+            Items = new ObservableCollection<OrderItemViewModel>(
+                order?.Items.Select(i =>
+                    new OrderItemViewModel(i, removeCallback))
+                ?? Enumerable.Empty<OrderItemViewModel>()
+            );
+        }
+
+        public void AttachOrder(Order order)
+        {
+            Order = order;
         }
     }
 

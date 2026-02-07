@@ -11,4 +11,14 @@
         <Setter Property="BorderThickness" Value="0"/>
     </Style>
 
+    <Style TargetType="Button">
+        <Style.Triggers>
+            <Trigger Property="IsEnabled"
+                     Value="False">
+                <Setter Property="Opacity"
+                        Value="0.4" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
 </ResourceDictionary>

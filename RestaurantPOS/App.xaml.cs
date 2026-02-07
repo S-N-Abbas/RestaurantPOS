@@ -58,6 +58,11 @@ namespace RestaurantPOS
             services.AddDbContext<PosDbContext>(options =>
                 options.UseSqlite("Data Source=C:\\RestaurantPOS\\pos.db"));
 
+            services.AddDbContextFactory<PosDbContext>(options =>
+            {
+                options.UseSqlite("Data Source=C:\\RestaurantPOS\\pos.db");
+            });
+
             // Windows
             services.AddSingleton<MainWindow>();
 
@@ -69,6 +74,9 @@ namespace RestaurantPOS
             services.AddScoped<IMenuDataService, MenuDataService>();
             services.AddSingleton<ITableSessionService, TableSessionService>();
             services.AddScoped<ITableService, TableService>();
+            services.AddSingleton<OrderService>();
+            services.AddSingleton<OrderStore>();
+            services.AddSingleton<TableStore>();
 
 
             // Shell
@@ -76,15 +84,10 @@ namespace RestaurantPOS
 
             // ViewModels
             services.AddSingleton<MainViewModel>();
-            services.AddSingleton<OrderStore>();
-            services.AddSingleton<TableStore>();
-
-
             services.AddTransient<LoginViewModel>();
             services.AddTransient<HomeViewModel>();
             services.AddTransient<TablesViewModel>();
             services.AddTransient<OrderViewModel>();
-            services.AddTransient<TablesViewModel>();
 
 
             // Services (empty for now)

@@ -21,6 +21,7 @@ namespace RestaurantPOS.Domain.Entities
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+        public DateTime? ClosedAt { get; set; }
         public OrderStatus Status { get; set; } = OrderStatus.Open;
 
         public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();

@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Windows.Navigation;
 
 namespace RestaurantPOS.ViewModels.Orders
 {
@@ -39,6 +40,10 @@ namespace RestaurantPOS.ViewModels.Orders
             set => SetProperty(ref _isTablePickerOpen, value);
         }
 
+        public bool CanPay =>
+            _orderState?.Order != null &&
+            OrderItems.Any();
+
         public ICommand OpenTablePickerCommand { get; }
         public ICommand CloseTablePickerCommand { get; }
 
@@ -49,10 +54,14 @@ namespace RestaurantPOS.ViewModels.Orders
 
         public ICommand AddItemCommand { get; }
         public ICommand ChangeTableCommand { get; }
+        public IRelayCommand PayCommand { get; }
 
         private readonly ITableSessionService _tableSession;
         private readonly OrderStore _orderStore;
         private OrderState _orderState;
+        private readonly OrderService _orderService;
+        private readonly INavigationService _navigationService;
+        private readonly TableStore _tableStore;
 
         private int _tableNumber;
         public int TableNumber
@@ -63,39 +72,31 @@ namespace RestaurantPOS.ViewModels.Orders
 
         private readonly IMenuDataService _menuService;
 
+        private void RaisePayState()
+        {
+            OnPropertyChanged(nameof(CanPay));
+        }
 
         public OrderViewModel(
             ITableSessionService tableSession,
             OrderStore orderStore,
-            IMenuDataService menuService)
+            IMenuDataService menuService,
+            OrderService orderService,
+            INavigationService navigationService,
+            TableStore tableStore)
         {
             _menuService = menuService;
             _tableSession = tableSession;
             _orderStore = orderStore;
+            _orderService = orderService;
+            _navigationService = navigationService;
+
 
             Categories = new();
             AllItems = new();
             Items = new();
 
-            OrderItems = new ObservableCollection<OrderItemViewModel>();
-            OrderItems.CollectionChanged += (_, __) =>
-           OnPropertyChanged(nameof(GrandTotal));
-
-            SelectedCategory = Categories.FirstOrDefault();
-
-            _ = LoadMenuAsync();
-
-            _tableSession.TableChanged += OnTableChanged;
-
-            TablePicker = new TablePickerViewModel(tableSession, orderStore);
-
-            OpenTablePickerCommand = new RelayCommand(() => IsTablePickerOpen = true);
-            CloseTablePickerCommand = new RelayCommand(() => IsTablePickerOpen = false);
-
-            _tableSession.TableChanged += _ => IsTablePickerOpen = false;
-
-            LoadTable(_tableSession.CurrentTable);
-
+            // Comands
             AddItemCommand = new RelayCommand<MenuItemViewModel>(AddItem);
 
             ChangeTableCommand = new RelayCommand(() =>
@@ -104,23 +105,53 @@ namespace RestaurantPOS.ViewModels.Orders
                 var next = TableNumber == 5 ? 1 : TableNumber + 1;
                 _tableSession.SwitchTable(next);
             });
+
+            PayCommand = new AsyncRelayCommand(PayAsync);
+
+            OrderItems = new ObservableCollection<OrderItemViewModel>();
+            
+            OrderItems.CollectionChanged += (_, __) =>
+                UpdateOrderState();
+
+            SelectedCategory = Categories.FirstOrDefault();
+
+            _ = LoadMenuAsync();
+
+            _tableSession.TableChanged += OnTableChanged;
+
+            TablePicker = new TablePickerViewModel(tableSession, orderStore, tableStore);
+
+            OpenTablePickerCommand = new RelayCommand(() => IsTablePickerOpen = true);
+            CloseTablePickerCommand = new RelayCommand(() => IsTablePickerOpen = false);
+
+            _tableSession.TableChanged += _ => IsTablePickerOpen = false;
+
+            LoadTable(_tableSession.CurrentTable);
         }
 
-        private void LoadTable(int tableNumber)
+        private void UpdateOrderState()
+        {
+            OnPropertyChanged(nameof(GrandTotal));
+            OnPropertyChanged(nameof(CanPay));
+            PayCommand.NotifyCanExecuteChanged();
+        }
+
+        private async void LoadTable(int tableNumber)
         {
             TableNumber = tableNumber;
 
             if (_orderState != null)
                 _orderState.Items.CollectionChanged -= OrderItems_CollectionChanged;
 
-            _orderState = _orderStore.GetOrCreate(tableNumber);
+            _orderState = await _orderStore.GetOrCreateAsync(
+                tableNumber,
+                RemoveItem);
 
             OrderItems = _orderState.Items;
             OnPropertyChanged(nameof(OrderItems));
 
             OrderItems.CollectionChanged += OrderItems_CollectionChanged;
-
-            OnPropertyChanged(nameof(GrandTotal));
+            UpdateOrderState();
         }
 
         private void OnTableChanged(int tableNumber)
@@ -172,35 +203,85 @@ namespace RestaurantPOS.ViewModels.Orders
                     item.PropertyChanged -= OrderItem_PropertyChanged;
             }
 
-            OnPropertyChanged(nameof(GrandTotal));
+            UpdateOrderState();
         }
 
-        private void OrderItem_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        private async void OrderItem_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
+            if (sender is not OrderItemViewModel item)
+                return;
+
             if (e.PropertyName == nameof(OrderItemViewModel.Quantity) ||
                 e.PropertyName == nameof(OrderItemViewModel.Total))
             {
-                OnPropertyChanged(nameof(GrandTotal));
+                UpdateOrderState();
+
+                if (_orderState.Order == null)
+                    return;
+
+                await _orderService.UpdateQuantityAsync(
+                    _orderState.Order,
+                    item.ItemId,
+                    item.Quantity);
             }
         }
 
 
-        private void AddItem(MenuItemViewModel item)
+        private async void AddItem(MenuItemViewModel item)
         {
+            if (_orderState.Order == null)
+            {
+                var order = await _orderService.CreateOrderAsync(TableNumber);
+                _orderState.AttachOrder(order);
+                UpdateOrderState();
+            }
+
+            await _orderService.AddItemAsync(_orderState.Order!, item);
+
             var existing = OrderItems.FirstOrDefault(i => i.ItemId == item.Id);
 
             if (existing != null)
                 existing.Quantity++;
             else
                 OrderItems.Add(new OrderItemViewModel(item, RemoveItem));
-
-            OnPropertyChanged(nameof(GrandTotal));
         }
 
-        private void RemoveItem(OrderItemViewModel item)
+        private async void RemoveItem(OrderItemViewModel item)
         {
             OrderItems.Remove(item);
-            OnPropertyChanged(nameof(GrandTotal));
+            if (_orderState.Order != null)
+            {
+                await _orderService.UpdateQuantityAsync(
+                    _orderState.Order,
+                    item.ItemId,
+                    0);
+            }
+            UpdateOrderState();
         }
+
+        private async Task PayAsync()
+        {
+            if (_orderState.Order == null)
+                return;
+
+            await _orderService.CloseOrderAsync(_orderState.Order);
+
+            _orderStore.CloseOrder(TableNumber);
+
+            _navigationService.NavigateTo<TablesViewModel>();
+        }
+
+        private async void Pay()
+        {
+            if (_orderState.Order == null)
+                return;
+
+            await _orderService.CloseOrderAsync(_orderState.Order);
+
+            _orderStore.CloseOrder(TableNumber);
+
+            _navigationService.NavigateTo<TablesViewModel>();
+        }
+
     }
 }

@@ -16,29 +16,28 @@ namespace RestaurantPOS.ViewModels.Tables
         private readonly ITableSessionService _tableSession;
         private readonly OrderStore _orderStore;
 
-        public ObservableCollection<TableViewModel> Tables { get; }
+        public ObservableCollection<TableViewModel> Tables => _tableStore.Tables;
+
+        private readonly TableStore _tableStore;
 
         public ICommand SelectTableCommand { get; }
 
         public TablePickerViewModel(
             ITableSessionService tableSession,
-            OrderStore orderStore)
+            OrderStore orderStore,
+            TableStore tableStore)
         {
             _tableSession = tableSession;
             _orderStore = orderStore;
-
-            Tables = new ObservableCollection<TableViewModel>();
-
-            for (int i = 1; i <= 12; i++)
-            {
-                var table = new TableViewModel(i, tableSession, orderStore)
-                {
-                    HasOrder = _orderStore.GetOrCreate(i).Items.Any(),
-                };
-                Tables.Add(table);
-            }
+            _tableStore = tableStore;
+            _ = LoadTables();
 
             SelectTableCommand = new RelayCommand<TableViewModel>(SelectTable);
+        }
+
+        private async Task LoadTables()
+        {
+            await _tableStore.LoadAsync();
         }
 
         private void SelectTable(TableViewModel table)
