@@ -18,6 +18,14 @@ namespace RestaurantPOS.Domain.Entities
         public int Id { get; set; }
 
         public int TableNumber { get; set; }
+        public int TableId { get; set; }
+
+        public Table Table { get; set; } = null!;
+
+        public decimal PaidAmount { get; set; }
+        public decimal TotalAmount { get; set; }
+        public bool IsClosed { get; set; }
+
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
@@ -25,5 +33,6 @@ namespace RestaurantPOS.Domain.Entities
         public OrderStatus Status { get; set; } = OrderStatus.Open;
 
         public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
+        public ICollection<Payment> Payments { get; set; } = new List<Payment>();
     }
 }

@@ -121,13 +121,27 @@ namespace RestaurantPOS.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("IsClosed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("PaidAmount")
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("TableId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("TableNumber")
                         .HasColumnType("INTEGER");
 
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("TableId");
 
                     b.ToTable("Orders");
                 });
@@ -161,6 +175,32 @@ namespace RestaurantPOS.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("OrderItems");
+                });
+
+            modelBuilder.Entity("RestaurantPOS.Domain.Entities.Payment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Method")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("PaidAt")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("Payments");
                 });
 
             modelBuilder.Entity("RestaurantPOS.Domain.Entities.Table", b =>
@@ -265,6 +305,17 @@ namespace RestaurantPOS.Migrations
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("RestaurantPOS.Domain.Entities.Order", b =>
+                {
+                    b.HasOne("RestaurantPOS.Domain.Entities.Table", "Table")
+                        .WithMany()
+                        .HasForeignKey("TableId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Table");
+                });
+
             modelBuilder.Entity("RestaurantPOS.Domain.Entities.OrderItem", b =>
                 {
                     b.HasOne("RestaurantPOS.Domain.Entities.Order", "Order")
@@ -284,6 +335,17 @@ namespace RestaurantPOS.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("RestaurantPOS.Domain.Entities.Payment", b =>
+                {
+                    b.HasOne("RestaurantPOS.Domain.Entities.Order", "Order")
+                        .WithMany("Payments")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+                });
+
             modelBuilder.Entity("RestaurantPOS.Domain.Entities.Category", b =>
                 {
                     b.Navigation("Products");
@@ -292,6 +354,8 @@ namespace RestaurantPOS.Migrations
             modelBuilder.Entity("RestaurantPOS.Domain.Entities.Order", b =>
                 {
                     b.Navigation("Items");
+
+                    b.Navigation("Payments");
                 });
 #pragma warning restore 612, 618
         }

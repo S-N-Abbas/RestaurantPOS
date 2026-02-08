@@ -21,6 +21,7 @@ namespace RestaurantPOS.Infrastructure.Data
         public DbSet<Table> Tables => Set<Table>();
         public DbSet<Order> Orders => Set<Order>();
         public DbSet<OrderItem> OrderItems => Set<OrderItem>();
+        public DbSet<Payment> Payments => Set<Payment>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

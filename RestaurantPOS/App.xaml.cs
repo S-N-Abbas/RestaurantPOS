@@ -7,6 +7,7 @@ using RestaurantPOS.ViewModels.Base;
 using RestaurantPOS.ViewModels.Home;
 using RestaurantPOS.ViewModels.Login;
 using RestaurantPOS.ViewModels.Orders;
+using RestaurantPOS.ViewModels.Payments;
 using RestaurantPOS.ViewModels.Shell;
 using RestaurantPOS.ViewModels.Tables;
 using Serilog;
@@ -88,10 +89,7 @@ namespace RestaurantPOS
             services.AddTransient<HomeViewModel>();
             services.AddTransient<TablesViewModel>();
             services.AddTransient<OrderViewModel>();
-
-
-            // Services (empty for now)
-            // services.AddScoped<IOrderService, OrderService>();
+            services.AddTransient<PaymentViewModel>();
         }
     }
 

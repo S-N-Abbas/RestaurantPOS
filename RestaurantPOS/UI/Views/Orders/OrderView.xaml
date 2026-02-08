@@ -115,7 +115,7 @@
                                 Foreground="White"
                                 BorderThickness="0"
                                 Command="{Binding PayCommand}"
-                                IsEnabled="{Binding HasOrder}" />
+                                IsEnabled="{Binding CanPay}" />
                     </StackPanel>
 
                 </DockPanel>

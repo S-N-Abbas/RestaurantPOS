@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using RestaurantPOS.Services;
 using RestaurantPOS.ViewModels.Base;
+using RestaurantPOS.ViewModels.Payments;
 using RestaurantPOS.ViewModels.Tables;
 using System;
 using System.Collections.Generic;
@@ -40,9 +41,8 @@ namespace RestaurantPOS.ViewModels.Orders
             set => SetProperty(ref _isTablePickerOpen, value);
         }
 
-        public bool CanPay =>
-            _orderState?.Order != null &&
-            OrderItems.Any();
+        public bool CanPay => _orderState?.Order != null && OrderItems.Any();
+
 
         public ICommand OpenTablePickerCommand { get; }
         public ICommand CloseTablePickerCommand { get; }
@@ -54,7 +54,7 @@ namespace RestaurantPOS.ViewModels.Orders
 
         public ICommand AddItemCommand { get; }
         public ICommand ChangeTableCommand { get; }
-        public IRelayCommand PayCommand { get; }
+        public ICommand PayCommand { get; }
 
         private readonly ITableSessionService _tableSession;
         private readonly OrderStore _orderStore;
@@ -106,7 +106,10 @@ namespace RestaurantPOS.ViewModels.Orders
                 _tableSession.SwitchTable(next);
             });
 
-            PayCommand = new AsyncRelayCommand(PayAsync);
+            PayCommand = new RelayCommand(
+                ExecutePay,
+                () => _orderState?.Order != null && OrderItems.Any()
+            );
 
             OrderItems = new ObservableCollection<OrderItemViewModel>();
             
@@ -133,7 +136,6 @@ namespace RestaurantPOS.ViewModels.Orders
         {
             OnPropertyChanged(nameof(GrandTotal));
             OnPropertyChanged(nameof(CanPay));
-            PayCommand.NotifyCanExecuteChanged();
         }
 
         private async void LoadTable(int tableNumber)
@@ -259,16 +261,9 @@ namespace RestaurantPOS.ViewModels.Orders
             UpdateOrderState();
         }
 
-        private async Task PayAsync()
+        private void ExecutePay()
         {
-            if (_orderState.Order == null)
-                return;
-
-            await _orderService.CloseOrderAsync(_orderState.Order);
-
-            _orderStore.CloseOrder(TableNumber);
-
-            _navigationService.NavigateTo<TablesViewModel>();
+            _navigationService.NavigateTo<PaymentViewModel>(_orderState);
         }
 
         private async void Pay()

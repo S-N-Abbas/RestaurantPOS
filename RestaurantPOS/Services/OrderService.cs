@@ -22,6 +22,53 @@ namespace RestaurantPOS.Services
             _contextFactory = contextFactory;
         }
 
+        public async Task RecordPaymentAsync(
+        Order order,
+        decimal amount,
+        string method)
+        {
+            if (amount <= 0)
+                throw new ArgumentException("Payment amount must be greater than zero");
+
+            using var context = _contextFactory.CreateDbContext();
+            using var tx = await context.Database.BeginTransactionAsync();
+
+            // Reload order safely
+            var dbOrder = await context.Orders
+                .Include(o => o.Payments)
+                .FirstOrDefaultAsync(o => o.Id == order.Id);
+
+            if (dbOrder == null)
+                throw new InvalidOperationException("Order not found");
+
+            if (dbOrder.IsClosed)
+                throw new InvalidOperationException("Order already closed");
+
+            var remaining = dbOrder.TotalAmount - dbOrder.PaidAmount;
+
+            // Card must not overpay
+            if (method == "Card" && amount != remaining)
+                throw new InvalidOperationException("Card payment must equal remaining amount");
+
+            // Cap cash overpayment (change handled in UI)
+            var appliedAmount = Math.Min(amount, remaining);
+
+            var payment = new Payment
+            {
+                OrderId = dbOrder.Id,
+                Amount = appliedAmount,
+                Method = method,
+                PaidAt = DateTime.UtcNow
+            };
+
+            context.Payments.Add(payment);
+
+            dbOrder.PaidAmount += appliedAmount;
+
+            await context.SaveChangesAsync();
+            await tx.CommitAsync();
+        }
+
         public async Task<Order?> GetOpenOrderAsync(int tableNumber)
         {
             return await _db.Orders
@@ -33,9 +80,12 @@ namespace RestaurantPOS.Services
 
         public async Task<Order> CreateOrderAsync(int tableNumber)
         {
+            var table = await _db.Tables.FirstAsync(t => t.Number == tableNumber);
+
             var order = new Order
             {
                 TableNumber = tableNumber,
+                TableId = table.Id,
                 CreatedAt = DateTime.Now
             };
 
@@ -133,8 +183,22 @@ namespace RestaurantPOS.Services
 
         public async Task CloseOrderAsync(Order order)
         {
-            order.ClosedAt = DateTime.Now;
-            await _db.SaveChangesAsync();
+            using var context = _contextFactory.CreateDbContext();
+
+            var dbOrder = await context.Orders.FindAsync(order.Id);
+            if (dbOrder == null)
+                return;
+
+            if (dbOrder.IsClosed)
+                return;
+
+            if (dbOrder.PaidAmount < dbOrder.TotalAmount)
+                throw new InvalidOperationException("Order not fully paid");
+
+            dbOrder.IsClosed = true;
+            dbOrder.ClosedAt = DateTime.UtcNow;
+
+            await context.SaveChangesAsync();
         }
     }
 }
