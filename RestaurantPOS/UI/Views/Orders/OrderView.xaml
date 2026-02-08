@@ -44,17 +44,23 @@
 
             <!-- Right: Order Summary -->
             <Border DockPanel.Dock="Right"
-                    Width="320"
-                    Padding="12"
+                    Width="340"
+                    Padding="16"
                     Background="#F9FAFB"
                     Style="{StaticResource OrderSummaryPanel}">
-                <StackPanel>
+                <DockPanel LastChildFill="True">
 
-                    <TextBlock Text="Order"
+                    <!-- Header -->
+                    <TextBlock DockPanel.Dock="Top"
+                               Text="Order Summary"
                                FontSize="20"
-                               FontWeight="Bold" />
+                               FontWeight="Bold"
+                               Margin="0,0,0,12" />
 
-                    <ListView ItemsSource="{Binding OrderItems}">
+                    <!-- Order Items -->
+                    <ListView DockPanel.Dock="Top"
+                              ItemsSource="{Binding OrderItems}"
+                              Margin="0,0,0,12">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <Grid Margin="4">
@@ -66,34 +72,53 @@
                                     </Grid.ColumnDefinitions>
 
                                     <TextBlock Text="{Binding Name}"
-                                               VerticalAlignment="Center" />
+                                               VerticalAlignment="Center"
+                                               FontWeight="SemiBold" />
 
                                     <Button Grid.Column="1"
                                             Content="−"
-                                            Width="32"
+                                            Width="30"
                                             Command="{Binding DecreaseCommand}" />
 
                                     <TextBlock Grid.Column="2"
                                                Text="{Binding Quantity}"
-                                               Width="32"
+                                               Width="30"
                                                TextAlignment="Center"
                                                VerticalAlignment="Center" />
 
                                     <Button Grid.Column="3"
                                             Content="+"
-                                            Width="32"
+                                            Width="30"
                                             Command="{Binding IncreaseCommand}" />
                                 </Grid>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
 
-                    <Separator />
+                    <!-- Footer -->
+                    <StackPanel DockPanel.Dock="Bottom"
+                                Margin="0,12,0,0">
 
-                    <TextBlock Text="{Binding GrandTotal, StringFormat=Total: Rs {0}}"
-                               FontSize="18"
-                               FontWeight="Bold" />
-                </StackPanel>
+                        <Separator Margin="0,8" />
+
+                        <TextBlock Text="{Binding GrandTotal, StringFormat=Total: Rs {0}}"
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Margin="0,0,0,12" />
+
+                        <!-- PAY BUTTON -->
+                        <Button Content="PAY"
+                                Height="48"
+                                FontSize="18"
+                                FontWeight="Bold"
+                                Background="#16A34A"
+                                Foreground="White"
+                                BorderThickness="0"
+                                Command="{Binding PayCommand}"
+                                IsEnabled="{Binding HasOrder}" />
+                    </StackPanel>
+
+                </DockPanel>
             </Border>
 
             <!-- Center: Items -->

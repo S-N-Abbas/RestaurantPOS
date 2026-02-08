@@ -24,6 +24,21 @@
                 <Setter Property="BorderThickness"
                         Value="3" />
             </DataTrigger>
+            <!-- Current table -->
+            <DataTrigger Binding="{Binding IsCurrent}"
+                         Value="True">
+                <Setter Property="Background"
+                        Value="#2563EB" />
+            </DataTrigger>
+
+            <!-- Occupied (locked) -->
+            <DataTrigger Binding="{Binding IsLocked}"
+                         Value="True">
+                <Setter Property="Background"
+                        Value="#6B7280" />
+                <Setter Property="Opacity"
+                        Value="0.6" />
+            </DataTrigger>
 
         </Style.Triggers>
     </Style>

@@ -8,25 +8,23 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
+
 namespace RestaurantPOS.ViewModels.Tables
 {
     public class TableViewModel : ViewModelBase
     {
+        private readonly OrderStore _orderStore;
+        private readonly ITableSessionService _tableSession;
+
         public int Number { get; }
 
-        private bool _isActive;
-        public bool IsActive
-        {
-            get => _isActive;
-            set => SetProperty(ref _isActive, value);
-        }
+        public bool HasOrder => _orderStore.HasOrder(Number);
 
-        private bool _hasOrder;
-        public bool HasOrder
-        {
-            get => _hasOrder;
-            set => SetProperty(ref _hasOrder, value);
-        }
+        public bool IsCurrent => _tableSession.CurrentTable == Number;
+
+        public bool IsLocked => HasOrder && !IsCurrent;
+
+        public ICommand SelectTableCommand { get; }
 
         public TableViewModel(
             int number,
@@ -35,18 +33,33 @@ namespace RestaurantPOS.ViewModels.Tables
         {
             Number = number;
 
-            IsActive = tableSession.CurrentTable == number;
+            _tableSession = tableSession;
+            _orderStore = orderStore;
 
-            tableSession.TableChanged += t =>
-                IsActive = (t == Number);
+            SelectTableCommand = new RelayCommand(SelectTable, CanSelectTable);
 
-            HasOrder = orderStore.HasOrder(number);
+            _orderStore.OrderStateChanged += OnOrderStateChanged;
+            _tableSession.TableChanged += _ => RaiseAll();
+        }
 
-            orderStore.OrderStateChanged += t =>
-            {
-                if (t == Number)
-                    HasOrder = orderStore.HasOrder(Number);
-            };
+        private bool CanSelectTable()
+        => !IsLocked;
+
+        private void SelectTable()
+            => _tableSession.SwitchTable(Number);
+
+        private void OnOrderStateChanged(int tableNumber)
+        {
+            if (tableNumber == Number)
+                RaiseAll();
+        }
+
+        private void RaiseAll()
+        {
+            OnPropertyChanged(nameof(HasOrder));
+            OnPropertyChanged(nameof(IsLocked));
+            OnPropertyChanged(nameof(IsCurrent));
+            ((RelayCommand)SelectTableCommand).NotifyCanExecuteChanged();
         }
     }
 }

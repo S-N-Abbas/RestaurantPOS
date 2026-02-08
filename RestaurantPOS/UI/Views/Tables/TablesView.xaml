@@ -22,8 +22,8 @@
                   RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                             CommandParameter="{Binding}"
                             Background="{Binding HasOrder, Converter={StaticResource BoolToBrushConverter}}"
-                            BorderThickness="0">
-
+                            BorderThickness="0"
+                            Style="{StaticResource TableTileStyle}">
                         <TextBlock Text="{Binding Number}"
                                    FontSize="32"
                                    Foreground="White"
