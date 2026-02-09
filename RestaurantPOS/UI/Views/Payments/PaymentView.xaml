@@ -15,7 +15,7 @@
         <!-- TOP BAR -->
         <Border Background="#1F2937"
                 Height="64"
-                Padding="20">
+                Padding="10">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -28,6 +28,7 @@
                            FontWeight="SemiBold" />
 
                 <Button Grid.Column="1"
+                        Style="{StaticResource TopBarButton}"
                         Content="Back"
                         Command="{Binding CancelCommand}"
                         Padding="16,6" />

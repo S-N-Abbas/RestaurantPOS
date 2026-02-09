@@ -3,11 +3,6 @@ using RestaurantPOS.Domain.Entities;
 using RestaurantPOS.Services;
 using RestaurantPOS.ViewModels.Base;
 using RestaurantPOS.ViewModels.Tables;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace RestaurantPOS.ViewModels.Payments
@@ -21,146 +16,151 @@ namespace RestaurantPOS.ViewModels.Payments
 
     public class PaymentViewModel : ViewModelBase
     {
-        private readonly OrderState _orderState;
         private readonly OrderService _orderService;
         private readonly INavigationService _navigationService;
 
-        private readonly IPaymentService _paymentService;
-        private readonly Order _order;
+        public OrderState OrderState { get; }
 
-        public decimal Total => _orderState.Order?.TotalAmount ?? 0m;
+        // UK currency labels
+        public string TableLabel => $"Table {OrderState.TableNumber}";
 
-        private decimal _paid;
-        public decimal Paid
-        {
-            get => _paid;
-            private set
-            {
-                if (SetProperty(ref _paid, value))
-                {
-                    OnPropertyChanged(nameof(Due));
-                    OnPropertyChanged(nameof(CanPay));
-                }
-            }
-        }
-        public decimal Due => Math.Max(0, Total - Paid);
+        // Payment amounts
+        public decimal Total => OrderState.Order?.TotalAmount ?? 0;
+        public decimal Paid => OrderState.Order?.PaidAmount ?? 0;
+        public decimal Due => Math.Max(Total - Paid, 0);
 
-        private string _enteredAmount = "";
-        public string EnteredAmount
+        private decimal _enteredAmount;
+        public decimal EnteredAmount
         {
             get => _enteredAmount;
-            set => SetProperty(ref _enteredAmount, value);
+            set
+            {
+                if (SetProperty(ref _enteredAmount, value))
+                    OnPropertyChanged(nameof(CanPay));
+            }
         }
 
-        private PaymentMethod _method = PaymentMethod.Cash;
-        public PaymentMethod Method
+        private string? _selectedMethod;
+        public string? SelectedMethod
         {
-            get => _method;
-            set => SetProperty(ref _method, value);
+            get => _selectedMethod;
+            set
+            {
+                if (SetProperty(ref _selectedMethod, value))
+                    OnPropertyChanged(nameof(CanPay));
+            }
         }
 
-        public bool CanPay => _orderState.Order != null && Due <= 0;
-
-        public string TableLabel => $"Table {_orderState.TableNumber}";
+        public bool CanPay => EnteredAmount > 0 && !string.IsNullOrEmpty(SelectedMethod);
 
         // Commands
+        public ICommand CancelCommand { get; }
+        public ICommand PayCommand { get; }
         public ICommand AppendDigitCommand { get; }
         public ICommand BackspaceCommand { get; }
         public ICommand ClearAmountCommand { get; }
-
         public ICommand SelectCashCommand { get; }
         public ICommand SelectCardCommand { get; }
         public ICommand SplitBillCommand { get; }
 
-        public ICommand PayCommand { get; }
-        public ICommand CancelCommand { get; }
-
-        public PaymentViewModel(
-        OrderState orderState,
-        OrderService orderService,
-        INavigationService navigationService)
+        public PaymentViewModel(OrderState orderState, OrderService orderService, INavigationService navigationService)
         {
-            _orderState = orderState;
+            OrderState = orderState;
             _orderService = orderService;
             _navigationService = navigationService;
 
-            Paid = orderState.Order?.PaidAmount ?? 0m;
+            // Commands
+            PayCommand = new RelayCommand(async () => await PayAsync(), () => CanPay);
+            CancelCommand = new RelayCommand(() => _navigationService.NavigateTo<TablesViewModel>());
 
             AppendDigitCommand = new RelayCommand<string>(AppendDigit);
             BackspaceCommand = new RelayCommand(Backspace);
-            ClearAmountCommand = new RelayCommand(() => EnteredAmount = "");
+            ClearAmountCommand = new RelayCommand(() => EnteredAmount = 0);
 
-            SelectCashCommand = new RelayCommand(() => Method = PaymentMethod.Cash);
-            SelectCardCommand = new RelayCommand(SelectCard);
-            SplitBillCommand = new RelayCommand(() => Method = PaymentMethod.Split);
-
-            PayCommand = new AsyncRelayCommand(PayAsync);
-            CancelCommand = new RelayCommand(() =>
-                _navigationService.NavigateTo<TablesViewModel>());
-        }
-
-        // -----------------------------
-        // INPUT
-        // -----------------------------
-        private void AppendDigit(string digit)
-        {
-            if (EnteredAmount.Length >= 6)
-                return;
-
-            EnteredAmount += digit;
-        }
-
-        private void Backspace()
-        {
-            if (EnteredAmount.Length > 0)
-                EnteredAmount = EnteredAmount[..^1];
-        }
-
-        private decimal ParseAmount()
-        {
-            return decimal.TryParse(EnteredAmount, out var value)
-                ? value
-                : 0m;
-        }
-
-        // -----------------------------
-        // PAYMENT FLOW
-        // -----------------------------
-        private void SelectCard()
-        {
-            Method = PaymentMethod.Card;
-            EnteredAmount = Due.ToString("0.00");
+            SelectCashCommand = new RelayCommand(() => SelectedMethod = "Cash");
+            SelectCardCommand = new RelayCommand(() => SelectedMethod = "Card");
+            SplitBillCommand = new RelayCommand(SplitBill);
         }
 
         private async Task PayAsync()
         {
-            if (_orderState.Order == null)
+            if (OrderState.Order == null)
                 return;
 
-            var amount = ParseAmount();
-            if (amount <= 0)
-                return;
+            var method = "Cash"; // or use selected method
+            await _orderService.RecordPaymentAsync(OrderState.Order.Id, EnteredAmount, method);
 
-            // Card must match remaining due
-            if (Method == PaymentMethod.Card)
-                amount = Due;
+            // Refresh totals after payment
+            OnPropertyChanged(nameof(Total));
+            OnPropertyChanged(nameof(Paid));
+            OnPropertyChanged(nameof(Due));
 
-            Paid += amount;
-            EnteredAmount = "";
+            EnteredAmount = 0;
 
-            await _orderService.RecordPaymentAsync(
-                _orderState.Order.Id,
-                amount,
-                Method.ToString());
-
-            if (Due <= 0)
-            {
-                await _orderService.CloseOrderAsync(_orderState.Order.Id);
+            // Optionally navigate back if fully paid
+            if (OrderState.Order.PaidAmount >= OrderState.Order.TotalAmount)
                 _navigationService.NavigateTo<TablesViewModel>();
-            }
+        }
 
-            var updatedOrder = await _orderService.GetByIdAsync(_orderState.Order.Id);
-            _orderState.UpdateFrom(updatedOrder);
+        private void AppendDigit(string digit)
+        {
+            string current = ((int)(EnteredAmount * 100)).ToString();
+            current += digit;
+            if (long.TryParse(current, out var val))
+            {
+                EnteredAmount = val / 100m;
+            }
+        }
+
+        private void Backspace()
+        {
+            string current = ((int)(EnteredAmount * 100)).ToString();
+            if (current.Length > 1)
+            {
+                current = current.Substring(0, current.Length - 1);
+                if (long.TryParse(current, out var val))
+                    EnteredAmount = val / 100m;
+            }
+            else
+            {
+                EnteredAmount = 0;
+            }
+        }
+
+        private void SplitBill()
+        {
+            SelectedMethod = "Split";
+            EnteredAmount = Math.Round(Due / 2, 2); // default half payment
+        }
+
+        private async Task ExecutePayAsync()
+        {
+            if (OrderState.Order == null) return;
+
+            try
+            {
+                await _orderService.RecordPaymentAsync(OrderState.Order.Id, EnteredAmount, SelectedMethod!);
+
+                // reset entered amount
+                EnteredAmount = 0;
+
+                // refresh totals
+                OnPropertyChanged(nameof(Total));
+                OnPropertyChanged(nameof(Paid));
+                OnPropertyChanged(nameof(Due));
+
+                // If fully paid, navigate back
+                if (Due <= 0)
+                {
+                    await _orderService.CloseOrderAsync(OrderState.Order.Id);
+                    _navigationService.NavigateTo<Orders.OrderViewModel>();
+                }
+            }
+            catch (Exception ex)
+            {
+                // TODO: show user-friendly error message
+                Console.WriteLine(ex.Message);
+            }
         }
     }
 }
