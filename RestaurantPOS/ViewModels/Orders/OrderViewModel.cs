@@ -97,7 +97,9 @@ namespace RestaurantPOS.ViewModels.Orders
             Items = new();
 
             // Comands
-            AddItemCommand = new RelayCommand<MenuItemViewModel>(AddItem);
+            AddItemCommand = new RelayCommand<MenuItemViewModel>(
+                item => _ = AddItemAsync(item)
+            );
 
             ChangeTableCommand = new RelayCommand(() =>
             {
@@ -136,6 +138,7 @@ namespace RestaurantPOS.ViewModels.Orders
         {
             OnPropertyChanged(nameof(GrandTotal));
             OnPropertyChanged(nameof(CanPay));
+            ((RelayCommand)PayCommand).NotifyCanExecuteChanged();
         }
 
         private async void LoadTable(int tableNumber)
@@ -153,6 +156,13 @@ namespace RestaurantPOS.ViewModels.Orders
             OnPropertyChanged(nameof(OrderItems));
 
             OrderItems.CollectionChanged += OrderItems_CollectionChanged;
+
+            // hook existing items
+            foreach (var item in OrderItems)
+            {
+                item.PropertyChanged += OrderItem_PropertyChanged;
+            }
+
             UpdateOrderState();
         }
 
@@ -196,46 +206,45 @@ namespace RestaurantPOS.ViewModels.Orders
             if (e.NewItems != null)
             {
                 foreach (OrderItemViewModel item in e.NewItems)
-                    item.PropertyChanged += OrderItem_PropertyChanged;
-            }
-
-            if (e.OldItems != null)
-            {
-                foreach (OrderItemViewModel item in e.OldItems)
+                {
                     item.PropertyChanged -= OrderItem_PropertyChanged;
+                    item.PropertyChanged += OrderItem_PropertyChanged;
+                }
             }
-
             UpdateOrderState();
         }
 
-        private async void OrderItem_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        private void OrderItem_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (sender is not OrderItemViewModel item)
                 return;
 
-            if (e.PropertyName == nameof(OrderItemViewModel.Quantity) ||
-                e.PropertyName == nameof(OrderItemViewModel.Total))
+            if (e.PropertyName == nameof(OrderItemViewModel.Quantity))
             {
-                UpdateOrderState();
-
-                if (_orderState.Order == null)
-                    return;
-
-                await _orderService.UpdateQuantityAsync(
-                    _orderState.Order,
-                    item.ItemId,
-                    item.Quantity);
+                _ = HandleQuantityChangedAsync(item);
             }
         }
 
+        private async Task HandleQuantityChangedAsync(OrderItemViewModel item)
+        {
+            UpdateOrderState();
 
-        private async void AddItem(MenuItemViewModel item)
+            if (_orderState.Order == null)
+                return;
+
+            await _orderService.UpdateQuantityAsync(
+                _orderState.Order,
+                item.ItemId,
+                item.Quantity);
+        }
+
+
+        private async Task AddItemAsync(MenuItemViewModel item)
         {
             if (_orderState.Order == null)
             {
                 var order = await _orderService.CreateOrderAsync(TableNumber);
                 _orderState.AttachOrder(order);
-                UpdateOrderState();
             }
 
             await _orderService.AddItemAsync(_orderState.Order!, item);
@@ -246,11 +255,20 @@ namespace RestaurantPOS.ViewModels.Orders
                 existing.Quantity++;
             else
                 OrderItems.Add(new OrderItemViewModel(item, RemoveItem));
+
+            UpdateOrderState();
         }
 
-        private async void RemoveItem(OrderItemViewModel item)
+
+        private void RemoveItem(OrderItemViewModel item)
+        {
+            _ = RemoveItemAsync(item);
+        }
+
+        private async Task RemoveItemAsync(OrderItemViewModel item)
         {
             OrderItems.Remove(item);
+
             if (_orderState.Order != null)
             {
                 await _orderService.UpdateQuantityAsync(
@@ -258,6 +276,7 @@ namespace RestaurantPOS.ViewModels.Orders
                     item.ItemId,
                     0);
             }
+
             UpdateOrderState();
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,10 +21,10 @@ namespace RestaurantPOS.Domain.Entities
         public int TableNumber { get; set; }
         public int TableId { get; set; }
 
-        public Table Table { get; set; } = null!;
+        public Table? Table { get; set; } = null!;
 
-        public decimal PaidAmount { get; set; }
         public decimal TotalAmount { get; set; }
+        public decimal PaidAmount { get; set; }
         public bool IsClosed { get; set; }
 
 

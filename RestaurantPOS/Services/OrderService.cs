@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 
 namespace RestaurantPOS.Services
 {
@@ -63,8 +64,6 @@ namespace RestaurantPOS.Services
 
             context.Payments.Add(payment);
 
-            dbOrder.PaidAmount += appliedAmount;
-
             await context.SaveChangesAsync();
             await tx.CommitAsync();
         }
@@ -90,6 +89,8 @@ namespace RestaurantPOS.Services
             };
 
             _db.Orders.Add(order);
+
+            RecalculateTotals(order);
             await _db.SaveChangesAsync();
 
             return order;
@@ -120,6 +121,8 @@ namespace RestaurantPOS.Services
             if (existing.Quantity <= 0)
                 order.Items.Remove(existing);
 
+            RecalculateTotals(order);
+
             await _db.SaveChangesAsync();
         }
 
@@ -130,10 +133,11 @@ namespace RestaurantPOS.Services
         {
             using var db = _contextFactory.CreateDbContext();
 
-            var item = await db.OrderItems
-                .FirstOrDefaultAsync(i =>
-                    i.OrderId == order.Id &&
-                    i.ProductId == menuItemId);
+            var dbOrder = await db.Orders
+        .Include(o => o.Items)
+        .FirstAsync(o => o.Id == order.Id);
+
+            var item = dbOrder.Items.FirstOrDefault(i => i.ProductId == menuItemId);
 
             if (item == null)
                 return;
@@ -147,6 +151,7 @@ namespace RestaurantPOS.Services
                 item.Quantity = quantity;
             }
 
+            RecalculateTotals(order);
             await db.SaveChangesAsync();
         }
 
@@ -177,9 +182,16 @@ namespace RestaurantPOS.Services
                 });
             }
 
+            RecalculateTotals(order);
+
             await db.SaveChangesAsync();
         }
 
+        private static void RecalculateTotals(Order dbOrder)
+        {
+            dbOrder.TotalAmount = dbOrder.Items.Sum(i => i.UnitPrice * i.Quantity);
+            dbOrder.PaidAmount = dbOrder.Payments.Sum(p => p.Amount);
+        }
 
         public async Task CloseOrderAsync(Order order)
         {

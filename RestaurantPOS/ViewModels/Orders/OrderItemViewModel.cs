@@ -22,10 +22,12 @@ namespace RestaurantPOS.ViewModels.Orders
             get => _quantity;
             set
             {
-                if (value < 1) return;
-
-                if (SetProperty(ref _quantity, value))
+                if (_quantity != value)
+                {
+                    _quantity = value;
+                    OnPropertyChanged();
                     OnPropertyChanged(nameof(Total));
+                }
             }
         }
 
