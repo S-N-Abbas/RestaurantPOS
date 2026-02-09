@@ -14,7 +14,7 @@
             <Border DockPanel.Dock="Top"
                     Height="60"
                     Background="#1F2937"
-                    Padding="16">
+                    Padding="10">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -26,6 +26,7 @@
                                FontWeight="SemiBold"
                                VerticalAlignment="Center" />
                     <Button Grid.Column="1"
+                            Style="{StaticResource TopBarButton}"
                             Content="Change Table"
                             HorizontalAlignment="Right"
                             Command="{Binding OpenTablePickerCommand}" />

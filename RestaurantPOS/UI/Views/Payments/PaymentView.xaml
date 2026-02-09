@@ -75,14 +75,14 @@
                                    Text="Paid" />
                         <TextBlock Grid.Row="1"
                                    Grid.Column="1"
-                                   Text="{Binding Paid, StringFormat=£{0:F2}}" />
+                                   Text="{Binding PreviewPaid, StringFormat=£{0:F2}}" />
 
                         <TextBlock Grid.Row="2"
                                    Text="Due"
                                    FontWeight="Bold" />
                         <TextBlock Grid.Row="2"
                                    Grid.Column="1"
-                                   Text="{Binding Due, StringFormat=£{0:F2}}"
+                                   Text="{Binding PreviewDue, StringFormat=£{0:F2}}"
                                    FontWeight="Bold"
                                    Foreground="#DC2626" />
                     </Grid>
@@ -111,20 +111,68 @@
                         <Button Content="Cash"
                                 Width="120"
                                 Margin="6"
-                                Command="{Binding SelectCashCommand}"
-                                Style="{StaticResource PosTileButton}" />
+                                Command="{Binding SelectCashCommand}">
+                            <Button.Style>
+                                <Style TargetType="Button"
+                                       BasedOn="{StaticResource PosTileButton}">
+                                    <Setter Property="Background"
+                                            Value="#D1D5DB" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SelectedMethod}"
+                                                     Value="Cash">
+                                            <Setter Property="Background"
+                                                    Value="#16A34A" />
+                                            <Setter Property="Foreground"
+                                                    Value="White" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
 
                         <Button Content="Card"
                                 Width="120"
                                 Margin="6"
-                                Command="{Binding SelectCardCommand}"
-                                Style="{StaticResource PosTileButton}" />
+                                Command="{Binding SelectCardCommand}">
+                            <Button.Style>
+                                <Style TargetType="Button"
+                                       BasedOn="{StaticResource PosTileButton}">
+                                    <Setter Property="Background"
+                                            Value="#D1D5DB" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SelectedMethod}"
+                                                     Value="Card">
+                                            <Setter Property="Background"
+                                                    Value="#16A34A" />
+                                            <Setter Property="Foreground"
+                                                    Value="White" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
 
                         <Button Content="Split"
                                 Width="120"
                                 Margin="6"
-                                Command="{Binding SplitBillCommand}"
-                                Style="{StaticResource PosTileButton}" />
+                                Command="{Binding SplitBillCommand}">
+                            <Button.Style>
+                                <Style TargetType="Button"
+                                       BasedOn="{StaticResource PosTileButton}">
+                                    <Setter Property="Background"
+                                            Value="#D1D5DB" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SelectedMethod}"
+                                                     Value="Split">
+                                            <Setter Property="Background"
+                                                    Value="#16A34A" />
+                                            <Setter Property="Foreground"
+                                                    Value="White" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
                     </StackPanel>
 
                     <!-- ENTERED AMOUNT -->
@@ -186,8 +234,7 @@
                             FontSize="18"
                             Background="#16A34A"
                             Foreground="White"
-                            Command="{Binding PayCommand}"
-                            IsEnabled="{Binding CanPay}" />
+                            Command="{Binding PayCommand}" />
                 </Grid>
 
             </Border>

@@ -5,18 +5,7 @@
         <Setter Property="Background"
                 Value="#2D2D2D" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding IsActive}"
-                         Value="True">
-                <Setter Property="Background"
-                        Value="#4CAF50" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding IsOccupied}"
-                         Value="True">
-                <Setter Property="BorderBrush"
-                        Value="Orange" />
-                <Setter Property="BorderThickness"
-                        Value="3" />
-            </DataTrigger>
+            
             <DataTrigger Binding="{Binding HasOrder}"
                          Value="True">
                 <Setter Property="BorderBrush"

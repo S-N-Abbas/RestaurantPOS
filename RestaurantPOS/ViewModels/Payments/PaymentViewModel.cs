@@ -26,32 +26,11 @@ namespace RestaurantPOS.ViewModels.Payments
 
         // Payment amounts
         public decimal Total => OrderState.Order?.TotalAmount ?? 0;
-        public decimal Paid => OrderState.Order?.PaidAmount ?? 0;
-        public decimal Due => Math.Max(Total - Paid, 0);
+        public decimal AlreadyPaid => OrderState.Order?.PaidAmount ?? 0;
+        public decimal PreviewPaid => AlreadyPaid + EnteredAmount;
 
-        private decimal _enteredAmount;
-        public decimal EnteredAmount
-        {
-            get => _enteredAmount;
-            set
-            {
-                if (SetProperty(ref _enteredAmount, value))
-                    OnPropertyChanged(nameof(CanPay));
-            }
-        }
-
-        private string? _selectedMethod;
-        public string? SelectedMethod
-        {
-            get => _selectedMethod;
-            set
-            {
-                if (SetProperty(ref _selectedMethod, value))
-                    OnPropertyChanged(nameof(CanPay));
-            }
-        }
-
-        public bool CanPay => EnteredAmount > 0 && !string.IsNullOrEmpty(SelectedMethod);
+        public decimal Due => Math.Max(Total - AlreadyPaid, 0);
+        public decimal PreviewDue => Math.Max(Total - PreviewPaid, 0);
 
         // Commands
         public ICommand CancelCommand { get; }
@@ -62,6 +41,41 @@ namespace RestaurantPOS.ViewModels.Payments
         public ICommand SelectCashCommand { get; }
         public ICommand SelectCardCommand { get; }
         public ICommand SplitBillCommand { get; }
+
+
+        private decimal _enteredAmount;
+        public decimal EnteredAmount
+        {
+            get => _enteredAmount;
+            set
+            {
+                if (SetProperty(ref _enteredAmount, value))
+                {
+                    OnPropertyChanged(nameof(PreviewPaid));
+                    OnPropertyChanged(nameof(PreviewDue));
+                    OnPropertyChanged(nameof(CanPay));
+                    (PayCommand as RelayCommand)?.NotifyCanExecuteChanged();
+                }
+            }
+        }
+
+        private PaymentMethod? _selectedMethod;
+        public PaymentMethod? SelectedMethod
+        {
+            get => _selectedMethod;
+            set
+            {
+                if (SetProperty(ref _selectedMethod, value))
+                    OnPropertyChanged(nameof(CanPay));
+                (PayCommand as RelayCommand)?.NotifyCanExecuteChanged();
+            }
+        }
+
+
+        public bool CanPay =>
+            SelectedMethod != null &&
+            EnteredAmount > 0 &&
+            EnteredAmount <= Due;
 
         public PaymentViewModel(OrderState orderState, OrderService orderService, INavigationService navigationService)
         {
@@ -77,30 +91,33 @@ namespace RestaurantPOS.ViewModels.Payments
             BackspaceCommand = new RelayCommand(Backspace);
             ClearAmountCommand = new RelayCommand(() => EnteredAmount = 0);
 
-            SelectCashCommand = new RelayCommand(() => SelectedMethod = "Cash");
-            SelectCardCommand = new RelayCommand(() => SelectedMethod = "Card");
-            SplitBillCommand = new RelayCommand(SplitBill);
+            SelectCashCommand = new RelayCommand(() => SelectedMethod = PaymentMethod.Cash);
+            SelectCardCommand = new RelayCommand(() => SelectedMethod = PaymentMethod.Card);
+            SplitBillCommand = new RelayCommand(() => SelectedMethod = PaymentMethod.Split);
         }
 
         private async Task PayAsync()
         {
-            if (OrderState.Order == null)
+            if (OrderState.Order == null || SelectedMethod == null)
                 return;
 
-            var method = "Cash"; // or use selected method
-            await _orderService.RecordPaymentAsync(OrderState.Order.Id, EnteredAmount, method);
+            await _orderService.RecordPaymentAsync(
+                OrderState.Order.Id,
+                EnteredAmount,
+                SelectedMethod.ToString() // convert enum to string for DB
 
-            // Refresh totals after payment
-            OnPropertyChanged(nameof(Total));
-            OnPropertyChanged(nameof(Paid));
-            OnPropertyChanged(nameof(Due));
+            );
 
             EnteredAmount = 0;
 
-            // Optionally navigate back if fully paid
             if (OrderState.Order.PaidAmount >= OrderState.Order.TotalAmount)
+            {
+                await _orderService.CloseOrderAsync(OrderState.Order.Id);
+
                 _navigationService.NavigateTo<TablesViewModel>();
+            }
         }
+
 
         private void AppendDigit(string digit)
         {
@@ -129,9 +146,10 @@ namespace RestaurantPOS.ViewModels.Payments
 
         private void SplitBill()
         {
-            SelectedMethod = "Split";
-            EnteredAmount = Math.Round(Due / 2, 2); // default half payment
+            SelectedMethod = PaymentMethod.Split;
+            EnteredAmount = Math.Round(PreviewDue / 2, 2); // default half payment
         }
+
 
         private async Task ExecutePayAsync()
         {
@@ -139,18 +157,13 @@ namespace RestaurantPOS.ViewModels.Payments
 
             try
             {
-                await _orderService.RecordPaymentAsync(OrderState.Order.Id, EnteredAmount, SelectedMethod!);
+                await _orderService.RecordPaymentAsync(OrderState.Order.Id, EnteredAmount, SelectedMethod.ToString()!);
 
                 // reset entered amount
                 EnteredAmount = 0;
 
-                // refresh totals
-                OnPropertyChanged(nameof(Total));
-                OnPropertyChanged(nameof(Paid));
-                OnPropertyChanged(nameof(Due));
-
                 // If fully paid, navigate back
-                if (Due <= 0)
+                if (PreviewDue <= 0)
                 {
                     await _orderService.CloseOrderAsync(OrderState.Order.Id);
                     _navigationService.NavigateTo<Orders.OrderViewModel>();

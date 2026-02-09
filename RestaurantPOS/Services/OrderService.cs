@@ -22,12 +22,13 @@ namespace RestaurantPOS.Services
         }
 
         public async Task RecordPaymentAsync(
-    int orderId,
-    decimal amount,
-    string method)
+            int orderId,
+            decimal amount,
+            string method)
         {
             if (amount <= 0)
                 throw new ArgumentException("Invalid amount");
+
 
             var order = await LoadOrderAsync(orderId);
 
@@ -43,12 +44,13 @@ namespace RestaurantPOS.Services
 
             order.Payments.Add(new Payment
             {
+                OrderId = orderId,
                 Amount = applied,
                 Method = method,
                 PaidAt = DateTime.UtcNow
+                
             });
 
-            RecalculateTotals(order);
             await _db.SaveChangesAsync();
         }
 
@@ -75,7 +77,6 @@ namespace RestaurantPOS.Services
 
             _db.Orders.Add(order);
 
-            RecalculateTotals(order);
             await _db.SaveChangesAsync();
 
             return order;
@@ -97,21 +98,24 @@ namespace RestaurantPOS.Services
 
         public async Task AddOrUpdateItemAsync(
             int orderId,
-            MenuItemViewModel item,
+            int itemId,
             int quantityChange)
         {
             var order = await LoadOrderAsync(orderId);
 
             var existing = order.Items
-                .FirstOrDefault(i => i.ProductId == item.Id);
+                .FirstOrDefault(i => i.ProductId == itemId);
+
 
             if (existing == null)
             {
+                var product = await _db.Products.FindAsync(itemId);
+
                 existing = new OrderItem
                 {
-                    ProductId = item.Id,
-                    ProductName = item.Name,
-                    UnitPrice = item.Price,
+                    ProductId = product.Id,
+                    ProductName = product.Name,
+                    UnitPrice = product.Price,
                     Quantity = 0
                 };
                 order.Items.Add(existing);
@@ -122,7 +126,6 @@ namespace RestaurantPOS.Services
             if (existing.Quantity <= 0)
                 order.Items.Remove(existing);
 
-            RecalculateTotals(order);
             await _db.SaveChangesAsync();
         }
 
@@ -141,21 +144,24 @@ namespace RestaurantPOS.Services
             else
                 item.Quantity = quantity;
 
-            RecalculateTotals(order);
             await _db.SaveChangesAsync();
         }
 
 
         public async Task AddItemAsync(
-    Order order,
-    MenuItemViewModel item)
+    int orderId,
+    int itemId)
         {
             using var db = _db;
+
+            var order = await db.Orders
+        .Include(o => o.Items)
+        .FirstAsync(o => o.Id == orderId);
 
             var existing = await db.OrderItems
                 .FirstOrDefaultAsync(i =>
                     i.OrderId == order.Id &&
-                    i.ProductId == item.Id);
+                    i.ProductId == itemId);
 
             if (existing != null)
             {
@@ -163,6 +169,7 @@ namespace RestaurantPOS.Services
             }
             else
             {
+                var item = await db.Products.FindAsync(itemId);
                 db.OrderItems.Add(new OrderItem
                 {
                     OrderId = order.Id,
@@ -173,7 +180,6 @@ namespace RestaurantPOS.Services
                 });
             }
 
-            RecalculateTotals(order);
 
             await db.SaveChangesAsync();
         }
@@ -184,13 +190,6 @@ namespace RestaurantPOS.Services
                 .Include(o => o.Items)
                 .Include(o => o.Payments)
                 .FirstAsync(o => o.Id == orderId);
-        }
-
-
-        private static void RecalculateTotals(Order dbOrder)
-        {
-            dbOrder.TotalAmount = dbOrder.Items.Sum(i => i.UnitPrice * i.Quantity);
-            dbOrder.PaidAmount = dbOrder.Payments.Sum(p => p.Amount);
         }
 
         public async Task CloseOrderAsync(int orderId)
@@ -204,6 +203,7 @@ namespace RestaurantPOS.Services
                 throw new InvalidOperationException("Order not fully paid");
 
             order.IsClosed = true;
+            order.Status = OrderStatus.Paid;
             order.ClosedAt = DateTime.UtcNow;
 
             await _db.SaveChangesAsync();

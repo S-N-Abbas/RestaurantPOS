@@ -23,8 +23,11 @@ namespace RestaurantPOS.Domain.Entities
 
         public Table? Table { get; set; } = null!;
 
-        public decimal TotalAmount { get; set; }
-        public decimal PaidAmount { get; set; }
+        [NotMapped]
+        public decimal TotalAmount => Items?.Sum(i => i.UnitPrice * i.Quantity) ?? 0m;
+
+        [NotMapped]
+        public decimal PaidAmount => Payments?.Sum(p => p.Amount) ?? 0m;
         public bool IsClosed { get; set; }
 
 

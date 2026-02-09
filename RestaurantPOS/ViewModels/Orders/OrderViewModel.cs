@@ -250,7 +250,7 @@ namespace RestaurantPOS.ViewModels.Orders
                 _orderState.AttachOrder(order);
             }
 
-            await _orderService.AddItemAsync(_orderState.Order!, item);
+            await _orderService.AddItemAsync(_orderState.Order!.Id, item.Id);
 
             var existing = OrderItems.FirstOrDefault(i => i.ItemId == item.Id);
 
