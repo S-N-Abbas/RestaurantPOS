@@ -233,9 +233,12 @@ namespace RestaurantPOS.ViewModels.Orders
                 return;
 
             await _orderService.UpdateQuantityAsync(
-                _orderState.Order,
+                _orderState.Order.Id,
                 item.ItemId,
                 item.Quantity);
+
+            var updatedOrder = await _orderService.GetByIdAsync(_orderState.Order.Id);
+            _orderState.UpdateFrom(updatedOrder);
         }
 
 
@@ -255,8 +258,9 @@ namespace RestaurantPOS.ViewModels.Orders
                 existing.Quantity++;
             else
                 OrderItems.Add(new OrderItemViewModel(item, RemoveItem));
-
             UpdateOrderState();
+            var updatedOrder = await _orderService.GetByIdAsync(_orderState.Order.Id);
+            _orderState.UpdateFrom(updatedOrder);
         }
 
 
@@ -272,12 +276,14 @@ namespace RestaurantPOS.ViewModels.Orders
             if (_orderState.Order != null)
             {
                 await _orderService.UpdateQuantityAsync(
-                    _orderState.Order,
+                    _orderState.Order.Id,
                     item.ItemId,
                     0);
             }
 
             UpdateOrderState();
+            var updatedOrder = await _orderService.GetByIdAsync(_orderState.Order.Id);
+            _orderState.UpdateFrom(updatedOrder);
         }
 
         private void ExecutePay()
@@ -290,7 +296,10 @@ namespace RestaurantPOS.ViewModels.Orders
             if (_orderState.Order == null)
                 return;
 
-            await _orderService.CloseOrderAsync(_orderState.Order);
+            await _orderService.CloseOrderAsync(_orderState.Order.Id);
+
+            var updatedOrder = await _orderService.GetByIdAsync(_orderState.Order.Id);
+            _orderState.UpdateFrom(updatedOrder);
 
             _orderStore.CloseOrder(TableNumber);
 

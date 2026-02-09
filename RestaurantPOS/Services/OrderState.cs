@@ -29,6 +29,12 @@ namespace RestaurantPOS.Services
             );
         }
 
+        public void UpdateFrom(Order order)
+        {
+            Order = order;
+        }
+
+
         public void AttachOrder(Order order)
         {
             Order = order;

@@ -149,15 +149,18 @@ namespace RestaurantPOS.ViewModels.Payments
             EnteredAmount = "";
 
             await _orderService.RecordPaymentAsync(
-                _orderState.Order,
+                _orderState.Order.Id,
                 amount,
                 Method.ToString());
 
             if (Due <= 0)
             {
-                await _orderService.CloseOrderAsync(_orderState.Order);
+                await _orderService.CloseOrderAsync(_orderState.Order.Id);
                 _navigationService.NavigateTo<TablesViewModel>();
             }
+
+            var updatedOrder = await _orderService.GetByIdAsync(_orderState.Order.Id);
+            _orderState.UpdateFrom(updatedOrder);
         }
     }
 }

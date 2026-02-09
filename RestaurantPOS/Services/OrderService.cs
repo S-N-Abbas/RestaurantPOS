@@ -15,58 +15,43 @@ namespace RestaurantPOS.Services
     public class OrderService
     {
         private readonly PosDbContext _db;
-        private readonly IDbContextFactory<PosDbContext> _contextFactory;
 
-        public OrderService(PosDbContext db, IDbContextFactory<PosDbContext> contextFactory)
+        public OrderService(PosDbContext db)
         {
             _db = db;
-            _contextFactory = contextFactory;
         }
 
         public async Task RecordPaymentAsync(
-        Order order,
-        decimal amount,
-        string method)
+    int orderId,
+    decimal amount,
+    string method)
         {
             if (amount <= 0)
-                throw new ArgumentException("Payment amount must be greater than zero");
+                throw new ArgumentException("Invalid amount");
 
-            using var context = _contextFactory.CreateDbContext();
-            using var tx = await context.Database.BeginTransactionAsync();
+            var order = await LoadOrderAsync(orderId);
 
-            // Reload order safely
-            var dbOrder = await context.Orders
-                .Include(o => o.Payments)
-                .FirstOrDefaultAsync(o => o.Id == order.Id);
-
-            if (dbOrder == null)
-                throw new InvalidOperationException("Order not found");
-
-            if (dbOrder.IsClosed)
+            if (order.IsClosed)
                 throw new InvalidOperationException("Order already closed");
 
-            var remaining = dbOrder.TotalAmount - dbOrder.PaidAmount;
+            var remaining = order.TotalAmount - order.PaidAmount;
 
-            // Card must not overpay
             if (method == "Card" && amount != remaining)
-                throw new InvalidOperationException("Card payment must equal remaining amount");
+                throw new InvalidOperationException("Card must pay exact amount");
 
-            // Cap cash overpayment (change handled in UI)
-            var appliedAmount = Math.Min(amount, remaining);
+            var applied = Math.Min(amount, remaining);
 
-            var payment = new Payment
+            order.Payments.Add(new Payment
             {
-                OrderId = dbOrder.Id,
-                Amount = appliedAmount,
+                Amount = applied,
                 Method = method,
                 PaidAt = DateTime.UtcNow
-            };
+            });
 
-            context.Payments.Add(payment);
-
-            await context.SaveChangesAsync();
-            await tx.CommitAsync();
+            RecalculateTotals(order);
+            await _db.SaveChangesAsync();
         }
+
 
         public async Task<Order?> GetOpenOrderAsync(int tableNumber)
         {
@@ -96,11 +81,27 @@ namespace RestaurantPOS.Services
             return order;
         }
 
+        private async Task<Order> LoadOrderAsync(int orderId)
+        {
+            var order = await _db.Orders
+                .Include(o => o.Items)
+                .Include(o => o.Payments)
+                .FirstOrDefaultAsync(o => o.Id == orderId);
+
+            if (order == null)
+                throw new InvalidOperationException("Order not found");
+
+            return order;
+        }
+
+
         public async Task AddOrUpdateItemAsync(
-            Order order,
+            int orderId,
             MenuItemViewModel item,
             int quantityChange)
         {
+            var order = await LoadOrderAsync(orderId);
+
             var existing = order.Items
                 .FirstOrDefault(i => i.ProductId == item.Id);
 
@@ -122,44 +123,34 @@ namespace RestaurantPOS.Services
                 order.Items.Remove(existing);
 
             RecalculateTotals(order);
-
             await _db.SaveChangesAsync();
         }
 
         public async Task UpdateQuantityAsync(
-    Order order,
-    int menuItemId,
+    int orderId,
+    int productId,
     int quantity)
         {
-            using var db = _contextFactory.CreateDbContext();
+            var order = await LoadOrderAsync(orderId);
 
-            var dbOrder = await db.Orders
-        .Include(o => o.Items)
-        .FirstAsync(o => o.Id == order.Id);
-
-            var item = dbOrder.Items.FirstOrDefault(i => i.ProductId == menuItemId);
-
-            if (item == null)
-                return;
+            var item = order.Items.FirstOrDefault(i => i.ProductId == productId);
+            if (item == null) return;
 
             if (quantity <= 0)
-            {
-                db.OrderItems.Remove(item);
-            }
+                order.Items.Remove(item);
             else
-            {
                 item.Quantity = quantity;
-            }
 
             RecalculateTotals(order);
-            await db.SaveChangesAsync();
+            await _db.SaveChangesAsync();
         }
+
 
         public async Task AddItemAsync(
     Order order,
     MenuItemViewModel item)
         {
-            using var db = _contextFactory.CreateDbContext();
+            using var db = _db;
 
             var existing = await db.OrderItems
                 .FirstOrDefaultAsync(i =>
@@ -187,30 +178,35 @@ namespace RestaurantPOS.Services
             await db.SaveChangesAsync();
         }
 
+        public async Task<Order> GetByIdAsync(int orderId)
+        {
+            return await _db.Orders
+                .Include(o => o.Items)
+                .Include(o => o.Payments)
+                .FirstAsync(o => o.Id == orderId);
+        }
+
+
         private static void RecalculateTotals(Order dbOrder)
         {
             dbOrder.TotalAmount = dbOrder.Items.Sum(i => i.UnitPrice * i.Quantity);
             dbOrder.PaidAmount = dbOrder.Payments.Sum(p => p.Amount);
         }
 
-        public async Task CloseOrderAsync(Order order)
+        public async Task CloseOrderAsync(int orderId)
         {
-            using var context = _contextFactory.CreateDbContext();
+            var order = await LoadOrderAsync(orderId);
 
-            var dbOrder = await context.Orders.FindAsync(order.Id);
-            if (dbOrder == null)
+            if (order.IsClosed)
                 return;
 
-            if (dbOrder.IsClosed)
-                return;
-
-            if (dbOrder.PaidAmount < dbOrder.TotalAmount)
+            if (order.PaidAmount < order.TotalAmount)
                 throw new InvalidOperationException("Order not fully paid");
 
-            dbOrder.IsClosed = true;
-            dbOrder.ClosedAt = DateTime.UtcNow;
+            order.IsClosed = true;
+            order.ClosedAt = DateTime.UtcNow;
 
-            await context.SaveChangesAsync();
+            await _db.SaveChangesAsync();
         }
     }
 }
