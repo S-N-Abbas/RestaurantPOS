@@ -152,13 +152,12 @@ namespace RestaurantPOS.Services
     int orderId,
     int itemId)
         {
-            using var db = _db;
 
-            var order = await db.Orders
+            var order = await _db.Orders
         .Include(o => o.Items)
         .FirstAsync(o => o.Id == orderId);
 
-            var existing = await db.OrderItems
+            var existing = await _db.OrderItems
                 .FirstOrDefaultAsync(i =>
                     i.OrderId == order.Id &&
                     i.ProductId == itemId);
@@ -169,8 +168,8 @@ namespace RestaurantPOS.Services
             }
             else
             {
-                var item = await db.Products.FindAsync(itemId);
-                db.OrderItems.Add(new OrderItem
+                var item = await _db.Products.FindAsync(itemId);
+                _db.OrderItems.Add(new OrderItem
                 {
                     OrderId = order.Id,
                     ProductId = item.Id,
@@ -181,7 +180,7 @@ namespace RestaurantPOS.Services
             }
 
 
-            await db.SaveChangesAsync();
+            await _db.SaveChangesAsync();
         }
 
         public async Task<Order> GetByIdAsync(int orderId)

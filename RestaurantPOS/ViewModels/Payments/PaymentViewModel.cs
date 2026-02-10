@@ -19,14 +19,15 @@ namespace RestaurantPOS.ViewModels.Payments
         private readonly OrderService _orderService;
         private readonly INavigationService _navigationService;
 
-        public OrderState OrderState { get; }
+        public OrderState _orderState { get; }
+        public OrderStore _orderStore { get; }
 
         // UK currency labels
-        public string TableLabel => $"Table {OrderState.TableNumber}";
+        public string TableLabel => $"Table {_orderState.TableNumber}";
 
         // Payment amounts
-        public decimal Total => OrderState.Order?.TotalAmount ?? 0;
-        public decimal AlreadyPaid => OrderState.Order?.PaidAmount ?? 0;
+        public decimal Total => _orderState.Order?.TotalAmount ?? 0;
+        public decimal AlreadyPaid => _orderState.Order?.PaidAmount ?? 0;
         public decimal PreviewPaid => AlreadyPaid + EnteredAmount;
 
         public decimal Due => Math.Max(Total - AlreadyPaid, 0);
@@ -77,10 +78,11 @@ namespace RestaurantPOS.ViewModels.Payments
             EnteredAmount > 0 &&
             EnteredAmount <= Due;
 
-        public PaymentViewModel(OrderState orderState, OrderService orderService, INavigationService navigationService)
+        public PaymentViewModel(OrderState orderState, OrderService orderService, OrderStore orderStore, INavigationService navigationService)
         {
-            OrderState = orderState;
+            _orderState = orderState;
             _orderService = orderService;
+            _orderStore = orderStore;
             _navigationService = navigationService;
 
             // Commands
@@ -98,11 +100,11 @@ namespace RestaurantPOS.ViewModels.Payments
 
         private async Task PayAsync()
         {
-            if (OrderState.Order == null || SelectedMethod == null)
+            if (_orderState.Order == null || SelectedMethod == null)
                 return;
 
             await _orderService.RecordPaymentAsync(
-                OrderState.Order.Id,
+                _orderState.Order.Id,
                 EnteredAmount,
                 SelectedMethod.ToString() // convert enum to string for DB
 
@@ -110,9 +112,13 @@ namespace RestaurantPOS.ViewModels.Payments
 
             EnteredAmount = 0;
 
-            if (OrderState.Order.PaidAmount >= OrderState.Order.TotalAmount)
+            if (_orderState.Order.PaidAmount >= _orderState.Order.TotalAmount)
             {
-                await _orderService.CloseOrderAsync(OrderState.Order.Id);
+                await _orderService.CloseOrderAsync(_orderState.Order.Id);
+                var updatedOrder = await _orderService.GetByIdAsync(_orderState.Order.Id);
+                _orderState.UpdateFrom(updatedOrder);
+
+                _orderStore.CloseOrder(_orderState.Order.TableNumber);
 
                 _navigationService.NavigateTo<TablesViewModel>();
             }
@@ -153,11 +159,11 @@ namespace RestaurantPOS.ViewModels.Payments
 
         private async Task ExecutePayAsync()
         {
-            if (OrderState.Order == null) return;
+            if (_orderState.Order == null) return;
 
             try
             {
-                await _orderService.RecordPaymentAsync(OrderState.Order.Id, EnteredAmount, SelectedMethod.ToString()!);
+                await _orderService.RecordPaymentAsync(_orderState.Order.Id, EnteredAmount, SelectedMethod.ToString()!);
 
                 // reset entered amount
                 EnteredAmount = 0;
@@ -165,7 +171,7 @@ namespace RestaurantPOS.ViewModels.Payments
                 // If fully paid, navigate back
                 if (PreviewDue <= 0)
                 {
-                    await _orderService.CloseOrderAsync(OrderState.Order.Id);
+                    await _orderService.CloseOrderAsync(_orderState.Order.Id);
                     _navigationService.NavigateTo<Orders.OrderViewModel>();
                 }
             }
