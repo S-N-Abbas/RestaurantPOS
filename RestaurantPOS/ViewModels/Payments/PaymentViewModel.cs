@@ -10,13 +10,13 @@ namespace RestaurantPOS.ViewModels.Payments
     public enum PaymentMethod
     {
         Cash,
-        Card,
-        Split
+        Card
     }
 
     public class PaymentViewModel : ViewModelBase
     {
         private readonly OrderService _orderService;
+        private readonly IPricingService _pricingService;
         private readonly INavigationService _navigationService;
 
         public OrderState _orderState { get; }
@@ -28,8 +28,8 @@ namespace RestaurantPOS.ViewModels.Payments
         // Payment amounts
         public decimal Total =>
             (_orderState.Order?.ItemsTotal
-            + _orderState.Order?.ChildCovers
-            + +_orderState.Order?.AdultCovers ?? 0);
+            + _orderState.Order?.ChildCovers * _pricingService.ChildCoverRate
+            + _orderState.Order?.AdultCovers * _pricingService.AdultCoverRate ?? 0);
 
         public decimal AlreadyPaid => _orderState.Order?.PaidAmount ?? 0;
         public decimal PreviewPaid => AlreadyPaid + EnteredAmount;
@@ -82,12 +82,15 @@ namespace RestaurantPOS.ViewModels.Payments
             EnteredAmount > 0 &&
             EnteredAmount <= Due;
 
-        public PaymentViewModel(OrderState orderState, OrderService orderService, OrderStore orderStore, INavigationService navigationService)
+        public PaymentViewModel(OrderState orderState, OrderService orderService, OrderStore orderStore, IPricingService pricingService, INavigationService navigationService)
         {
             _orderState = orderState;
             _orderService = orderService;
             _orderStore = orderStore;
+            _pricingService = pricingService;
             _navigationService = navigationService;
+
+            SelectedMethod = PaymentMethod.Cash; // default to cash
 
             // Commands
             PayCommand = new RelayCommand(async () => await PayAsync(), () => CanPay);
@@ -99,7 +102,6 @@ namespace RestaurantPOS.ViewModels.Payments
 
             SelectCashCommand = new RelayCommand(() => SelectedMethod = PaymentMethod.Cash);
             SelectCardCommand = new RelayCommand(() => SelectedMethod = PaymentMethod.Card);
-            SplitBillCommand = new RelayCommand(() => SelectedMethod = PaymentMethod.Split);
         }
 
         private async Task PayAsync()
@@ -116,7 +118,7 @@ namespace RestaurantPOS.ViewModels.Payments
 
             EnteredAmount = 0;
 
-            if (_orderState.Order.PaidAmount >= _orderState.Order.ItemsTotal)
+            if (_orderState.Order.PaidAmount >= Total)
             {
                 await _orderService.CloseOrderAsync(_orderState.Order.Id);
                 var updatedOrder = await _orderService.GetByIdAsync(_orderState.Order.Id);
@@ -152,12 +154,6 @@ namespace RestaurantPOS.ViewModels.Payments
             {
                 EnteredAmount = 0;
             }
-        }
-
-        private void SplitBill()
-        {
-            SelectedMethod = PaymentMethod.Split;
-            EnteredAmount = Math.Round(PreviewDue / 2, 2); // default half payment
         }
 
 

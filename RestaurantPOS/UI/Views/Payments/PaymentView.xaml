@@ -151,28 +151,6 @@
                                 </Style>
                             </Button.Style>
                         </Button>
-
-                        <Button Content="Split"
-                                Width="120"
-                                Margin="6"
-                                Command="{Binding SplitBillCommand}">
-                            <Button.Style>
-                                <Style TargetType="Button"
-                                       BasedOn="{StaticResource PosTileButton}">
-                                    <Setter Property="Background"
-                                            Value="#D1D5DB" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding SelectedMethod}"
-                                                     Value="Split">
-                                            <Setter Property="Background"
-                                                    Value="#16A34A" />
-                                            <Setter Property="Foreground"
-                                                    Value="White" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                        </Button>
                     </StackPanel>
 
                     <!-- ENTERED AMOUNT -->

@@ -57,6 +57,10 @@ namespace RestaurantPOS.ViewModels.Orders
             }
         }
 
+        public string CoversDisplay =>
+            $"Adults: {_orderState.Order?.AdultCovers ?? 0}   •   Children: {_orderState.Order?.ChildCovers ?? 0}";
+
+
 
         public ICommand OpenTablePickerCommand { get; }
         public ICommand CloseTablePickerCommand { get; }
@@ -157,16 +161,20 @@ namespace RestaurantPOS.ViewModels.Orders
 
         private void UpdateOrderState()
         {
-            if(coverSelectorViewModel != null)
+            if (coverSelectorViewModel != null)
+            {
                 coverSelectorViewModel.Reload(_orderState);
+            }
 
+
+            if (_orderState.Order == null || (_orderState.Order!.AdultCovers == 0 && _orderState.Order!.ChildCovers == 0))
+                IsCoverSelectorOpen = true;
+
+            OnPropertyChanged(nameof(CoversDisplay));
             OnPropertyChanged(nameof(GrandTotal));
             OnPropertyChanged(nameof(CanPay));
             ((RelayCommand)PayCommand).NotifyCanExecuteChanged();
             
-
-            if (_orderState.Order!.AdultCovers == 0 && _orderState.Order!.ChildCovers == 0)
-                IsCoverSelectorOpen = true;
         }
 
         private async void LoadTable(int tableNumber)
@@ -197,6 +205,7 @@ namespace RestaurantPOS.ViewModels.Orders
         private void CloseCoverSelector()
         {
             IsCoverSelectorOpen = false;
+            OnPropertyChanged(nameof(CoversDisplay));
         }
 
 

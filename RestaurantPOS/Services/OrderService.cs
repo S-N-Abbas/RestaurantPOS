@@ -15,10 +15,12 @@ namespace RestaurantPOS.Services
     public class OrderService
     {
         private readonly PosDbContext _db;
+        private readonly IPricingService _pricingService;
 
-        public OrderService(PosDbContext db)
+        public OrderService(PosDbContext db, IPricingService pricingService)
         {
             _db = db;
+            _pricingService = pricingService;
         }
 
         public async Task UpdateCoversAsync(int orderId, int adults, int children)
@@ -55,7 +57,10 @@ namespace RestaurantPOS.Services
             if (order.IsClosed)
                 throw new InvalidOperationException("Order already closed");
 
-            var remaining = order.ItemsTotal - order.PaidAmount;
+            var orderTotal = order.ItemsTotal + order.ChildCovers * _pricingService.ChildCoverRate
+                + order.AdultCovers * _pricingService.AdultCoverRate;
+
+            var remaining = orderTotal - order.PaidAmount;
 
             if (method == "Card" && amount != remaining)
                 throw new InvalidOperationException("Card must pay exact amount");
@@ -218,7 +223,10 @@ namespace RestaurantPOS.Services
             if (order.IsClosed)
                 return;
 
-            if (order.PaidAmount < order.ItemsTotal)
+            var orderTotal = order.ItemsTotal + order.ChildCovers * _pricingService.ChildCoverRate
+                + order.AdultCovers * _pricingService.AdultCoverRate;
+
+            if (order.PaidAmount < orderTotal)
                 throw new InvalidOperationException("Order not fully paid");
 
             order.IsClosed = true;
