@@ -20,7 +20,7 @@ namespace RestaurantPOS.ViewModels.Orders
 {
     public class OrderViewModel : ViewModelBase
     {
-        public CoverSelectorViewModel coverSelectorViewModel { get; }
+        public CoverSelectorViewModel coverSelectorViewModel { get; set; }
 
         public ObservableCollection<CategoryViewModel> Categories { get; }
         public ObservableCollection<MenuItemViewModel> AllItems { get; }
@@ -153,17 +153,20 @@ namespace RestaurantPOS.ViewModels.Orders
                 _orderService);
 
             coverSelectorViewModel.RequestClose += CloseCoverSelector;
-
-            if (_orderState.Order!.AdultCovers == 0 && _orderState.Order!.ChildCovers == 0)
-                IsCoverSelectorOpen = true;
-
         }
 
         private void UpdateOrderState()
         {
+            if(coverSelectorViewModel != null)
+                coverSelectorViewModel.Reload(_orderState);
+
             OnPropertyChanged(nameof(GrandTotal));
             OnPropertyChanged(nameof(CanPay));
             ((RelayCommand)PayCommand).NotifyCanExecuteChanged();
+            
+
+            if (_orderState.Order!.AdultCovers == 0 && _orderState.Order!.ChildCovers == 0)
+                IsCoverSelectorOpen = true;
         }
 
         private async void LoadTable(int tableNumber)
@@ -188,7 +191,7 @@ namespace RestaurantPOS.ViewModels.Orders
                 item.PropertyChanged += OrderItem_PropertyChanged;
             }
 
-            UpdateOrderState();
+            UpdateOrderState();            
         }
 
         private void CloseCoverSelector()

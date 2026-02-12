@@ -19,7 +19,7 @@ namespace RestaurantPOS.ViewModels.Cover
 
     public class CoverSelectorViewModel : ViewModelBase
     {
-        private readonly OrderState _orderState;
+        private OrderState _orderState;
         private readonly OrderService _orderService;
 
         public event Action? RequestClose;
@@ -65,6 +65,14 @@ namespace RestaurantPOS.ViewModels.Cover
             get => _childCovers;
             set => SetProperty(ref _childCovers, Math.Max(0, value));
         }
+
+        public void Reload(OrderState newState)
+        {
+            _orderState = newState;
+            AdultCovers = _orderState.Order?.AdultCovers ?? 0;
+            ChildCovers = _orderState.Order?.ChildCovers ?? 0;
+        }
+
 
         // Active field tracking (CRITICAL for keypad)
         private CoverField _activeField = CoverField.Adults;
