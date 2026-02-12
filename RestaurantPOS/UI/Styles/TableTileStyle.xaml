@@ -3,30 +3,21 @@
     <Style TargetType="Button"
            x:Key="TableTileStyle">
         <Setter Property="Background"
-                Value="#2D2D2D" />
+                Value="#2563EB" />
         <Style.Triggers>
             
             <DataTrigger Binding="{Binding HasOrder}"
+                         Value="True">
+                <Setter Property="Background"
+                        Value="Brown" />
+            </DataTrigger>
+            <!-- Current table -->
+            <DataTrigger Binding="{Binding IsCurrent}"
                          Value="True">
                 <Setter Property="BorderBrush"
                         Value="Orange" />
                 <Setter Property="BorderThickness"
                         Value="3" />
-            </DataTrigger>
-            <!-- Current table -->
-            <DataTrigger Binding="{Binding IsCurrent}"
-                         Value="True">
-                <Setter Property="Background"
-                        Value="#2563EB" />
-            </DataTrigger>
-
-            <!-- Occupied (locked) -->
-            <DataTrigger Binding="{Binding IsLocked}"
-                         Value="True">
-                <Setter Property="Background"
-                        Value="#6B7280" />
-                <Setter Property="Opacity"
-                        Value="0.6" />
             </DataTrigger>
 
         </Style.Triggers>

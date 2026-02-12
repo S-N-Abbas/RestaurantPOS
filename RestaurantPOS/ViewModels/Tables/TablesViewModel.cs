@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using RestaurantPOS.Services;
 using RestaurantPOS.ViewModels.Base;
+using RestaurantPOS.ViewModels.Cover;
 using RestaurantPOS.ViewModels.Orders;
 using System;
 using System.Collections.Generic;

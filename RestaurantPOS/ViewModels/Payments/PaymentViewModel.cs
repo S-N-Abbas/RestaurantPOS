@@ -26,7 +26,11 @@ namespace RestaurantPOS.ViewModels.Payments
         public string TableLabel => $"Table {_orderState.TableNumber}";
 
         // Payment amounts
-        public decimal Total => _orderState.Order?.TotalAmount ?? 0;
+        public decimal Total =>
+            (_orderState.Order?.ItemsTotal
+            + _orderState.Order?.ChildCovers
+            + +_orderState.Order?.AdultCovers ?? 0);
+
         public decimal AlreadyPaid => _orderState.Order?.PaidAmount ?? 0;
         public decimal PreviewPaid => AlreadyPaid + EnteredAmount;
 
@@ -112,7 +116,7 @@ namespace RestaurantPOS.ViewModels.Payments
 
             EnteredAmount = 0;
 
-            if (_orderState.Order.PaidAmount >= _orderState.Order.TotalAmount)
+            if (_orderState.Order.PaidAmount >= _orderState.Order.ItemsTotal)
             {
                 await _orderService.CloseOrderAsync(_orderState.Order.Id);
                 var updatedOrder = await _orderService.GetByIdAsync(_orderState.Order.Id);

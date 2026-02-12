@@ -23,8 +23,12 @@ namespace RestaurantPOS.Domain.Entities
 
         public Table? Table { get; set; } = null!;
 
+        // ✅ Covers (Persisted)
+        public int AdultCovers { get; set; }
+        public int ChildCovers { get; set; }
+
         [NotMapped]
-        public decimal TotalAmount => Items?.Sum(i => i.UnitPrice * i.Quantity) ?? 0m;
+        public decimal ItemsTotal => Items?.Sum(i => i.UnitPrice * i.Quantity) ?? 0m;
 
         [NotMapped]
         public decimal PaidAmount => Payments?.Sum(p => p.Amount) ?? 0m;

@@ -16,12 +16,12 @@
 
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Button Margin="10"
+                    <Button
+                        Margin="10"
                             Height="140"
                             Command="{Binding DataContext.SelectTableCommand,
                   RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                             CommandParameter="{Binding}"
-                            Background="{Binding HasOrder, Converter={StaticResource BoolToBrushConverter}}"
                             BorderThickness="0"
                             Style="{StaticResource TableTileStyle}">
                         <TextBlock Text="{Binding Number}"

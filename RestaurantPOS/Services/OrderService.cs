@@ -21,6 +21,26 @@ namespace RestaurantPOS.Services
             _db = db;
         }
 
+        public async Task UpdateCoversAsync(int orderId, int adults, int children)
+        {
+            if (adults < 0 || children < 0)
+                throw new ArgumentException("Cover counts cannot be negative");
+
+            var order = await _db.Orders.FindAsync(orderId);
+
+            if (order == null)
+                throw new InvalidOperationException("Order not found");
+
+            if (order.IsClosed)
+                throw new InvalidOperationException("Cannot modify closed order");
+
+            order.AdultCovers = adults;
+            order.ChildCovers = children;
+
+            await _db.SaveChangesAsync();
+        }
+
+
         public async Task RecordPaymentAsync(
             int orderId,
             decimal amount,
@@ -35,7 +55,7 @@ namespace RestaurantPOS.Services
             if (order.IsClosed)
                 throw new InvalidOperationException("Order already closed");
 
-            var remaining = order.TotalAmount - order.PaidAmount;
+            var remaining = order.ItemsTotal - order.PaidAmount;
 
             if (method == "Card" && amount != remaining)
                 throw new InvalidOperationException("Card must pay exact amount");
@@ -198,7 +218,7 @@ namespace RestaurantPOS.Services
             if (order.IsClosed)
                 return;
 
-            if (order.PaidAmount < order.TotalAmount)
+            if (order.PaidAmount < order.ItemsTotal)
                 throw new InvalidOperationException("Order not fully paid");
 
             order.IsClosed = true;

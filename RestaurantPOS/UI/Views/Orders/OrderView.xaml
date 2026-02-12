@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:RestaurantPOS.UI.Views.Orders"
              xmlns:converter="clr-namespace:RestaurantPOS.UI.Converters"
+             xmlns:views="clr-namespace:RestaurantPOS.UI.Views.Cover"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
@@ -19,6 +20,7 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="{Binding TableNumber, StringFormat=Table {0}}"
                                Foreground="White"
@@ -29,7 +31,12 @@
                             Style="{StaticResource TopBarButton}"
                             Content="Change Table"
                             HorizontalAlignment="Right"
-                            Command="{Binding OpenTablePickerCommand}" />
+                            Command="{Binding OpenTablePickerCommand}"/>
+                    <Button Grid.Column="2"
+                            Content="Covers"
+                            Style="{StaticResource TopBarButton}"
+                            HorizontalAlignment="Right"
+                            Command="{Binding OpenCoverSelectorCommand}" />
                 </Grid>
             </Border>
 
@@ -190,6 +197,14 @@
                 </ItemsControl>
 
             </Border>
+        </Border>
+        <Border Background="#AA000000"
+                Visibility="{Binding IsCoverSelectorOpen,
+                     Converter={StaticResource BoolToVisibilityConverter}}">
+
+            <views:CoverSelectorView
+                DataContext="{Binding coverSelectorViewModel}"/>
+
         </Border>
     </Grid>
 </UserControl>

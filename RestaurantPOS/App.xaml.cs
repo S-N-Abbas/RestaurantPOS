@@ -4,6 +4,7 @@ using RestaurantPOS.Infrastructure.Data;
 using RestaurantPOS.Services;
 using RestaurantPOS.ViewModels;
 using RestaurantPOS.ViewModels.Base;
+using RestaurantPOS.ViewModels.Cover;
 using RestaurantPOS.ViewModels.Home;
 using RestaurantPOS.ViewModels.Login;
 using RestaurantPOS.ViewModels.Orders;
@@ -75,6 +76,7 @@ namespace RestaurantPOS
             services.AddScoped<IMenuDataService, MenuDataService>();
             services.AddSingleton<ITableSessionService, TableSessionService>();
             services.AddScoped<ITableService, TableService>();
+            services.AddSingleton<IPricingService, PricingService>();
             services.AddScoped<OrderService>();
             services.AddSingleton<OrderStore>();
             services.AddSingleton<TableStore>();
@@ -90,6 +92,7 @@ namespace RestaurantPOS
             services.AddTransient<TablesViewModel>();
             services.AddTransient<OrderViewModel>();
             services.AddTransient<PaymentViewModel>();
+            services.AddTransient<CoverSelectorViewModel>();
         }
     }
 

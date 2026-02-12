@@ -1,6 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using RestaurantPOS.Domain.Entities;
 using RestaurantPOS.Services;
 using RestaurantPOS.ViewModels.Base;
+using RestaurantPOS.ViewModels.Cover;
 using RestaurantPOS.ViewModels.Payments;
 using RestaurantPOS.ViewModels.Tables;
 using System;
@@ -18,6 +20,8 @@ namespace RestaurantPOS.ViewModels.Orders
 {
     public class OrderViewModel : ViewModelBase
     {
+        public CoverSelectorViewModel coverSelectorViewModel { get; }
+
         public ObservableCollection<CategoryViewModel> Categories { get; }
         public ObservableCollection<MenuItemViewModel> AllItems { get; }
         public ObservableCollection<MenuItemViewModel> Items { get; }
@@ -41,19 +45,37 @@ namespace RestaurantPOS.ViewModels.Orders
             set => SetProperty(ref _isTablePickerOpen, value);
         }
 
-        public bool CanPay => _orderState?.Order != null && OrderItems.Any();
+
+        private bool _isCoverSelectorOpen;
+        public bool IsCoverSelectorOpen
+        {
+            get => _isCoverSelectorOpen;
+            set
+            {
+                _isCoverSelectorOpen = value;
+                OnPropertyChanged();
+            }
+        }
 
 
         public ICommand OpenTablePickerCommand { get; }
         public ICommand CloseTablePickerCommand { get; }
 
+        public ICommand OpenCoverSelectorCommand { get; }
+        public ICommand CloseCoverSelectorCommand { get; }
+
         public TablePickerViewModel TablePicker { get; }
 
-
-        public decimal GrandTotal => OrderItems.Sum(i => i.Total);
+        public decimal CoversTotal =>
+            _orderState.Order == null ? 0 :
+            _pricing.CalculateCoverCharge(_orderState.Order);
+        public bool CanPay => _orderState?.Order != null && OrderItems.Any();
+        public decimal ItemsTotal =>
+            OrderItems.Sum(i => i.Total);
+        public decimal GrandTotal => 
+            CoversTotal + OrderItems.Sum(i => i.Total);
 
         public ICommand AddItemCommand { get; }
-        public ICommand ChangeTableCommand { get; }
         public ICommand PayCommand { get; }
 
         private readonly ITableSessionService _tableSession;
@@ -62,6 +84,7 @@ namespace RestaurantPOS.ViewModels.Orders
         private readonly OrderService _orderService;
         private readonly INavigationService _navigationService;
         private readonly TableStore _tableStore;
+        private readonly IPricingService _pricing;
 
         private int _tableNumber;
         public int TableNumber
@@ -72,25 +95,21 @@ namespace RestaurantPOS.ViewModels.Orders
 
         private readonly IMenuDataService _menuService;
 
-        private void RaisePayState()
-        {
-            OnPropertyChanged(nameof(CanPay));
-        }
-
         public OrderViewModel(
             ITableSessionService tableSession,
             OrderStore orderStore,
             IMenuDataService menuService,
             OrderService orderService,
             INavigationService navigationService,
-            TableStore tableStore)
+            TableStore tableStore,
+            IPricingService pricing)
         {
             _menuService = menuService;
             _tableSession = tableSession;
             _orderStore = orderStore;
             _orderService = orderService;
             _navigationService = navigationService;
-
+            _pricing = pricing;
 
             Categories = new();
             AllItems = new();
@@ -100,13 +119,6 @@ namespace RestaurantPOS.ViewModels.Orders
             AddItemCommand = new RelayCommand<MenuItemViewModel>(
                 item => _ = AddItemAsync(item)
             );
-
-            ChangeTableCommand = new RelayCommand(() =>
-            {
-                // TEMP: cycle tables for now
-                var next = TableNumber == 5 ? 1 : TableNumber + 1;
-                _tableSession.SwitchTable(next);
-            });
 
             PayCommand = new RelayCommand(
                 ExecutePay,
@@ -129,9 +141,22 @@ namespace RestaurantPOS.ViewModels.Orders
             OpenTablePickerCommand = new RelayCommand(() => IsTablePickerOpen = true);
             CloseTablePickerCommand = new RelayCommand(() => IsTablePickerOpen = false);
 
+            OpenCoverSelectorCommand = new RelayCommand(() => IsCoverSelectorOpen = true);
+            CloseCoverSelectorCommand = new RelayCommand(() => IsCoverSelectorOpen = false);
+
             _tableSession.TableChanged += _ => IsTablePickerOpen = false;
 
             LoadTable(_tableSession.CurrentTable);
+
+            coverSelectorViewModel = new CoverSelectorViewModel(
+                _orderState,
+                _orderService);
+
+            coverSelectorViewModel.RequestClose += CloseCoverSelector;
+
+            if (_orderState.Order!.AdultCovers == 0 && _orderState.Order!.ChildCovers == 0)
+                IsCoverSelectorOpen = true;
+
         }
 
         private void UpdateOrderState()
@@ -165,6 +190,12 @@ namespace RestaurantPOS.ViewModels.Orders
 
             UpdateOrderState();
         }
+
+        private void CloseCoverSelector()
+        {
+            IsCoverSelectorOpen = false;
+        }
+
 
         private void OnTableChanged(int tableNumber)
         {
@@ -290,21 +321,5 @@ namespace RestaurantPOS.ViewModels.Orders
         {
             _navigationService.NavigateTo<PaymentViewModel>(_orderState);
         }
-
-        private async void Pay()
-        {
-            if (_orderState.Order == null)
-                return;
-
-            await _orderService.CloseOrderAsync(_orderState.Order.Id);
-
-            var updatedOrder = await _orderService.GetByIdAsync(_orderState.Order.Id);
-            _orderState.UpdateFrom(updatedOrder);
-
-            _orderStore.CloseOrder(TableNumber);
-
-            _navigationService.NavigateTo<TablesViewModel>();
-        }
-
     }
 }

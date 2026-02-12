@@ -14,7 +14,9 @@
              xmlns:vmOrders="clr-namespace:RestaurantPOS.ViewModels.Orders"
              xmlns:ordersViews="clr-namespace:RestaurantPOS.UI.Views.Orders"
              xmlns:vmPayments="clr-namespace:RestaurantPOS.ViewModels.Payments"
-             xmlns:paymentsViews="clr-namespace:RestaurantPOS.UI.Views.Payments">
+             xmlns:paymentsViews="clr-namespace:RestaurantPOS.UI.Views.Payments"
+             xmlns:vmCovers="clr-namespace:RestaurantPOS.ViewModels.Cover"
+             xmlns:coversViews="clr-namespace:RestaurantPOS.UI.Views.Cover">
     <Application.Resources>
 
         <!-- Buttons Style -->
@@ -57,6 +59,10 @@
 
             <DataTemplate DataType="{x:Type vmPayments:PaymentViewModel}">
                 <paymentsViews:PaymentView />
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type vmCovers:CoverSelectorViewModel}">
+                <coversViews:CoverSelectorView />
             </DataTemplate>
 
         </ResourceDictionary>
