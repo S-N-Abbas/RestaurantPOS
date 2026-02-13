@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RestaurantPOS.Domain.Entities
 {
@@ -21,6 +22,10 @@ namespace RestaurantPOS.Domain.Entities
         public decimal UnitPrice { get; set; }
 
         public int Quantity { get; set; }
+
+        [NotMapped]
+        public decimal LineTotal => UnitPrice * Quantity;
+
     }
 
 }

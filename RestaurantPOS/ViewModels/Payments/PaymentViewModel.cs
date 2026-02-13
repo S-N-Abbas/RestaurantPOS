@@ -2,7 +2,9 @@
 using RestaurantPOS.Domain.Entities;
 using RestaurantPOS.Services;
 using RestaurantPOS.ViewModels.Base;
+using RestaurantPOS.ViewModels.Orders;
 using RestaurantPOS.ViewModels.Tables;
+using System.Collections.ObjectModel;
 using System.Windows.Input;
 
 namespace RestaurantPOS.ViewModels.Payments
@@ -31,6 +33,9 @@ namespace RestaurantPOS.ViewModels.Payments
             + _orderState.Order?.ChildCovers * _pricingService.ChildCoverRate
             + _orderState.Order?.AdultCovers * _pricingService.AdultCoverRate ?? 0);
 
+        public string CoversDisplay =>
+            $"Adults: {_orderState.Order?.AdultCovers ?? 0}   •   Children: {_orderState.Order?.ChildCovers ?? 0}";
+
         public decimal AlreadyPaid => _orderState.Order?.PaidAmount ?? 0;
         public decimal PreviewPaid => AlreadyPaid + EnteredAmount;
 
@@ -45,7 +50,6 @@ namespace RestaurantPOS.ViewModels.Payments
         public ICommand ClearAmountCommand { get; }
         public ICommand SelectCashCommand { get; }
         public ICommand SelectCardCommand { get; }
-        public ICommand SplitBillCommand { get; }
 
 
         private decimal _enteredAmount;
@@ -89,6 +93,8 @@ namespace RestaurantPOS.ViewModels.Payments
             _orderStore = orderStore;
             _pricingService = pricingService;
             _navigationService = navigationService;
+
+   
 
             SelectedMethod = PaymentMethod.Cash; // default to cash
 
@@ -153,32 +159,6 @@ namespace RestaurantPOS.ViewModels.Payments
             else
             {
                 EnteredAmount = 0;
-            }
-        }
-
-
-        private async Task ExecutePayAsync()
-        {
-            if (_orderState.Order == null) return;
-
-            try
-            {
-                await _orderService.RecordPaymentAsync(_orderState.Order.Id, EnteredAmount, SelectedMethod.ToString()!);
-
-                // reset entered amount
-                EnteredAmount = 0;
-
-                // If fully paid, navigate back
-                if (PreviewDue <= 0)
-                {
-                    await _orderService.CloseOrderAsync(_orderState.Order.Id);
-                    _navigationService.NavigateTo<Orders.OrderViewModel>();
-                }
-            }
-            catch (Exception ex)
-            {
-                // TODO: show user-friendly error message
-                Console.WriteLine(ex.Message);
             }
         }
     }
