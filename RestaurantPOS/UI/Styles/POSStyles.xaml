@@ -219,5 +219,75 @@
         <Setter Property="Background"
                 Value="#F8FAFC" />
     </Style>
+    
+    
+    <!-- ROUNDED CONFIRMATION BUTTON-->
+    <Style x:Key="RoundedConfirmButton"
+           TargetType="Button">
+        <Setter Property="Background"
+                Value="#16A34A" />
+        <Setter Property="Foreground"
+                Value="White" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}"
+                            CornerRadius="12"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <!-- PAYMENT METHOD STYLE -->
+    <Style x:Key="PaymentMethodStyle"
+           TargetType="ToggleButton">
+        <Setter Property="Background"
+                Value="#F1F5F9" />
+        <Setter Property="Foreground"
+                Value="#64748B" />
+        <Setter Property="BorderThickness"
+                Value="0" />
+        <Setter Property="FontWeight"
+                Value="Bold" />
+        <Setter Property="FontSize"
+                Value="16" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Border x:Name="border"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="12"
+                            BorderThickness="2"
+                            BorderBrush="Transparent">
+                        <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked"
+                                 Value="True">
+                            <Setter TargetName="border"
+                                    Property="Background"
+                                    Value="#EFF6FF" />
+                            <Setter TargetName="border"
+                                    Property="BorderBrush"
+                                    Value="{StaticResource PrimaryAccent}" />
+                            <Setter Property="Foreground"
+                                    Value="{StaticResource PrimaryAccent}" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver"
+                                 Value="True">
+                            <Setter TargetName="border"
+                                    Property="Opacity"
+                                    Value="0.8" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 
 </ResourceDictionary>

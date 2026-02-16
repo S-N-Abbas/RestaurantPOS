@@ -42,10 +42,10 @@ namespace RestaurantPOS.ViewModels.Payments
             $"Adults: {_orderState.Order?.AdultCovers ?? 0}   •   Children: {_orderState.Order?.ChildCovers ?? 0}";
 
         public decimal AlreadyPaid => _orderState.Order?.PaidAmount ?? 0;
-        public decimal PreviewPaid => AlreadyPaid + EnteredAmount;
+        public decimal PreviewPaid => AlreadyPaid;
 
         public decimal Due => Math.Max(Total - AlreadyPaid, 0);
-        public decimal PreviewDue => Math.Max(Total - PreviewPaid, 0);
+        public decimal PreviewDue => Math.Max(Total - AlreadyPaid, 0);
 
         // Commands
         public ICommand CancelCommand { get; }
@@ -67,6 +67,8 @@ namespace RestaurantPOS.ViewModels.Payments
                 {
                     OnPropertyChanged(nameof(PreviewPaid));
                     OnPropertyChanged(nameof(PreviewDue));
+                    OnPropertyChanged(nameof(AlreadyPaid));
+                    OnPropertyChanged(nameof(Due));
                     OnPropertyChanged(nameof(CanPay));
                     (PayCommand as RelayCommand)?.NotifyCanExecuteChanged();
                 }

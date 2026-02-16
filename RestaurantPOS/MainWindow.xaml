@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:RestaurantPOS"
         mc:Ignorable="d"
         Title="Restaurant POS by ESP Tech Mirpur" Height="450" Width="800"
-        WindowState="Maximized">
+        WindowState="Maximized"
+        WindowStyle="None">
     <ContentControl Content="{Binding}" />
 </Window>

@@ -36,6 +36,7 @@
             <!-- CONVERTERS -->
             <converters:BoolToBrushConverter x:Key="BoolToBrushConverter" />
             <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+            <converters:StringToBoolConverter x:Key="StringToBoolConverter" />
 
             <!-- DATA TEMPLATES -->
             <DataTemplate DataType="{x:Type vmShell:ShellViewModel}">

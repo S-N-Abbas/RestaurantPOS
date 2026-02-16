@@ -1,41 +1,126 @@
 ﻿<UserControl x:Class="RestaurantPOS.UI.Views.Shell.ShellView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:local="clr-namespace:RestaurantPOS.UI.Views.Shell"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
+             mc:Ignorable="d"
+             d:DesignHeight="720"
+             d:DesignWidth="1280">
+
+    <Grid Background="{StaticResource BackgroundGray}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="60" />
+            <RowDefinition Height="70" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!-- TOP BAR -->
-        <Grid Background="#222"
-              Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
+        <Border Grid.Row="0"
+                Background="{StaticResource SurfaceWhite}"
+                BorderBrush="{StaticResource BorderGray}"
+                BorderThickness="0,0,0,1">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="10"
+                                  ShadowDepth="1"
+                                  Opacity="0.05" />
+            </Border.Effect>
 
-            <TextBlock Text="Restaurant POS"
-                       Foreground="White"
-                       FontSize="20"
-                       VerticalAlignment="Center"
-                       Margin="20,0" />
+            <Grid Margin="24,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
-            <Button Content="Logout"
-                    Style="{StaticResource TopBarButton}"
-                    Grid.Column="1"
-                    Margin="0,0,20,0"
-                    Padding="20,6"
-                    Command="{Binding LogoutCommand}" />
-        </Grid>
+                <StackPanel Orientation="Horizontal"
+                            VerticalAlignment="Center">
+                    <Border Background="{StaticResource PrimaryAccent}"
+                            CornerRadius="8"
+                            Width="40"
+                            Height="40"
+                            Margin="0,0,12,0">
+                        <iconPacks:PackIconMaterial Kind="SilverwareForkKnife"
+                                                    Foreground="White"
+                                                    VerticalAlignment="Center"
+                                                    HorizontalAlignment="Center"
+                                                    Width="20"
+                                                    Height="20" />
+                    </Border>
+                    <StackPanel>
+                        <TextBlock Text="NAWAB PALACE"
+                                   FontSize="18"
+                                   FontWeight="Black"
+                                   Foreground="{StaticResource TextDark}"
+                                   Margin="1"/>
+                        <TextBlock Text="Terminal 01 - Main Floor"
+                                   FontSize="11"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextMuted}" />
+                    </StackPanel>
+                </StackPanel>
 
-        <!-- CONTENT -->
+                <StackPanel Grid.Column="2"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center"
+                            Margin="0,0,24,0">
+                    <Ellipse Width="32"
+                             Height="32"
+                             Fill="#E2E8F0"
+                             Margin="0,0,10,0" />
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="Staff Member"
+                                   FontSize="13"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource TextDark}" />
+                        <TextBlock Text="Server"
+                                   FontSize="11"
+                                   Foreground="{StaticResource SuccessGreen}"
+                                   FontWeight="Bold" />
+                    </StackPanel>
+                </StackPanel>
+
+                <Button Grid.Column="3"
+                        Command="{Binding LogoutCommand}"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Cursor="Hand"
+                        Margin="5, 10">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="border"
+                                    Background="#FEF2F2"
+                                    Padding="16,8"
+                                    CornerRadius="10">
+                                <StackPanel Orientation="Horizontal">
+                                    <iconPacks:PackIconMaterial Kind="Logout"
+                                                                Foreground="{StaticResource DangerRed}"
+                                                                Width="14"
+                                                                Margin="0,0,8,0"
+                                                                VerticalAlignment="Center" />
+                                    <TextBlock Text="LOGOUT"
+                                               Foreground="{StaticResource DangerRed}"
+                                               FontWeight="Bold"
+                                               FontSize="12"
+                                               VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver"
+                                         Value="True">
+                                    <Setter TargetName="border"
+                                            Property="Background"
+                                            Value="#FEE2E2" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+            </Grid>
+        </Border>
+
         <ContentControl Grid.Row="1"
-                        Content="{Binding CurrentViewModel}" />
+                        Content="{Binding CurrentViewModel}">
+        </ContentControl>
     </Grid>
 </UserControl>
