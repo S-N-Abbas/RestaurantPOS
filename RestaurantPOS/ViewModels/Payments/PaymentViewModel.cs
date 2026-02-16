@@ -5,6 +5,8 @@ using RestaurantPOS.ViewModels.Base;
 using RestaurantPOS.ViewModels.Orders;
 using RestaurantPOS.ViewModels.Tables;
 using System.Collections.ObjectModel;
+using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 
 namespace RestaurantPOS.ViewModels.Payments
@@ -20,6 +22,9 @@ namespace RestaurantPOS.ViewModels.Payments
         private readonly OrderService _orderService;
         private readonly IPricingService _pricingService;
         private readonly INavigationService _navigationService;
+
+        private readonly ReceiptBuilder _receiptBuilder;
+        public ICommand PrintReceiptCommand => new RelayCommand(PrintReceipt);
 
         public OrderState _orderState { get; }
         public OrderStore _orderStore { get; }
@@ -80,6 +85,22 @@ namespace RestaurantPOS.ViewModels.Payments
             }
         }
 
+        private void PrintReceipt()
+        {
+            if (_orderState.Order == null)
+                return;
+
+            var doc = _receiptBuilder.Build(_orderState.Order);
+
+            var dialog = new PrintDialog();
+
+            if (dialog.ShowDialog() == true)
+            {
+                dialog.PrintDocument(
+                    ((IDocumentPaginatorSource)doc).DocumentPaginator,
+                    "Receipt");
+            }
+        }
 
         public bool CanPay =>
             SelectedMethod != null &&
@@ -94,7 +115,9 @@ namespace RestaurantPOS.ViewModels.Payments
             _pricingService = pricingService;
             _navigationService = navigationService;
 
-   
+            _receiptBuilder = new ReceiptBuilder(pricingService);
+
+
 
             SelectedMethod = PaymentMethod.Cash; // default to cash
 
@@ -131,6 +154,8 @@ namespace RestaurantPOS.ViewModels.Payments
                 _orderState.UpdateFrom(updatedOrder);
 
                 _orderStore.CloseOrder(_orderState.Order.TableNumber);
+
+                PrintReceipt();
 
                 _navigationService.NavigateTo<TablesViewModel>();
             }

@@ -43,8 +43,16 @@
                 <ColumnDefinition Width="3*" />
             </Grid.ColumnDefinitions>
 
-            <!-- LEFT: SUMMARY -->
-            <Border Background="White"
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+            
+
+                <!-- LEFT: SUMMARY -->
+            <Border Grid.Row ="0"
+                    Background="White"
                     CornerRadius="12"
                     Padding="20"
                     Margin="0,0,20,0">
@@ -159,6 +167,18 @@
 
                 </DockPanel>
             </Border>
+                <Border Grid.Row="1"
+                        Background="White"
+                        CornerRadius="12"
+                        Padding="20"
+                        Margin="0,0,20,0">
+                    <Button Content="PRINT RECEIPT"
+                            Height="45"
+                            Style="{StaticResource PosTileButton}"
+                            Command="{Binding PrintReceiptCommand}" />
+
+                </Border>
+            </Grid>
 
             <!-- RIGHT: PAYMENT INPUT -->
             <Border Grid.Column="1"
