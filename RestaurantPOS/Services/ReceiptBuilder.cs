@@ -20,88 +20,157 @@ namespace RestaurantPOS.Services
         }
         public FlowDocument Build(Order order)
         {
-            var AdultCoverTotal = _princingService.AdultCoverRate * order.AdultCovers;
-            var ChildCoverTotal = _princingService.ChildCoverRate * order.ChildCovers;
-            var GrandTotal = AdultCoverTotal + ChildCoverTotal + order.ItemsTotal;
+            // Calculation Logic
+            var adultCoverTotal = _princingService.AdultCoverRate * order.AdultCovers;
+            var childCoverTotal = _princingService.ChildCoverRate * order.ChildCovers;
+            var grandTotal = adultCoverTotal + childCoverTotal + order.ItemsTotal;
 
-            var CashPaid = order.Payments
-                .Where(p => p.Method == PaymentMethod.Cash.ToString())
-                .Sum(p => p.Amount);
-
-            var CardPaid = order.Payments
-                .Where(p => p.Method == PaymentMethod.Card.ToString())
-                .Sum(p => p.Amount);
-
-            var TotalPaid = CashPaid + CardPaid;
-
+            var cashPaid = order.Payments.Where(p => p.Method == "Cash").Sum(p => p.Amount);
+            var cardPaid = order.Payments.Where(p => p.Method == "Card").Sum(p => p.Amount);
+            var totalPaid = cashPaid + cardPaid;
+            var balanceDue = grandTotal - totalPaid;
 
             var doc = new FlowDocument
             {
-                PageWidth = 300,
-                FontFamily = new FontFamily("Consolas"), // Printer-style
+                PageWidth = 280, // Standard 80mm thermal width
+                FontFamily = new FontFamily("Consolas"),
                 FontSize = 12,
-                PagePadding = new Thickness(10)
+                PagePadding = new Thickness(5),
+                ColumnGap = 0
             };
 
+            // 1. BRANDING & HEADER
             AddLogo(doc);
-
-            // ✅ HEADER
             doc.Blocks.Add(Title("NAWAB PALACE"));
-            doc.Blocks.Add(Center("136 Rochdale Rd Burry"));
-            doc.Blocks.Add(Center("Tel: 01612170541"));
-
-            doc.Blocks.Add(Spacer(6));
+            doc.Blocks.Add(Center("136 Rochdale Rd, Bury"));
+            doc.Blocks.Add(Center("Tel: 0161 217 0541"));
+            doc.Blocks.Add(Spacer(8));
             doc.Blocks.Add(Line());
 
-            // ✅ ORDER META
-            doc.Blocks.Add(TwoColumnBold($"Table: {order.TableNumber}",
-                                         $"Order: #{order.Id}"));
+            // 2. ORDER INFO
+            // Using Table for Order Meta to ensure perfect alignment
+            var metaTable = new System.Windows.Documents.Table { CellSpacing = 0 };
+            metaTable.Columns.Add(new TableColumn { Width = new GridLength(1, GridUnitType.Star) });
+            metaTable.Columns.Add(new TableColumn { Width = new GridLength(1, GridUnitType.Star) });
+            var metaRow = new TableRow();
+            metaRow.Cells.Add(Cell($"Table: {order.TableNumber}", fontWeight: FontWeights.Bold));
+            metaRow.Cells.Add(Cell($"ID: #{order.Id}", TextAlignment.Right));
+            metaTable.RowGroups.Add(new TableRowGroup());
+            metaTable.RowGroups[0].Rows.Add(metaRow);
+            doc.Blocks.Add(metaTable);
 
-            doc.Blocks.Add(TwoColumn($"Till: 1", $"User: Admin"));
-
-            doc.Blocks.Add(Center($"{DateTime.Now:dd-MM-yyyy hh:mm tt}"));
-
+            doc.Blocks.Add(TwoColumn($"Server: {"Admin"}", $"Till: 1"));
+            doc.Blocks.Add(Center($"{DateTime.Now:dd/MM/yyyy HH:mm}"));
             doc.Blocks.Add(Line());
 
-            // ✅ COVERS
-            doc.Blocks.Add(SectionHeader("COVERS"));
+            // 3. COVERS
+            if (order.AdultCovers > 0 || order.ChildCovers > 0)
+            {
+                doc.Blocks.Add(SectionHeader("COVERS"));
+                if (order.AdultCovers > 0)
+                    doc.Blocks.Add(TwoColumn($"Adults (x{order.AdultCovers})", $"£{adultCoverTotal:F2}"));
+                if (order.ChildCovers > 0)
+                    doc.Blocks.Add(TwoColumn($"Children (x{order.ChildCovers})", $"£{childCoverTotal:F2}"));
+                doc.Blocks.Add(Spacer(4));
+            }
 
-            doc.Blocks.Add(TwoColumn(
-                $"Adults: x{order.AdultCovers} {AdultCoverTotal}",
-                $"Children: x{order.ChildCovers} {ChildCoverTotal}"
-            ));
-
-            doc.Blocks.Add(Line());
-
-            // ✅ ITEMS
+            // 4. ITEMS
             doc.Blocks.Add(SectionHeader("ITEMS"));
-            doc.Blocks.Add(Spacer(4));
-
             doc.Blocks.Add(BuildItemsTable(order));
+            doc.Blocks.Add(Line());
+
+            // 5. TOTALS (Aligned to Right)
+            doc.Blocks.Add(TotalRow("SUBTOTAL", grandTotal));
+
+            if (cashPaid > 0) doc.Blocks.Add(TotalRow("CASH PAID", cashPaid));
+            if (cardPaid > 0) doc.Blocks.Add(TotalRow("CARD PAID", cardPaid));
+
+            if (balanceDue > 0)
+            {
+                doc.Blocks.Add(Spacer(2));
+                doc.Blocks.Add(TotalRow("BALANCE DUE", balanceDue, isHighlight: true));
+            }
+            else if (totalPaid > grandTotal)
+            {
+                doc.Blocks.Add(TotalRow("CHANGE", totalPaid - grandTotal));
+            }
 
             doc.Blocks.Add(Line());
 
-            // ✅ TOTALS
-            doc.Blocks.Add(TotalRow("TOTAL", GrandTotal, true));
-            doc.Blocks.Add(Spacer(4));
-
-            if(CashPaid > 0)
-                doc.Blocks.Add(TotalRow("Cash", CashPaid));
-
-            if(CardPaid > 0)
-                doc.Blocks.Add(TotalRow("Card", CardPaid));
-
-            doc.Blocks.Add(Line());
-
-            // ✅ FOOTER
+            // 6. FOOTER
+            doc.Blocks.Add(Spacer(10));
+            doc.Blocks.Add(CenterBold("THANK YOU FOR YOUR VISIT!"));
+            doc.Blocks.Add(Center("VAT No: 123 4567 89")); // Common in UK
             doc.Blocks.Add(Spacer(6));
-            doc.Blocks.Add(CenterBold("Thank You!"));
-            doc.Blocks.Add(Spacer(4));
-
             doc.Blocks.Add(Center("Developed By"));
             doc.Blocks.Add(CenterBold("EPS Tech Mirpur"));
+            doc.Blocks.Add(Spacer(20)); // Extra space for the tear-off
 
             return doc;
+        }
+
+        private Paragraph TotalRow(string label, decimal value, bool isHighlight = false)
+        {
+            var p = new Paragraph { Margin = new Thickness(0, 2, 0, 2) };
+            p.Inlines.Add(new Run(label) { FontWeight = isHighlight ? FontWeights.Black : FontWeights.Normal });
+
+            // This creates a "Right-Aligned" effect for the price
+            var priceRun = new Run($"£{value:F2}")
+            {
+                FontWeight = FontWeights.Bold,
+                FontSize = isHighlight ? 16 : 13
+            };
+
+            var container = new Figure(new BlockUIContainer(new TextBlock
+            {
+                Text = $"£{value:F2}",
+                FontWeight = priceRun.FontWeight,
+                FontSize = priceRun.FontSize,
+                TextAlignment = TextAlignment.Right,
+                Width = 120 // Fixed width to force right alignment
+            }));
+            container.HorizontalAnchor = FigureHorizontalAnchor.ColumnRight;
+
+            p.Inlines.Add(new InlineUIContainer(new TextBlock
+            {
+                Text = $"£{value:F2}",
+                Width = 270,
+                TextAlignment = TextAlignment.Right,
+                FontWeight = priceRun.FontWeight,
+                FontSize = priceRun.FontSize
+            }));
+
+            return p;
+        }
+
+        private Paragraph TwoColumn(string left, string right)
+        {
+            // Cleanest way to do two columns in FlowDocument without Tables
+            return new Paragraph(new Run(left))
+            {
+                Margin = new Thickness(0),
+                Inlines = {
+            new InlineUIContainer(new TextBlock {
+                Text = right,
+                Width = 270 - (left.Length * 7), // Rough estimate for Consolas
+                TextAlignment = TextAlignment.Right
+            })
+        }
+            };
+        }
+
+        private TableCell Cell(string text,
+                       TextAlignment alignment = TextAlignment.Left,
+                       FontWeight? fontWeight = null)
+        {
+            var p = new Paragraph(new Run(text)) { Margin = new Thickness(0) };
+            if (fontWeight.HasValue) p.FontWeight = fontWeight.Value;
+
+            return new TableCell(p)
+            {
+                TextAlignment = alignment,
+                Padding = new Thickness(0, 2, 0, 2)
+            };
         }
 
         // ✅ LOGO
@@ -155,31 +224,7 @@ namespace RestaurantPOS.Services
             return table;
         }
 
-        // ✅ TOTAL ROW (BOLD OPTION)
-        private Paragraph TotalRow(string label, decimal value, bool bold = false)
-        {
-            var run = new Run($"{label}");
-            if (bold) run.FontWeight = FontWeights.Bold;
-
-            var amount = new Run($"£{value:F2}");
-            if (bold)
-            {
-                amount.FontWeight = FontWeights.Bold;
-                amount.FontSize = 14; // Emphasize total
-            }
-
-            return new Paragraph
-            {
-                Margin = new Thickness(0),
-                Inlines =
-            {
-                run,
-                new Run("     "),
-                amount
-            }
-            };
-        }
-
+        
         // ✅ TYPOGRAPHY HELPERS ⭐⭐⭐⭐⭐
 
         private Paragraph Title(string text) =>
@@ -214,18 +259,7 @@ namespace RestaurantPOS.Services
                 Margin = new Thickness(0)
             };
 
-        private Paragraph TwoColumn(string left, string right) =>
-            new Paragraph
-            {
-                Margin = new Thickness(0),
-                Inlines =
-                {
-                new Run(left),
-                new Run("     "),
-                new Run(right)
-                }
-            };
-
+        
         private Paragraph TwoColumnBold(string left, string right) =>
             new Paragraph
             {
@@ -249,16 +283,5 @@ namespace RestaurantPOS.Services
             {
                 Margin = new Thickness(0, height, 0, 0)
             };
-
-        private TableCell Cell(string text,
-            TextAlignment alignment = TextAlignment.Left)
-        {
-            return new TableCell(new Paragraph(new Run(text)))
-            {
-                TextAlignment = alignment,
-                Padding = new Thickness(0),
-                BorderThickness = new Thickness(0)
-            };
-        }
     }
 }
