@@ -6,162 +6,240 @@
              xmlns:local="clr-namespace:RestaurantPOS.UI.Views.Orders"
              xmlns:converter="clr-namespace:RestaurantPOS.UI.Converters"
              xmlns:views="clr-namespace:RestaurantPOS.UI.Views.Cover"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
+    <Grid Background="{StaticResource BackgroundGray}">
         <DockPanel>
-
-            <!-- Top Bar -->
             <Border DockPanel.Dock="Top"
-                    Height="60"
-                    Background="#1F2937"
-                    Padding="10">
-                <Grid>
+                    Height="80"
+                    Background="White"
+                    BorderBrush="{StaticResource BorderGray}"
+                    BorderThickness="0,0,0,1"
+                    Padding="24,0">
+                <Grid VerticalAlignment="Center">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="{Binding TableNumber, StringFormat=Table {0}}"
-                               Foreground="White"
-                               FontSize="22"
-                               FontWeight="SemiBold"
-                               VerticalAlignment="Center" />
-                    <Button Grid.Column="1"
-                            Style="{StaticResource TopBarButton}"
-                            Content="Change Table"
-                            HorizontalAlignment="Right"
-                            Command="{Binding OpenTablePickerCommand}"/>
-                    <Button Grid.Column="2"
-                            Content="Covers"
-                            Style="{StaticResource TopBarButton}"
-                            HorizontalAlignment="Right"
-                            Command="{Binding OpenCoverSelectorCommand}" />
+
+                    <StackPanel Orientation="Horizontal"
+                                VerticalAlignment="Center">
+                        <iconPacks:PackIconMaterial Kind="TableChair"
+                                                    Foreground="{StaticResource PrimaryAccent}"
+                                                    VerticalAlignment="Center"
+                                                    Width="24"
+                                                    Height="24"
+                                                    Margin="0,0,12,0" />
+                        <TextBlock Text="{Binding TableNumber, StringFormat=TABLE {0}}"
+                                   FontSize="28"
+                                   FontWeight="Black"
+                                   Foreground="{StaticResource TextDark}"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal">
+                        <Button Style="{StaticResource ModernButton}"
+                                Command="{Binding OpenTablePickerCommand}"
+                                Margin="0,0,12,0">
+                            <StackPanel Orientation="Horizontal">
+                                <iconPacks:PackIconMaterial Kind="SwapHorizontal"
+                                                            Margin="0,0,8,0"
+                                                            VerticalAlignment="Center"
+                                                            Width="14" />
+                                <TextBlock Text="Switch Table"
+                                           VerticalAlignment="Center"
+                                           FontWeight="SemiBold" />
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource ModernButton}"
+                                Command="{Binding OpenCoverSelectorCommand}">
+                            <StackPanel Orientation="Horizontal">
+                                <iconPacks:PackIconMaterial Kind="AccountGroup"
+                                                            Margin="0,0,8,0"
+                                                            VerticalAlignment="Center"
+                                                            Width="14" />
+                                <TextBlock Text="Manage Covers"
+                                           VerticalAlignment="Center"
+                                           FontWeight="SemiBold" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
                 </Grid>
             </Border>
 
-            <!-- Left: Categories -->
             <Border DockPanel.Dock="Left"
-                    Width="200"
-                    Background="#111827">
-                <ListBox ItemsSource="{Binding Categories}"
-                         SelectedItem="{Binding SelectedCategory}"
-                         DisplayMemberPath="Name"
-                         ItemContainerStyle="{StaticResource MenuItemTileListBoxItem}" />
+                    Width="240"
+                    Background="White"
+                    BorderBrush="{StaticResource BorderGray}"
+                    BorderThickness="0,0,1,0">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top"
+                               Text="CATEGORIES"
+                               Margin="20,20,20,10"
+                               FontSize="12"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource TextMuted}"
+                                />
+                    <ListBox ItemsSource="{Binding Categories}"
+                             SelectedItem="{Binding SelectedCategory}"
+                             DisplayMemberPath="Name"
+                             ItemContainerStyle="{StaticResource CategoryListBoxItem}"
+                             Background="Transparent"
+                             BorderThickness="0"
+                             Margin="10,0" />
+                </DockPanel>
             </Border>
 
-            <!-- Right: Order Summary -->
             <Border DockPanel.Dock="Right"
-                    Width="340"
-                    Padding="16"
-                    Background="#F9FAFB"
-                    Style="{StaticResource OrderSummaryPanel}">
-                <DockPanel LastChildFill="True">
+                    Width="380"
+                    Margin="20"
+                    Background="White"
+                    CornerRadius="16"
+                    BorderBrush="{StaticResource BorderGray}"
+                    BorderThickness="1">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="20"
+                                      ShadowDepth="2"
+                                      Opacity="0.05" />
+                </Border.Effect>
 
-                    <!-- Header -->
-                    <TextBlock DockPanel.Dock="Top"
-                               Text="Order Summary"
+                <Grid Margin="20">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="Current Order"
                                FontSize="20"
                                FontWeight="Bold"
-                               Margin="0,0,0,12" />
+                               Foreground="{StaticResource TextDark}"
+                               Margin="0,0,0,15" />
 
-                    <!-- ✅ COVERS SUMMARY -->
-                    <Border DockPanel.Dock="Top"
-                            Background="#EEF2FF"
+                    <Border Grid.Row="1"
+                            Background="#F8FAFC"
                             CornerRadius="8"
-                            Padding="10"
-                            Margin="0,0,0,12">
-
+                            Padding="12"
+                            Margin="0,0,0,15">
                         <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-
-                            <StackPanel>
-                                <TextBlock Text="Covers"
-                                           FontWeight="Bold"
-                                           FontSize="14" />
-
-                                <TextBlock Text="{Binding CoversDisplay}"
-                                           FontSize="13"
-                                           Foreground="#374151" />
+                            <StackPanel Orientation="Horizontal">
+                                <iconPacks:PackIconMaterial Kind="Account"
+                                                            Foreground="{StaticResource TextMuted}"
+                                                            VerticalAlignment="Center"
+                                                            Width="14"
+                                                            Margin="0,0,8,0" />
+                                <TextBlock Text="{Binding CoversDisplay, StringFormat='{}Guests: {0}'}"
+                                           VerticalAlignment="Center"
+                                           Foreground="{StaticResource TextMuted}"
+                                           FontWeight="Medium" />
                             </StackPanel>
-
-                            <Button Grid.Column="1"
+                            <Button HorizontalAlignment="Right"
                                     Content="Edit"
-                                    Padding="10,4"
-                                    Margin="8,0,0,0"
+                                    FontSize="11"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Foreground="{StaticResource PrimaryAccent}"
                                     Command="{Binding OpenCoverSelectorCommand}" />
                         </Grid>
                     </Border>
 
-                    <!-- Order Items -->
-                    <ListView DockPanel.Dock="Top"
+                    <ListView Grid.Row="2"
                               ItemsSource="{Binding OrderItems}"
-                              Margin="0,0,0,12">
+                              BorderThickness="0"
+                              ScrollViewer.VerticalScrollBarVisibility="Auto"
+                              HorizontalContentAlignment="Stretch">
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <Grid Margin="4">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
+                                <Border BorderBrush="{StaticResource BorderGray}"
+                                        BorderThickness="0,0,0,1"
+                                        Padding="4,12">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
 
-                                    <TextBlock Text="{Binding Name}"
-                                               VerticalAlignment="Center"
-                                               FontWeight="SemiBold" />
+                                        <StackPanel VerticalAlignment="Center"
+                                                    Margin="0,0,16,0">
+                                            <TextBlock Text="{Binding Name}"
+                                                       FontWeight="Bold"
+                                                       Foreground="{StaticResource TextDark}"
+                                                       FontSize="15"
+                                                       TextWrapping="Wrap" />
+                                            <TextBlock Text="{Binding Price, StringFormat='£{0:N2}'}"
+                                                       Foreground="{StaticResource TextMuted}"
+                                                       FontSize="13"
+                                                       Margin="0,2,0,0" />
+                                        </StackPanel>
 
-                                    <Button Grid.Column="1"
-                                            Content="−"
-                                            Width="30"
-                                            Command="{Binding DecreaseCommand}" />
+                                        <StackPanel Grid.Column="1"
+                                                    Orientation="Horizontal"
+                                                    VerticalAlignment="Center">
 
-                                    <TextBlock Grid.Column="2"
-                                               Text="{Binding Quantity}"
-                                               Width="30"
-                                               TextAlignment="Center"
-                                               VerticalAlignment="Center" />
+                                            <Button Style="{StaticResource CircleActionButton}"
+                                                    Command="{Binding DecreaseCommand}"
+                                                    Content="−" />
 
-                                    <Button Grid.Column="3"
-                                            Content="+"
-                                            Width="30"
-                                            Command="{Binding IncreaseCommand}" />
-                                </Grid>
+                                            <TextBlock Text="{Binding Quantity}"
+                                                       Width="40"
+                                                       TextAlignment="Center"
+                                                       VerticalAlignment="Center"
+                                                       FontWeight="Black"
+                                                       Foreground="{StaticResource PrimaryAccent}"
+                                                       FontSize="16"
+                                                       Margin="4,0" />
+
+                                            <Button Style="{StaticResource CircleActionButton}"
+                                                    Command="{Binding IncreaseCommand}"
+                                                    Content="+" />
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
 
-                    <!-- Footer -->
-                    <StackPanel DockPanel.Dock="Bottom"
-                                Margin="0,12,0,0">
+                    <StackPanel Grid.Row="3"
+                                Margin="0,15,0,0">
+                        <Separator Background="{StaticResource BorderGray}"
+                                   Margin="0,0,0,15" />
+                        <Grid Margin="0,0,0,20">
+                            <TextBlock Text="Total Payable"
+                                       FontSize="14"
+                                       Foreground="{StaticResource TextMuted}"
+                                       VerticalAlignment="Bottom" />
+                            <TextBlock Text="{Binding GrandTotal, StringFormat='£{0:N2}'}"
+                                       FontSize="32"
+                                       FontWeight="Black"
+                                       Foreground="{StaticResource TextDark}"
+                                       HorizontalAlignment="Right" />
+                        </Grid>
 
-                        <Separator Margin="0,8" />
-
-                        <TextBlock Text="{Binding GrandTotal, StringFormat=Total: Rs {0}}"
-                                   FontSize="18"
-                                   FontWeight="Bold"
-                                   Margin="0,0,0,12" />
-
-                        <!-- PAY BUTTON -->
-                        <Button Content="PAY"
-                                Height="48"
+                        <Button Content="PROCESS PAYMENT"
+                                Height="65"
                                 FontSize="18"
                                 FontWeight="Bold"
-                                Background="#16A34A"
+                                Background="{StaticResource SuccessGreen}"
                                 Foreground="White"
                                 BorderThickness="0"
                                 Command="{Binding PayCommand}"
-                                IsEnabled="{Binding CanPay}" />
+                                IsEnabled="{Binding CanPay}">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius"
+                                            Value="12" />
+                                </Style>
+                            </Button.Resources>
+                        </Button>
                     </StackPanel>
-
-                </DockPanel>
+                </Grid>
             </Border>
 
-            <!-- Center: Items -->
-            <ScrollViewer>
+            <ScrollViewer Margin="10,20,0,20"
+                          VerticalScrollBarVisibility="Auto">
                 <ItemsControl ItemsSource="{Binding Items}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -171,71 +249,75 @@
 
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Button Height="100"
-                                    Margin="8"
-                                    Style="{StaticResource MenuItemTile}"
-                                    Command="{Binding DataContext.AddItemCommand,
-                                          RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                            <Button Style="{StaticResource MenuItemTile}"
+                                    Height="130"
+                                    Command="{Binding DataContext.AddItemCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                     CommandParameter="{Binding}">
-                                <StackPanel>
-                                    <TextBlock Text="{Binding Name}"
-                                               FontWeight="SemiBold" />
-                                    <TextBlock Text="{Binding Price}" />
-                                </StackPanel>
+                                <Grid>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Name}"
+                                                   TextAlignment="Center"
+                                                   FontWeight="Bold"
+                                                   FontSize="16"
+                                                   Foreground="{StaticResource TextDark}"
+                                                   TextWrapping="Wrap"
+                                                   MaxHeight="60" />
+                                        <TextBlock Text="{Binding Price, StringFormat='£{0:N2}'}"
+                                                   TextAlignment="Center"
+                                                   Margin="0,8,0,0"
+                                                   Foreground="{StaticResource PrimaryAccent}"
+                                                   FontWeight="SemiBold" />
+                                    </StackPanel>
+                                </Grid>
                             </Button>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </ScrollViewer>
-
         </DockPanel>
-        <!-- TABLE PICKER OVERLAY -->
-        <Border Background="#AA000000"
-                Visibility="{Binding IsTablePickerOpen,
-                                 Converter={StaticResource BoolToVisibilityConverter}}">
 
-            <Border Width="500"
-                    Height="400"
+        <Border Background="#CC1E293B"
+                Visibility="{Binding IsTablePickerOpen, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Border Width="600"
                     Background="White"
-                    CornerRadius="12"
-                    Padding="20"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center">
-
-                <ItemsControl ItemsSource="{Binding TablePicker.Tables}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <UniformGrid Columns="4" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Button
-                                Style="{StaticResource TableTileStyle}"
-                                Height="80"
-                                    Margin="8"
-                                    Command="{Binding DataContext.TablePicker.SelectTableCommand,
-                                                  RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                    CommandParameter="{Binding}">
-                                <TextBlock Text="{Binding Number}"
-                                           FontSize="22"
-                                           HorizontalAlignment="Center"
-                                           VerticalAlignment="Center" />
-                            </Button>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-
+                    CornerRadius="20"
+                    Padding="30"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center">
+                <StackPanel>
+                    <TextBlock Text="Select a Table"
+                               FontSize="24"
+                               FontWeight="Bold"
+                               Margin="0,0,0,20"
+                               HorizontalAlignment="Center" />
+                    <ItemsControl ItemsSource="{Binding TablePicker.Tables}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="4" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Style="{StaticResource MenuItemTile}"
+                                        Height="80"
+                                        Command="{Binding DataContext.TablePicker.SelectTableCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                        CommandParameter="{Binding}">
+                                    <TextBlock Text="{Binding Number}"
+                                               FontSize="22"
+                                               FontWeight="Bold" />
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
             </Border>
         </Border>
-        <Border Background="#AA000000"
-                Visibility="{Binding IsCoverSelectorOpen,
-                     Converter={StaticResource BoolToVisibilityConverter}}">
 
-            <views:CoverSelectorView
-                DataContext="{Binding coverSelectorViewModel}"/>
-
+        <Border Background="#CC1E293B"
+                Visibility="{Binding IsCoverSelectorOpen, Converter={StaticResource BoolToVisibilityConverter}}">
+            <views:CoverSelectorView DataContext="{Binding coverSelectorViewModel}"
+                                     VerticalAlignment="Center"
+                                     HorizontalAlignment="Center" />
         </Border>
     </Grid>
 </UserControl>

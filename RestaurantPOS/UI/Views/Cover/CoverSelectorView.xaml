@@ -4,155 +4,202 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:RestaurantPOS.UI.Views.Cover"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Border Background="#AA000000">
-
-        <Border Width="420"
+             d:DesignHeight="900" d:DesignWidth="1200">
+    <Border Background="#CC1E293B">
+        <Border Width="400"
                 Background="White"
-                CornerRadius="14"
+                CornerRadius="20"
                 Padding="24"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="30"
+                                  ShadowDepth="0"
+                                  Opacity="0.2" />
+            </Border.Effect>
 
             <Grid>
-
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <!-- HEADER -->
-                <TextBlock Text="Select Covers"
-                           FontSize="22"
-                           FontWeight="Bold"
-                           Margin="0,0,0,20" />
+                <StackPanel Margin="0,0,0,24">
+                    <TextBlock Text="Guest Covers"
+                               FontSize="24"
+                               FontWeight="Black"
+                               Foreground="#1E293B" />
+                    <TextBlock Text="Set the number of people at the table"
+                               FontSize="13"
+                               Foreground="#64748B" />
+                </StackPanel>
 
-                <!-- ADULTS -->
-                <Grid Grid.Row="1"
-                      Margin="0,0,0,12">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
+                <StackPanel Grid.Row="1"
+                            Margin="0,0,0,20">
+                    <Border Background="#F8FAFC"
+                            CornerRadius="12"
+                            Padding="12"
+                            Margin="0,0,0,8"
+                            BorderBrush="#E2E8F0"
+                            BorderThickness="1">
+                        <Grid>
+                            <StackPanel Orientation="Horizontal">
+                                <iconPacks:PackIconMaterial Kind="Account"
+                                                            VerticalAlignment="Center"
+                                                            Foreground="#2563EB"
+                                                            Width="18" />
+                                <TextBlock Text="Adults"
+                                           VerticalAlignment="Center"
+                                           Margin="10,0,0,0"
+                                           FontSize="16"
+                                           FontWeight="SemiBold"
+                                           Foreground="#1E293B" />
+                            </StackPanel>
 
-                    <TextBlock Text="Adults"
-                               VerticalAlignment="Center"
-                               FontSize="16" />
+                            <StackPanel Orientation="Horizontal"
+                                        HorizontalAlignment="Right">
+                                <Button Style="{StaticResource CircleActionButton}"
+                                        Content="−"
+                                        Command="{Binding DecreaseAdultsCommand}" />
+                                <TextBox Text="{Binding AdultCovers}"
+                                         Width="50"
+                                         BorderThickness="0"
+                                         Background="Transparent"
+                                         FontSize="20"
+                                         FontWeight="Bold"
+                                         Foreground="#2563EB"
+                                         GotFocus="AdultsBox_GotFocus"
+                                         HorizontalContentAlignment="Center"
+                                         VerticalAlignment="Center" />
+                                <Button Style="{StaticResource CircleActionButton}"
+                                        Content="+"
+                                        Command="{Binding IncreaseAdultsCommand}" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
 
-                    <Button Grid.Column="1"
-                            Content="−"
-                            Width="32"
-                            Margin="6,0"
-                            Command="{Binding DecreaseAdultsCommand}" />
+                    <Border Background="#F8FAFC"
+                            CornerRadius="12"
+                            Padding="12"
+                            BorderBrush="#E2E8F0"
+                            BorderThickness="1">
+                        <Grid>
+                            <StackPanel Orientation="Horizontal">
+                                <iconPacks:PackIconMaterial Kind="HumanChild"
+                                                            VerticalAlignment="Center"
+                                                            Foreground="#2563EB"
+                                                            Width="18" />
+                                <TextBlock Text="Children"
+                                           VerticalAlignment="Center"
+                                           Margin="10,0,0,0"
+                                           FontSize="16"
+                                           FontWeight="SemiBold"
+                                           Foreground="#1E293B" />
+                            </StackPanel>
 
-                    <TextBox Grid.Column="2"
-                             Text="{Binding AdultCovers}"
-                             Width="50"
-                             FontSize="16"
-                             GotFocus="AdultsBox_GotFocus"
-                             HorizontalContentAlignment="Center" />
+                            <StackPanel Orientation="Horizontal"
+                                        HorizontalAlignment="Right">
+                                <Button Style="{StaticResource CircleActionButton}"
+                                        Content="−"
+                                        Command="{Binding DecreaseChildrenCommand}" />
+                                <TextBox Text="{Binding ChildCovers}"
+                                         Width="50"
+                                         BorderThickness="0"
+                                         Background="Transparent"
+                                         FontSize="20"
+                                         FontWeight="Bold"
+                                         Foreground="#2563EB"
+                                         GotFocus="ChildrenBox_GotFocus"
+                                         HorizontalContentAlignment="Center"
+                                         VerticalAlignment="Center" />
+                                <Button Style="{StaticResource CircleActionButton}"
+                                        Content="+"
+                                        Command="{Binding IncreaseChildrenCommand}" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </StackPanel>
 
-                    <Button Grid.Column="3"
-                            Content="+"
-                            Width="32"
-                            Margin="6,0"
-                            Command="{Binding IncreaseAdultsCommand}" />
-                </Grid>
-
-                <!-- CHILDREN -->
-                <Grid Grid.Row="2"
-                      Margin="0,0,0,20">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-
-                    <TextBlock Text="Children"
-                               VerticalAlignment="Center"
-                               FontSize="16" />
-
-                    <Button Grid.Column="1"
-                            Content="−"
-                            Width="32"
-                            Margin="6,0"
-                            Command="{Binding DecreaseChildrenCommand}" />
-
-                    <TextBox Grid.Column="2"
-                             Text="{Binding ChildCovers}"
-                             Width="50"
-                             FontSize="16"
-                             GotFocus="ChildrenBox_GotFocus"
-                             HorizontalContentAlignment="Center" />
-
-                    <Button Grid.Column="3"
-                            Content="+"
-                            Width="32"
-                            Margin="6,0"
-                            Command="{Binding IncreaseChildrenCommand}" />
-                </Grid>
-
-                <!-- KEYPAD -->
-                <UniformGrid Grid.Row="3"
+                <UniformGrid Grid.Row="2"
                              Columns="3"
                              Rows="4"
-                             Margin="0,0,0,16">
-
+                             Height="280">
                     <Button Content="1"
+                            Style="{StaticResource KeypadButton}"
                             Command="{Binding AppendDigitCommand}"
                             CommandParameter="1" />
                     <Button Content="2"
+                            Style="{StaticResource KeypadButton}"
                             Command="{Binding AppendDigitCommand}"
                             CommandParameter="2" />
                     <Button Content="3"
+                            Style="{StaticResource KeypadButton}"
                             Command="{Binding AppendDigitCommand}"
                             CommandParameter="3" />
 
                     <Button Content="4"
+                            Style="{StaticResource KeypadButton}"
                             Command="{Binding AppendDigitCommand}"
                             CommandParameter="4" />
                     <Button Content="5"
+                            Style="{StaticResource KeypadButton}"
                             Command="{Binding AppendDigitCommand}"
                             CommandParameter="5" />
                     <Button Content="6"
+                            Style="{StaticResource KeypadButton}"
                             Command="{Binding AppendDigitCommand}"
                             CommandParameter="6" />
 
                     <Button Content="7"
+                            Style="{StaticResource KeypadButton}"
                             Command="{Binding AppendDigitCommand}"
                             CommandParameter="7" />
                     <Button Content="8"
+                            Style="{StaticResource KeypadButton}"
                             Command="{Binding AppendDigitCommand}"
                             CommandParameter="8" />
                     <Button Content="9"
+                            Style="{StaticResource KeypadButton}"
                             Command="{Binding AppendDigitCommand}"
                             CommandParameter="9" />
 
-                    <Button Content="C"
-                            Command="{Binding ClearCommand}" />
+                    <Button Style="{StaticResource KeypadActionButton}"
+                            Command="{Binding ClearCommand}">
+                        <iconPacks:PackIconMaterial Kind="Refresh"
+                                                    Width="18" />
+                    </Button>
                     <Button Content="0"
+                            Style="{StaticResource KeypadButton}"
                             Command="{Binding AppendDigitCommand}"
                             CommandParameter="0" />
-                    <Button Content="←"
-                            Command="{Binding BackspaceCommand}" />
+                    <Button Style="{StaticResource KeypadActionButton}"
+                            Command="{Binding BackspaceCommand}">
+                        <iconPacks:PackIconMaterial Kind="BackspaceOutline"
+                                                    Width="18" />
+                    </Button>
                 </UniformGrid>
 
-                <!-- CONFIRM -->
-                <Button Grid.Row="4"
-                        Content="Confirm Covers"
-                        Height="48"
+                <Button Grid.Row="3"
+                        Content="CONFIRM GUESTS"
+                        Height="56"
+                        Margin="0,20,0,0"
                         FontSize="16"
                         FontWeight="Bold"
                         Background="#16A34A"
                         Foreground="White"
-                        Command="{Binding ConfirmCommand}" />
+                        BorderThickness="0"
+                        Command="{Binding ConfirmCommand}">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius"
+                                    Value="12" />
+                        </Style>
+                    </Button.Resources>
+                </Button>
             </Grid>
         </Border>
     </Border>

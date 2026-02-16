@@ -30,6 +30,7 @@
                 <ResourceDictionary Source="UI/Styles/CategoryTile.xaml" />
                 <ResourceDictionary Source="UI/Styles/MenuItemTile.xaml" />
                 <ResourceDictionary Source="UI/Styles/OrderSummary.xaml" />
+                <ResourceDictionary Source="UI/Styles/POSStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <!-- CONVERTERS -->
