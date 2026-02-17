@@ -4,37 +4,54 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:RestaurantPOS.UI.Views.Tables"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             xmlns:converters="clr-namespace:RestaurantPOS.UI.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <ScrollViewer>
+    <ScrollViewer Margin="20"
+                  PanningMode="Both"
+                  VerticalScrollBarVisibility="Hidden">
         <ItemsControl ItemsSource="{Binding Tables}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <UniformGrid Columns="4" />
+                    <UniformGrid Columns="5" />
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
 
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Button
-                        Margin="10"
+                    <Button Margin="10"
                             Height="140"
-                            Command="{Binding DataContext.SelectTableCommand,
-                  RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                            Command="{Binding DataContext.SelectTableCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                             CommandParameter="{Binding}"
-                            BorderThickness="0"
                             Style="{StaticResource TableTileStyle}">
-                        <TextBlock Text="{Binding Number}"
-                                   FontSize="32"
-                                   Foreground="White"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center" />
+
+                        <Grid>
+                            <StackPanel VerticalAlignment="Center"
+                                        HorizontalAlignment="Center">
+                                <iconPacks:PackIconMaterial Kind="TableChair"
+                                                            HorizontalAlignment="Center"
+                                                            Width="30"
+                                                            Height="30"
+                                                            Margin="0,0,0,10"
+                                                            Opacity="0.5" />
+
+                                <TextBlock Text="{Binding Number}"
+                                           FontSize="36"
+                                           FontWeight="Black"
+                                           HorizontalAlignment="Center" />
+
+                                <TextBlock Text="{Binding CurrentTotal, StringFormat=£{0:F2}}"
+                                           FontSize="14"
+                                           FontWeight="SemiBold"
+                                           Opacity="0.8"
+                                           HorizontalAlignment="Center"
+                                           Visibility="{Binding HasOrder, Converter={StaticResource BoolToVisibilityConverter}}" />
+                            </StackPanel>
+                        </Grid>
                     </Button>
-
                 </DataTemplate>
-
             </ItemsControl.ItemTemplate>
-
         </ItemsControl>
     </ScrollViewer>
 </UserControl>

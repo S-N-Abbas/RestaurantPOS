@@ -1,11 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RestaurantPOS.Domain;
 using RestaurantPOS.Domain.Entities;
+using RestaurantPOS.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using RestaurantPOS.Services;
 
 namespace RestaurantPOS.Infrastructure.Data
 {
@@ -22,6 +24,8 @@ namespace RestaurantPOS.Infrastructure.Data
         public DbSet<Order> Orders => Set<Order>();
         public DbSet<OrderItem> OrderItems => Set<OrderItem>();
         public DbSet<Payment> Payments => Set<Payment>();
+        public DbSet<User> Users => Set<User>();
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -66,7 +70,6 @@ namespace RestaurantPOS.Infrastructure.Data
         }
     )
 );
-
         }
     }
 }

@@ -10,9 +10,12 @@ namespace RestaurantPOS.Services
     public class OrderStore
     {
         private readonly OrderService _orderService;
+        private readonly IPricingService _pricingService;
         private readonly Dictionary<int, OrderState> _orders = new();
 
         public event Action<int>? OrderStateChanged;
+
+
 
         public bool HasOrder(int tableNumber)
        => _orders.ContainsKey(tableNumber);
@@ -20,6 +23,7 @@ namespace RestaurantPOS.Services
         public OrderStore(OrderService orderService)
         {
             _orderService = orderService;
+            _pricingService = new PricingService();
         }
 
         public async Task<OrderState> GetOrCreateAsync(
@@ -41,6 +45,17 @@ namespace RestaurantPOS.Services
         {
             if (_orders.Remove(tableNumber))
                 OrderStateChanged?.Invoke(tableNumber);
+        }
+
+        public decimal GetOrderTotal(int number)
+        {
+            _orders.TryGetValue(number, out var state);
+            if (state == null)
+                return 0;
+
+            return state.Order!.ItemsTotal
+                + state.Order.ChildCovers * _pricingService.ChildCoverRate
+                + state.Order.AdultCovers * _pricingService.AdultCoverRate;
         }
     }
 }

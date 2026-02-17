@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RestaurantPOS.Infrastructure.Data;
 
@@ -10,9 +11,11 @@ using RestaurantPOS.Infrastructure.Data;
 namespace RestaurantPOS.Migrations
 {
     [DbContext(typeof(PosDbContext))]
-    partial class PosDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260216163647_userupdate")]
+    partial class userupdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.12");
@@ -317,6 +320,24 @@ namespace RestaurantPOS.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            IsActive = true,
+                            PasscodeHash = "$2a$11$vl0UxJaGDJQLPFSER5kYE.nMVmYXM4jqWLU7zHVYEAHU9IC2hMhq.",
+                            Role = 1,
+                            Username = "Abbas"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            IsActive = true,
+                            PasscodeHash = "$2a$11$3E1HMTpo7ekBujQ2zXTWtOTY.6nVLsbqGSkX/.O3tlZ5fdl4uZXui",
+                            Role = 2,
+                            Username = "Bilal"
+                        });
                 });
 
             modelBuilder.Entity("RestaurantPOS.Domain.Entities.MenuProduct", b =>

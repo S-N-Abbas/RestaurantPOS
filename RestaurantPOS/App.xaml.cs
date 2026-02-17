@@ -47,6 +47,7 @@ namespace RestaurantPOS
 
             var mainWindow = Services.GetRequiredService<MainWindow>();
             mainWindow.DataContext = Services.GetRequiredService<ShellViewModel>();
+
             mainWindow.Show();
 
         }
@@ -77,6 +78,7 @@ namespace RestaurantPOS
             services.AddSingleton<ITableSessionService, TableSessionService>();
             services.AddScoped<ITableService, TableService>();
             services.AddSingleton<IPricingService, PricingService>();
+            services.AddSingleton<IUserService, UserService>();
             services.AddScoped<OrderService>();
             services.AddSingleton<OrderStore>();
             services.AddSingleton<TableStore>();

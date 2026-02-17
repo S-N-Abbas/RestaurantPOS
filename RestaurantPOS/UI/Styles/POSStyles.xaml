@@ -17,6 +17,8 @@
                      Color="#1E293B" />
     <SolidColorBrush x:Key="TextMuted"
                      Color="#64748B" />
+    <SolidColorBrush x:Key="SurfaceDark"
+                     Color="#1F2937" />
 
     <Style x:Key="ModernButton"
            TargetType="Button">
@@ -36,6 +38,65 @@
                         Value="8" />
             </Style>
         </Style.Resources>
+    </Style>
+    
+    <!-- TABLE TILE STYLE -->
+    <Style x:Key="TableTileStyle"
+           TargetType="Button">
+        <Setter Property="Background"
+                Value="{StaticResource SurfaceWhite}" />
+        <Setter Property="Foreground"
+                Value="{StaticResource TextDark}" />
+        <Setter Property="BorderThickness"
+                Value="0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="20"
+                            BorderThickness="2"
+                            BorderBrush="{StaticResource BorderGray}">
+                        <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <DataTrigger Binding="{Binding HasOrder}"
+                                     Value="True">
+                            <Setter TargetName="border"
+                                    Property="Background"
+                                    Value="{StaticResource PrimaryAccent}" />
+                            <Setter TargetName="border"
+                                    Property="BorderBrush"
+                                    Value="{StaticResource PrimaryAccent}" />
+                            <Setter Property="Foreground"
+                                    Value="White" />
+                        </DataTrigger>
+
+                        <Trigger Property="IsMouseOver"
+                                 Value="True">
+                            <Setter TargetName="border"
+                                    Property="Opacity"
+                                    Value="0.9" />
+                            <Setter TargetName="border"
+                                    Property="BorderBrush"
+                                    Value="{StaticResource PrimaryAccent}" />
+                        </Trigger>
+
+                        <Trigger Property="IsPressed"
+                                 Value="True">
+                            <Setter TargetName="border"
+                                    Property="RenderTransform">
+                                <Setter.Value>
+                                    <ScaleTransform ScaleX="0.95"
+                                                    ScaleY="0.95" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style x:Key="CategoryListBoxItem"

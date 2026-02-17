@@ -24,6 +24,8 @@ namespace RestaurantPOS.ViewModels.Tables
 
         public bool IsLocked => HasOrder && !IsCurrent;
 
+        public decimal CurrentTotal => _orderStore.GetOrderTotal(Number);
+
         public ICommand SelectTableCommand { get; }
 
         public TableViewModel(
@@ -59,6 +61,7 @@ namespace RestaurantPOS.ViewModels.Tables
             OnPropertyChanged(nameof(HasOrder));
             OnPropertyChanged(nameof(IsLocked));
             OnPropertyChanged(nameof(IsCurrent));
+            OnPropertyChanged(nameof(CurrentTotal));
             ((RelayCommand)SelectTableCommand).NotifyCanExecuteChanged();
         }
     }
