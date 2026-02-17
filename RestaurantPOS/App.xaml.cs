@@ -26,7 +26,7 @@ namespace RestaurantPOS
     {
         public static IServiceProvider Services { get; private set; } = null!;
 
-        protected override void OnStartup(StartupEventArgs e)
+        protected override async void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
@@ -47,6 +47,10 @@ namespace RestaurantPOS
 
             var mainWindow = Services.GetRequiredService<MainWindow>();
             mainWindow.DataContext = Services.GetRequiredService<ShellViewModel>();
+
+            var orderStore = Services.GetRequiredService<OrderStore>();
+
+            await orderStore.InitializeAsync();
 
             mainWindow.Show();
 

@@ -26,6 +26,28 @@ namespace RestaurantPOS.Services
             _pricingService = new PricingService();
         }
 
+        public async Task InitializeAsync()
+        {
+            var openOrders = await _orderService.GetOpenOrdersAsync();
+
+            foreach (var order in openOrders)
+            {
+                _orders[order.TableNumber] =
+                    new OrderState(order.TableNumber, order, RemoveItem);
+            }
+        }
+
+        private void RemoveItem(OrderItemViewModel item)
+        {
+            if (item == null) return;
+
+            if (_orders.TryGetValue(item.TableNumber, out var orderState))
+            {
+                orderState.Items.Remove(item);
+            }
+        }
+
+
         public async Task<OrderState> GetOrCreateAsync(
             int tableNumber,
             Action<OrderItemViewModel> removeCallback)

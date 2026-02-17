@@ -24,7 +24,7 @@ namespace RestaurantPOS.Services
 
             Items = new ObservableCollection<OrderItemViewModel>(
                 order?.Items.Select(i =>
-                    new OrderItemViewModel(i, removeCallback))
+                    new OrderItemViewModel(i, tableNumber, removeCallback))
                 ?? Enumerable.Empty<OrderItemViewModel>()
             );
         }

@@ -23,6 +23,16 @@ namespace RestaurantPOS.Services
             _pricingService = pricingService;
         }
 
+        public async Task<List<Order>> GetOpenOrdersAsync()
+        {
+            return await _db.Orders
+                .Include(o => o.Items)
+                .Include(o => o.Payments)
+                .Where(o => o.ClosedAt == null)
+                .ToListAsync();
+        }
+
+
         public async Task UpdateCoversAsync(int orderId, int adults, int children)
         {
             if (adults < 0 || children < 0)

@@ -12,6 +12,7 @@ namespace RestaurantPOS.ViewModels.Orders
 {
     public class OrderItemViewModel : ViewModelBase
     {
+        public int TableNumber { get; }
         public int ItemId { get; }
         public string Name { get; }
         public decimal UnitPrice { get; }
@@ -52,9 +53,10 @@ namespace RestaurantPOS.ViewModels.Orders
         }
 
         public OrderItemViewModel(
-    OrderItem orderItem,
+    OrderItem orderItem, int tableNumber,
     Action<OrderItemViewModel> removeCallback)
         {
+            TableNumber = tableNumber;
             ItemId = orderItem.ProductId;
             Name = orderItem.ProductName;
             UnitPrice = orderItem.UnitPrice;
