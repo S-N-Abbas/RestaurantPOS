@@ -1,152 +1,265 @@
 ﻿<UserControl x:Class="RestaurantPOS.UI.Views.BackOffice.Users.UsersView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:RestaurantPOS.UI.Views.BackOffice.Users"
-             mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="1100">
-    <Grid Background="#F3F4F6">
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             mc:Ignorable="d"
+             d:DesignHeight="700"
+             d:DesignWidth="1100">
 
-        <Border Background="White"
-                CornerRadius="12"
-                Padding="20"
-                Margin="20">
+    <Grid Background="{StaticResource BackgroundGray}">
+        <Grid Margin="30">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
+            <Border Background="{StaticResource SurfaceWhite}"
+                    CornerRadius="16"
+                    Margin="0,0,20,0">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="15"
+                                      ShadowDepth="0"
+                                      Opacity="0.05" />
+                </Border.Effect>
 
-                <!-- HEADER -->
-                <DockPanel Grid.Row="0"
-                           Margin="0,0,0,16">
+                <DockPanel Margin="25">
+                    <DockPanel DockPanel.Dock="Top"
+                               LastChildFill="False"
+                               Margin="0,0,0,20">
+                        <StackPanel DockPanel.Dock="Left">
+                            <TextBlock Text="Staff Management"
+                                       FontSize="24"
+                                       FontWeight="Black"
+                                       Foreground="{StaticResource TextDark}" />
+                            <TextBlock Text="Manage system access and roles"
+                                       Foreground="{StaticResource TextMuted}"
+                                       FontSize="13" />
+                        </StackPanel>
 
-                    <TextBlock Text="Users Management"
-                               FontSize="22"
-                               FontWeight="Bold"
-                               VerticalAlignment="Center"
-                               DockPanel.Dock="Left" />
+                        <Button DockPanel.Dock="Right"
+                                VerticalAlignment="Center"
+                                Content="+ New User"
+                                Command="{Binding NewUserCommand}"
+                                Background="{StaticResource PrimaryAccent}"
+                                Foreground="White"
+                                Padding="20,10"
+                                FontWeight="Bold">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius"
+                                            Value="8" />
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+                    </DockPanel>
 
-                    <Button Content="+ New User"
-                            Width="120"
-                            Height="36"
-                            FontWeight="SemiBold"
-                            Background="#2563EB"
-                            Foreground="White"
-                            BorderThickness="0"
-                            DockPanel.Dock="Right"
-                            Command="{Binding NewUserCommand}" />
-                </DockPanel>
+                    <Border DockPanel.Dock="Top"
+                            Background="#F8FAFC"
+                            CornerRadius="8"
+                            Padding="10,5"
+                            Margin="0,0,0,15"
+                            BorderBrush="{StaticResource BorderGray}"
+                            BorderThickness="1">
+                        <Grid>
+                            <iconPacks:PackIconMaterial Kind="Magnify"
+                                                        Foreground="{StaticResource TextMuted}"
+                                                        VerticalAlignment="Center" />
+                            <TextBox Margin="25,0,0,0"
+                                     Background="Transparent"
+                                     BorderThickness="0"
+                                     VerticalAlignment="Center"
+                                     Tag="Search users..."
+                                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+                        </Grid>
+                    </Border>
 
-                <!-- MAIN CONTENT -->
-                <Grid Grid.Row="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="20" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-
-                    <!-- USERS GRID -->
-                    <DataGrid Grid.Column="0"
-                              ItemsSource="{Binding Users}"
+                    <DataGrid ItemsSource="{Binding Users}"
                               SelectedItem="{Binding SelectedUser}"
                               AutoGenerateColumns="False"
                               CanUserAddRows="False"
-                              RowHeight="40">
+                              HeadersVisibility="Column"
+                              GridLinesVisibility="None"
+                              SelectionMode="Single"
+                              RowHeight="50"
+                              Background="Transparent"
+                              BorderThickness="0">
+                        <DataGrid.Resources>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="Background"
+                                        Value="Transparent" />
+                                <Setter Property="Foreground"
+                                        Value="{StaticResource TextMuted}" />
+                                <Setter Property="FontWeight"
+                                        Value="SemiBold" />
+                                <Setter Property="Padding"
+                                        Value="10,0" />
+                                <Setter Property="BorderThickness"
+                                        Value="0,0,0,1" />
+                                <Setter Property="BorderBrush"
+                                        Value="{StaticResource BorderGray}" />
+                            </Style>
+                        </DataGrid.Resources>
 
                         <DataGrid.Columns>
+                            <DataGridTemplateColumn Header="User"
+                                                    Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal"
+                                                    VerticalAlignment="Center">
+                                            <Border Width="32"
+                                                    Height="32"
+                                                    CornerRadius="16"
+                                                    Background="#EFF6FF"
+                                                    Margin="0,0,10,0">
+                                                <iconPacks:PackIconMaterial Kind="Account"
+                                                                            Foreground="{StaticResource PrimaryAccent}"
+                                                                            Width="14"
+                                                                            Height="14"
+                                                                            HorizontalAlignment="Center"
+                                                                            VerticalAlignment="Center" />
+                                            </Border>
+                                            <TextBlock Text="{Binding Username}"
+                                                       VerticalAlignment="Center"
+                                                       FontWeight="Bold"
+                                                       Foreground="{StaticResource TextDark}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
 
-                            <DataGridTextColumn Header="Name"
-                                                Binding="{Binding Username}"
-                                                Width="*" />
-
-                            <DataGridTextColumn Header="Role"
+                            <DataGridTextColumn Header="Access Role"
                                                 Binding="{Binding Role}"
                                                 Width="150" />
 
-                            <DataGridCheckBoxColumn Header="Active"
-                                                    Binding="{Binding IsActive}"
-                                                    Width="100" />
-
+                            <DataGridTemplateColumn Header="Status"
+                                                    Width="100">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border CornerRadius="10"
+                                                Padding="8,2"
+                                                HorizontalAlignment="Left"
+                                                Background="{Binding IsActive, Converter={StaticResource StatusToBrushConverter}}">
+                                            <TextBlock Text="{Binding IsActive, Converter={StaticResource StatusToTextConverter}}"
+                                                       FontSize="11"
+                                                       FontWeight="Bold"
+                                                       Foreground="White" />
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
+                </DockPanel>
+            </Border>
 
-                    <!-- SPACER -->
-                    <Grid Grid.Column="1" />
+            <Border Grid.Column="1"
+                    Background="{StaticResource SurfaceWhite}"
+                    CornerRadius="16"
+                    Padding="30">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="15"
+                                      ShadowDepth="0"
+                                      Opacity="0.05" />
+                </Border.Effect>
 
-                    <!-- EDITOR PANEL -->
-                    <Border Grid.Column="2"
-                            Background="#F9FAFB"
-                            CornerRadius="10"
-                            Padding="16">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
 
+                    <TextBlock Text="Edit User Profile"
+                               FontSize="20"
+                               FontWeight="Black"
+                               Margin="0,0,0,25" />
+
+                    <ScrollViewer Grid.Row="1"
+                                  VerticalScrollBarVisibility="Auto">
                         <StackPanel>
-
-                            <TextBlock Text="User Details"
-                                       FontSize="18"
+                            <TextBlock Text="DISPLAY NAME"
+                                       FontSize="11"
                                        FontWeight="Bold"
-                                       Margin="0,0,0,16" />
-
-                            <!-- NAME -->
-                            <TextBlock Text="Name" />
+                                       Foreground="{StaticResource TextMuted}"
+                                       Margin="0,0,0,8" />
                             <TextBox Text="{Binding EditorName}"
-                                     Margin="0,4,0,12"
-                                     Height="32" />
+                                     Height="40"
+                                     Margin="0,0,0,20" />
 
-                            <!-- ROLE -->
-                            <TextBlock Text="Role" />
-                            <ComboBox SelectedItem="{Binding EditorRole}"
-                                      Margin="0,4,0,12"
-                                      Height="32" 
-                                      ItemsSource="{Binding Roles}"/>
+                            <TextBlock Text="SYSTEM ROLE"
+                                       FontSize="11"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource TextMuted}"
+                                       Margin="0,0,0,8" />
+                            <ComboBox ItemsSource="{Binding Roles}"
+                                      SelectedItem="{Binding EditorRole}"
+                                      Height="40"
+                                      Margin="0,0,0,20" />
 
-                            <!-- PIN -->
-                            <TextBlock Text="PIN" />
-                            <PasswordBox Margin="0,4,0,12"
-                                         Height="32"
-                                         x:Name="PinBox"
-                                         PasswordChanged="PinBox_PasswordChanged"/>
+                            <TextBlock Text="SECURITY PIN"
+                                       FontSize="11"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource TextMuted}"
+                                       Margin="0,0,0,8" />
+                            <PasswordBox x:Name="PinBox"
+                                         Height="40"
+                                         Margin="0,0,0,10"
+                                         PasswordChanged="PinBox_PasswordChanged" />
+                            <TextBlock Text="Leave empty to keep current PIN"
+                                       FontSize="11"
+                                       Foreground="{StaticResource TextMuted}"
+                                       Margin="0,0,0,20"
+                                       FontStyle="Italic" />
 
-                            <!-- ACTIVE -->
-                            <CheckBox Content="Active User"
+                            <CheckBox Content="Enable account access"
                                       IsChecked="{Binding EditorIsActive}"
-                                      Margin="0,8,0,16" />
-
-                            <!-- ACTION BUTTONS -->
-                            <StackPanel Orientation="Horizontal">
-
-                                <Button Content="Save"
-                                        Width="90"
-                                        Height="36"
-                                        Background="#16A34A"
-                                        Foreground="White"
-                                        BorderThickness="0"
-                                        Command="{Binding SaveUserCommand}" />
-
-                                <Button Content="Clear"
-                                        Width="90"
-                                        Height="36"
-                                        Margin="8,0,0,0"
-                                        Command="{Binding ClearEditorCommand}" />
-
-                                <Button Content="Delete"
-                                        Width="90"
-                                        Height="36"
-                                        Margin="8,0,0,0"
-                                        Background="#DC2626"
-                                        Foreground="White"
-                                        BorderThickness="0"
-                                        Command="{Binding DeleteUserCommand}" />
-
-                            </StackPanel>
-
+                                      FontWeight="SemiBold" />
                         </StackPanel>
-                    </Border>
+                    </ScrollViewer>
 
+                    <Grid Grid.Row="2"
+                          Margin="0,20,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Button Content="Save User"
+                                Command="{Binding SaveUserCommand}"
+                                Background="{StaticResource SuccessGreen}"
+                                Foreground="White"
+                                Height="45"
+                                Margin="0,0,5,0"
+                                FontWeight="Bold">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius"
+                                            Value="10" />
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+
+                        <Button Grid.Column="1"
+                                Content="Delete"
+                                Command="{Binding DeleteUserCommand}"
+                                Background="{StaticResource DangerRed}"
+                                Foreground="White"
+                                Height="45"
+                                Margin="5,0,0,0"
+                                FontWeight="Bold">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius"
+                                            Value="10" />
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+                    </Grid>
                 </Grid>
-            </Grid>
-        </Border>
+            </Border>
+        </Grid>
     </Grid>
 </UserControl>
