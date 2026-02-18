@@ -22,7 +22,7 @@ namespace RestaurantPOS.Domain.Entities
 
         public string PasscodeHash { get; set; } = string.Empty;
 
-        public UserRole Role { get; set; }
+        public string Role { get; set; } = string.Empty;
 
         public bool IsActive { get; set; } = true;
     }

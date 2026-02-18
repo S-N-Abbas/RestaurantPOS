@@ -21,7 +21,10 @@ namespace RestaurantPOS.Services
             if (_session.CurrentUser == null)
                 return false;
 
-            return roles.Contains(_session.CurrentUser.Role);
+            UserRole currentRole;
+            Enum.TryParse(_session.CurrentUser.Role.ToString(), out currentRole);
+
+            return roles.Contains(currentRole);
         }
     }
 

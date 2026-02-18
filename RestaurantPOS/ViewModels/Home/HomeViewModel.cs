@@ -1,12 +1,14 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using RestaurantPOS.Services;
 using RestaurantPOS.ViewModels.Base;
+using RestaurantPOS.ViewModels.Login;
 using RestaurantPOS.ViewModels.Tables;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using RestaurantPOS.ViewModels.BackOffice.Users;
 
 namespace RestaurantPOS.ViewModels.Home
 {
@@ -16,7 +18,7 @@ namespace RestaurantPOS.ViewModels.Home
 
         public IRelayCommand DineInCommand { get; }
         public IRelayCommand TakeawayCommand { get; }
-        public IRelayCommand DeliveryCommand { get; }
+        public IRelayCommand BackOfficeCommand { get; }
 
         public HomeViewModel(INavigationService navigationService)
         {
@@ -26,7 +28,8 @@ namespace RestaurantPOS.ViewModels.Home
                 _navigationService.NavigateTo<TablesViewModel>());
 
             TakeawayCommand = new RelayCommand(() => Navigate("Takeaway"));
-            DeliveryCommand = new RelayCommand(() => Navigate("Delivery"));
+            BackOfficeCommand = new RelayCommand(() =>
+            _navigationService.NavigateTo<UsersViewModel>());
         }
 
         private void Navigate(string mode)

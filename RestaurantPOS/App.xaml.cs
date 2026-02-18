@@ -16,6 +16,7 @@ using System.Configuration;
 using System.Data;
 using System.IO;
 using System.Windows;
+using RestaurantPOS.ViewModels.BackOffice.Users;
 
 namespace RestaurantPOS
 {
@@ -99,6 +100,7 @@ namespace RestaurantPOS
             services.AddTransient<OrderViewModel>();
             services.AddTransient<PaymentViewModel>();
             services.AddTransient<CoverSelectorViewModel>();
+            services.AddTransient<UsersViewModel>();
         }
     }
 

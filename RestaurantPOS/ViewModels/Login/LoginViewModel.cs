@@ -121,7 +121,7 @@ namespace RestaurantPOS.ViewModels.Login
 
                 ClearPin();
 
-                _navigationService.NavigateTo<TablesViewModel>();
+                _navigationService.NavigateTo<HomeViewModel>();
             }
             catch (Exception ex)
             {

@@ -9,7 +9,7 @@
     <Grid Margin="20">
         <UniformGrid Columns="3">
 
-            <Button Content="DINE IN"
+            <Button Content="ORDER"
                     Style="{StaticResource PosTileButton}"
                     Command="{Binding DineInCommand}" />
 
@@ -17,9 +17,9 @@
                     Style="{StaticResource PosTileButton}"
                     Command="{Binding TakeawayCommand}" />
 
-            <Button Content="DELIVERY"
+            <Button Content="BACK OFFICE"
                     Style="{StaticResource PosTileButton}"
-                    Command="{Binding DeliveryCommand}" />
+                    Command="{Binding BackOfficeCommand}" />
 
         </UniformGrid>
     </Grid>

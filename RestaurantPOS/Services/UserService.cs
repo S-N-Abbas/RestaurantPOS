@@ -51,5 +51,49 @@ namespace RestaurantPOS.Services
 
             return Convert.ToHexString(hash);
         }
+
+        // ✅ CREATE
+
+        public void CreateUser(User user)
+        {
+            if (user == null)
+                return;
+
+            _context.Users.Add(user);
+            _context.SaveChanges();
+        }
+
+        // ✅ UPDATE
+
+        public void UpdateUser(User user)
+        {
+            if (user == null)
+                return;
+
+            var existingUser = _context.Users.Find(user.Id);
+
+            if (existingUser == null)
+                return;
+
+            existingUser.Username = user.Username;
+            existingUser.Role = user.Role;
+            existingUser.PasscodeHash = user.PasscodeHash;
+            existingUser.IsActive = user.IsActive;
+
+            _context.SaveChanges();
+        }
+
+        // ✅ DELETE
+
+        public void DeleteUser(int userId)
+        {
+            var user = _context.Users.Find(userId);
+
+            if (user == null)
+                return;
+
+            _context.Users.Remove(user);
+            _context.SaveChanges();
+        }
     }
 }

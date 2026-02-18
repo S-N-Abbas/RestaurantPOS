@@ -11,6 +11,12 @@ namespace RestaurantPOS.Services
     {
         IEnumerable<User> GetAllUsers();
         Task<bool> ValidatePinAsync(int userId, string pin);
+
+        void CreateUser(User user);
+
+        void UpdateUser(User user);
+
+        void DeleteUser(int userId);
     }
 
 }
