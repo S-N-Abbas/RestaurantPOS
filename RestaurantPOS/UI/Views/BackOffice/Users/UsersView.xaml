@@ -130,20 +130,28 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
-                            <DataGridTextColumn Header="Access Role"
-                                                Binding="{Binding Role}"
-                                                Width="150" />
+                            <DataGridTemplateColumn Header="Access Role"
+                                                    Width="150">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Role}"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="{StaticResource TextDark}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
 
                             <DataGridTemplateColumn Header="Status"
                                                     Width="100">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Border CornerRadius="10"
-                                                Padding="8,2"
-                                                HorizontalAlignment="Left"
+                                                Padding="5"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
                                                 Background="{Binding IsActive, Converter={StaticResource StatusToBrushConverter}}">
                                             <TextBlock Text="{Binding IsActive, Converter={StaticResource StatusToTextConverter}}"
-                                                       FontSize="11"
+                                                       FontSize="10"
                                                        FontWeight="Bold"
                                                        Foreground="White" />
                                         </Border>
@@ -195,7 +203,7 @@
                                        Foreground="{StaticResource TextMuted}"
                                        Margin="0,0,0,8" />
                             <ComboBox ItemsSource="{Binding Roles}"
-                                      SelectedItem="{Binding EditorRole}"
+                                      SelectedItem="{Binding EditorRole, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                       Height="40"
                                       Margin="0,0,0,20" />
 

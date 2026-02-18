@@ -19,6 +19,7 @@ namespace RestaurantPOS.ViewModels.Login
     {
         private readonly IUserService _userService;
         private readonly INavigationService _navigationService;
+        private readonly UserSessionService _userSessionService;
 
         private const int MaxPinLength = 4;
 
@@ -45,10 +46,12 @@ namespace RestaurantPOS.ViewModels.Login
 
         public LoginViewModel(
             IUserService userService,
-            INavigationService navigationService)
+            INavigationService navigationService,
+            UserSessionService userSessionService)
         {
             _userService = userService;
             _navigationService = navigationService;
+            _userSessionService = userSessionService;
 
             Users = new ObservableCollection<UserViewModel>(
                 _userService.GetAllUsers()
@@ -121,6 +124,7 @@ namespace RestaurantPOS.ViewModels.Login
 
                 ClearPin();
 
+                _userSessionService.SetUser(SelectedUser._user);
                 _navigationService.NavigateTo<HomeViewModel>();
             }
             catch (Exception ex)

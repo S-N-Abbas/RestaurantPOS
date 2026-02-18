@@ -87,6 +87,7 @@ namespace RestaurantPOS
             services.AddScoped<OrderService>();
             services.AddSingleton<OrderStore>();
             services.AddSingleton<TableStore>();
+            services.AddSingleton<UserSessionService>();
 
 
             // Shell

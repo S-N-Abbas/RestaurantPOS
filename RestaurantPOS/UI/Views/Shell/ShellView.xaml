@@ -31,6 +31,7 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Orientation="Horizontal"
@@ -42,18 +43,18 @@
                             Margin="0,0,12,0">
                         <iconPacks:PackIconMaterial Kind="SilverwareForkKnife"
                                                     Foreground="White"
-                                                    VerticalAlignment="Center"
-                                                    HorizontalAlignment="Center"
                                                     Width="20"
-                                                    Height="20" />
+                                                    Height="20"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center" />
                     </Border>
                     <StackPanel>
-                        <TextBlock Text="NAWAB PALACE"
+                        <TextBlock Text="{Binding RestaurantName}"
                                    FontSize="18"
                                    FontWeight="Black"
                                    Foreground="{StaticResource TextDark}"
-                                   Margin="1"/>
-                        <TextBlock Text="Terminal 01 - Main Floor"
+                                   Margin="1" />
+                        <TextBlock Text="{Binding TerminalInfo}"
                                    FontSize="11"
                                    FontWeight="SemiBold"
                                    Foreground="{StaticResource TextMuted}" />
@@ -64,16 +65,19 @@
                             Orientation="Horizontal"
                             VerticalAlignment="Center"
                             Margin="0,0,24,0">
-                    <Ellipse Width="32"
-                             Height="32"
-                             Fill="#E2E8F0"
-                             Margin="0,0,10,0" />
+                    <iconPacks:PackIconMaterial Kind="Account"
+                                                Foreground="#E2E8F0"
+                                                Width="32"
+                                                Height="32"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center" 
+                                                Padding="0,0,10,0"/>
                     <StackPanel VerticalAlignment="Center">
-                        <TextBlock Text="Staff Member"
+                        <TextBlock Text="{Binding CurrentUserName}"
                                    FontSize="13"
                                    FontWeight="Bold"
                                    Foreground="{StaticResource TextDark}" />
-                        <TextBlock Text="Server"
+                        <TextBlock Text="{Binding CurrentUserRole}"
                                    FontSize="11"
                                    Foreground="{StaticResource SuccessGreen}"
                                    FontWeight="Bold" />
@@ -116,11 +120,44 @@
                         </ControlTemplate>
                     </Button.Template>
                 </Button>
+
+                <Button Grid.Column="4"
+                        Command="{Binding CloseCommand}"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Cursor="Hand"
+                        Margin="5, 10">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="border"
+                                    Background="#F1F5F9"
+                                    Width="40"
+                                    Height="40"
+                                    CornerRadius="10">
+                                <iconPacks:PackIconMaterial Kind="Close"
+                                                            Foreground="{StaticResource TextMuted}"
+                                                            Width="18"
+                                                            Height="18"
+                                                            HorizontalAlignment="Center"
+                                                            VerticalAlignment="Center" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver"
+                                         Value="True">
+                                    <Setter TargetName="border"
+                                            Property="Background"
+                                            Value="#E2E8F0" />
+                                    <Setter Property="Tag"
+                                            Value="CloseApp" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
             </Grid>
         </Border>
 
         <ContentControl Grid.Row="1"
-                        Content="{Binding CurrentViewModel}">
-        </ContentControl>
+                        Content="{Binding CurrentViewModel}" />
     </Grid>
 </UserControl>

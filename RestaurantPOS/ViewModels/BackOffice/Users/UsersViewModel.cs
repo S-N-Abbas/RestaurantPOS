@@ -15,6 +15,7 @@ namespace RestaurantPOS.ViewModels.BackOffice.Users
     public class UsersViewModel : ViewModelBase
     {
         private readonly IUserService _userService;
+        private readonly UserSessionService _userSessionService;
 
         private ObservableCollection<User> _users;
         public ObservableCollection<User> Users { 
@@ -36,6 +37,7 @@ namespace RestaurantPOS.ViewModels.BackOffice.Users
                 OnPropertyChanged();
 
                 LoadSelectedUser();
+                CanDeleteUser();
             }
         }
 
@@ -52,11 +54,12 @@ namespace RestaurantPOS.ViewModels.BackOffice.Users
             Enum.GetValues(typeof(UserRole)).Cast<UserRole>();
 
 
-        private string _editorRole = "Cashier";
-        public string EditorRole
+        private UserRole _editorRole = UserRole.Cashier;
+        public UserRole EditorRole
         {
             get => _editorRole;
-            set { _editorRole = value; OnPropertyChanged(); }
+            set { _editorRole = value; 
+                OnPropertyChanged(); }
         }
 
         private string _editorPin = string.Empty;
@@ -80,9 +83,10 @@ namespace RestaurantPOS.ViewModels.BackOffice.Users
         public ICommand ClearEditorCommand { get; }
         public ICommand NewUserCommand { get; }
 
-        public UsersViewModel(IUserService userService)
+        public UsersViewModel(IUserService userService, UserSessionService userSessionService)
         {
             _userService = userService;
+            _userSessionService = userSessionService;
 
             LoadUsers();
 
@@ -105,8 +109,11 @@ namespace RestaurantPOS.ViewModels.BackOffice.Users
             if (SelectedUser == null)
                 return;
 
+            UserRole selectedUserRole;
+            Enum.TryParse<UserRole>(SelectedUser.Role, out selectedUserRole);
+
             EditorName = SelectedUser.Username;
-            EditorRole = SelectedUser.Role.ToString();
+            EditorRole = selectedUserRole;
             EditorIsActive = SelectedUser.IsActive;
 
             // POS systems typically DO NOT reveal PIN
@@ -123,13 +130,11 @@ namespace RestaurantPOS.ViewModels.BackOffice.Users
             if (SelectedUser == null)
             {
                 // ✅ CREATE NEW USER
-                UserRole role;
-                Enum.TryParse(EditorRole, out role);
 
                 var newUser = new User
                 {
                     Username = EditorName,
-                    Role = role.ToString(),
+                    Role = EditorRole.ToString(),
                     PasscodeHash = EditorPin,
                     IsActive = EditorIsActive
                 };
@@ -141,7 +146,7 @@ namespace RestaurantPOS.ViewModels.BackOffice.Users
                 // ✅ UPDATE EXISTING USER
 
                 SelectedUser.Username = EditorName;
-                SelectedUser.Role = EditorRole;
+                SelectedUser.Role = EditorRole.ToString();
                 SelectedUser.IsActive = EditorIsActive;
 
                 // Update PIN only if changed
@@ -158,7 +163,9 @@ namespace RestaurantPOS.ViewModels.BackOffice.Users
         // ✅ Delete Logic
 
         private bool CanDeleteUser()
-            => SelectedUser != null;
+        {
+            return SelectedUser != null && SelectedUser.Username != _userSessionService.CurrentUser?.Username;
+        }
 
         private void DeleteUser()
         {
@@ -166,7 +173,6 @@ namespace RestaurantPOS.ViewModels.BackOffice.Users
                 return;
 
             _userService.DeleteUser(SelectedUser.Id);
-
 
 
             ClearEditor(); 
@@ -180,7 +186,7 @@ namespace RestaurantPOS.ViewModels.BackOffice.Users
             SelectedUser = null;
 
             EditorName = string.Empty;
-            EditorRole = "Cashier";
+            EditorRole = UserRole.Cashier;
             EditorPin = string.Empty;
             EditorIsActive = true;
         }
