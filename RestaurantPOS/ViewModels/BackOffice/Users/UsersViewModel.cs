@@ -37,7 +37,8 @@ namespace RestaurantPOS.ViewModels.BackOffice.Users
                 OnPropertyChanged();
 
                 LoadSelectedUser();
-                CanDeleteUser();
+                // Tell WPF to re-check CanExecute
+                (DeleteUserCommand as RelayCommand)?.NotifyCanExecuteChanged();
             }
         }
 

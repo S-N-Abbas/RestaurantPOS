@@ -203,7 +203,7 @@
                                        Foreground="{StaticResource TextMuted}"
                                        Margin="0,0,0,8" />
                             <ComboBox ItemsSource="{Binding Roles}"
-                                      SelectedItem="{Binding EditorRole, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                      SelectedItem="{Binding EditorRole, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                       Height="40"
                                       Margin="0,0,0,20" />
 
