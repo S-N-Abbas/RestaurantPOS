@@ -10,6 +10,10 @@ namespace RestaurantPOS.Services
     public interface IUserService
     {
         IEnumerable<User> GetAllUsers();
+
+        IEnumerable<User> GetActiveUsers();
+
+        IEnumerable<User> SearchUsers(string search);
         Task<bool> ValidatePinAsync(int userId, string pin);
 
         void CreateUser(User user);

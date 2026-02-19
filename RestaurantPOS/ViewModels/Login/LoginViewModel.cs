@@ -54,7 +54,7 @@ namespace RestaurantPOS.ViewModels.Login
             _userSessionService = userSessionService;
 
             Users = new ObservableCollection<UserViewModel>(
-                _userService.GetAllUsers()
+                _userService.GetActiveUsers()
                             .Select(u => new UserViewModel(u)));
 
             AppendDigitCommand = new RelayCommand<string>(AppendDigit);

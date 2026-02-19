@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace RestaurantPOS.ViewModels.BackOffice.Users
@@ -77,6 +78,18 @@ namespace RestaurantPOS.ViewModels.BackOffice.Users
             set { _editorIsActive = value; OnPropertyChanged(); }
         }
 
+        private string _searchText;
+        public string SearchText
+        {
+            get => _searchText;
+            set
+            {
+                _searchText = value;
+                OnPropertyChanged();
+                LoadUsers(SearchText);
+            }
+        }
+
         // ✅ Commands
 
         public ICommand SaveUserCommand { get; }
@@ -97,10 +110,16 @@ namespace RestaurantPOS.ViewModels.BackOffice.Users
             NewUserCommand = new RelayCommand(NewUser);
         }
 
-        private void LoadUsers()
+        private void LoadUsers(string filter = "")
         {
+            if(filter == string.Empty)
+            {
+                Users = new ObservableCollection<User>(
+                    _userService.GetAllUsers());
+            }
+            else
             Users = new ObservableCollection<User>(
-                _userService.GetAllUsers());
+                _userService.SearchUsers(filter));
         }
 
         // ✅ Selection Handling
@@ -173,6 +192,9 @@ namespace RestaurantPOS.ViewModels.BackOffice.Users
             if (SelectedUser == null)
                 return;
 
+            var DialogResult = MessageBox.Show("Are you sure you want to delete this user?", "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            if(DialogResult != MessageBoxResult.Yes)
+                return;
             _userService.DeleteUser(SelectedUser.Id);
 
 

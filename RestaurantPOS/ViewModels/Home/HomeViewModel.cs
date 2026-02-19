@@ -15,21 +15,31 @@ namespace RestaurantPOS.ViewModels.Home
     public class HomeViewModel : ViewModelBase
     {
         private readonly INavigationService _navigationService;
-
+        private readonly AuthorizationService _authorizationService;
         public IRelayCommand DineInCommand { get; }
         public IRelayCommand TakeawayCommand { get; }
         public IRelayCommand BackOfficeCommand { get; }
 
-        public HomeViewModel(INavigationService navigationService)
+        public HomeViewModel(INavigationService navigationService, AuthorizationService authorizationService)
         {
             _navigationService = navigationService;
+            _authorizationService = authorizationService;
 
             DineInCommand = new RelayCommand(() =>
                 _navigationService.NavigateTo<TablesViewModel>());
 
             TakeawayCommand = new RelayCommand(() => Navigate("Takeaway"));
-            BackOfficeCommand = new RelayCommand(() =>
-            _navigationService.NavigateTo<UsersViewModel>());
+            BackOfficeCommand = new RelayCommand(GoToBackOffice, CanGoToBackOffice);
+        }
+
+        private bool CanGoToBackOffice()
+        {
+            return _authorizationService.HasAccess(Domain.Entities.UserRole.Admin);
+        }
+
+        private void GoToBackOffice()
+        {
+            _navigationService.NavigateTo<UsersViewModel>();
         }
 
         private void Navigate(string mode)

@@ -27,6 +27,24 @@ namespace RestaurantPOS.Services
                            .ToList();
         }
 
+        public IEnumerable<User> GetActiveUsers()
+        {
+            return _context.Users
+                           .AsNoTracking()
+                           .Where(u => u.IsActive)
+                           .OrderBy(u => u.Username)
+                           .ToList();
+        }
+
+        public IEnumerable<User> SearchUsers(string search)
+        {
+            return _context.Users
+                           .AsNoTracking()
+                           .Where(u => u.Username.ToLower().Contains(search.ToLower()) || u.Role.ToLower().Contains(search.ToLower()))
+                           .OrderBy(u => u.Username)
+                           .ToList();
+        }
+
         public async Task<bool> ValidatePinAsync(int userId, string pin)
         {
             var user = await _context.Users
