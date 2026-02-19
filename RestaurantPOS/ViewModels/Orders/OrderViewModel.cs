@@ -205,7 +205,7 @@ namespace RestaurantPOS.ViewModels.Orders
         private void CloseCoverSelector()
         {
             IsCoverSelectorOpen = false;
-            OnPropertyChanged(nameof(CoversDisplay));
+            UpdateOrderState();
         }
 
 

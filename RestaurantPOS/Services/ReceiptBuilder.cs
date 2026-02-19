@@ -13,10 +13,12 @@ namespace RestaurantPOS.Services
     public class ReceiptBuilder
     {
         private readonly IPricingService _princingService;
+        private readonly UserSessionService _userSessionService;
 
-        public ReceiptBuilder(IPricingService pricingService)
+        public ReceiptBuilder(IPricingService pricingService, UserSessionService userSessionService)
         {
             _princingService = pricingService;
+            _userSessionService = userSessionService;
         }
         public FlowDocument Build(Order order)
         {
@@ -59,7 +61,7 @@ namespace RestaurantPOS.Services
             metaTable.RowGroups[0].Rows.Add(metaRow);
             doc.Blocks.Add(metaTable);
 
-            doc.Blocks.Add(TwoColumn($"Server: {"Admin"}", $"Till: 1"));
+            doc.Blocks.Add(TwoColumn($"Server: {_userSessionService?.CurrentUser?.Username}", $"Till: 1"));
             doc.Blocks.Add(Center($"{DateTime.Now:dd/MM/yyyy HH:mm}"));
             doc.Blocks.Add(Line());
 

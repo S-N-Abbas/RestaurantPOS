@@ -33,13 +33,17 @@ namespace RestaurantPOS.ViewModels.Payments
         public string TableLabel => $"Table {_orderState.TableNumber}";
 
         // Payment amounts
+
+        public int AdultCount => _orderState.Order?.AdultCovers ?? 0;
+        public int ChildCount => _orderState.Order?.ChildCovers ?? 0;
+
+        public decimal AdultCoverTotal => AdultCount * _pricingService.AdultCoverRate;
+        public decimal ChildCoverTotal => ChildCount * _pricingService.ChildCoverRate;
+
         public decimal Total =>
             (_orderState.Order?.ItemsTotal
-            + _orderState.Order?.ChildCovers * _pricingService.ChildCoverRate
-            + _orderState.Order?.AdultCovers * _pricingService.AdultCoverRate ?? 0);
-
-        public string CoversDisplay =>
-            $"Adults: {_orderState.Order?.AdultCovers ?? 0}   •   Children: {_orderState.Order?.ChildCovers ?? 0}";
+            + ChildCoverTotal
+            + AdultCoverTotal ?? 0);
 
         public decimal AlreadyPaid => _orderState.Order?.PaidAmount ?? 0;
         public decimal PreviewPaid => AlreadyPaid;

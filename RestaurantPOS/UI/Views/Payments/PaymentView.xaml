@@ -89,6 +89,47 @@
                                 BorderBrush="{StaticResource BorderGray}"
                                 BorderThickness="0,1,0,0">
                             <StackPanel>
+                                <Grid Margin="0,0,0,4">
+                                    <StackPanel Orientation="Horizontal">
+                                        <iconPacks:PackIconMaterial Kind="Account"
+                                                                    Width="12"
+                                                                    Height="12"
+                                                                    Foreground="{StaticResource TextMuted}"
+                                                                    VerticalAlignment="Center"
+                                                                    Margin="0,0,8,0" />
+                                        <TextBlock Text="Adult Covers"
+                                                   Foreground="{StaticResource TextMuted}" />
+                                        <TextBlock Text="{Binding AdultCount, StringFormat=' (x{0})'}"
+                                                   Foreground="{StaticResource TextMuted}"
+                                                   FontSize="11" />
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding AdultCoverTotal, StringFormat=£{0:F2}}"
+                                               HorizontalAlignment="Right"
+                                               Foreground="{StaticResource TextDark}" />
+                                </Grid>
+
+                                <Grid Margin="0,0,0,12">
+                                    <StackPanel Orientation="Horizontal">
+                                        <iconPacks:PackIconMaterial Kind="AccountChild"
+                                                                    Width="12"
+                                                                    Height="12"
+                                                                    Foreground="{StaticResource TextMuted}"
+                                                                    VerticalAlignment="Center"
+                                                                    Margin="0,0,8,0" />
+                                        <TextBlock Text="Child Covers"
+                                                   Foreground="{StaticResource TextMuted}" />
+                                        <TextBlock Text="{Binding ChildCount, StringFormat=' (x{0})'}"
+                                                   Foreground="{StaticResource TextMuted}"
+                                                   FontSize="11" />
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding ChildCoverTotal, StringFormat=£{0:F2}}"
+                                               HorizontalAlignment="Right"
+                                               Foreground="{StaticResource TextDark}" />
+                                </Grid>
+
+                                <Separator Background="{StaticResource BorderGray}"
+                                           Margin="0,4,0,12" />
+
                                 <Grid Margin="0,0,0,8">
                                     <TextBlock Text="Subtotal"
                                                Foreground="{StaticResource TextMuted}" />
@@ -141,12 +182,10 @@
                                                    Foreground="{StaticResource TextDark}"
                                                    FontWeight="Medium"
                                                    TextWrapping="Wrap" />
-
                                         <TextBlock Grid.Column="1"
                                                    Text="{Binding Quantity, StringFormat='x{0}'}"
                                                    Foreground="{StaticResource TextMuted}"
                                                    Margin="15,0" />
-
                                         <TextBlock Grid.Column="2"
                                                    Text="{Binding LineTotal, StringFormat=£{0:F2}}"
                                                    Foreground="{StaticResource TextDark}"

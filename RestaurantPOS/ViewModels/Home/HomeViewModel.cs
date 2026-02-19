@@ -16,8 +16,8 @@ namespace RestaurantPOS.ViewModels.Home
     {
         private readonly INavigationService _navigationService;
         private readonly AuthorizationService _authorizationService;
-        public IRelayCommand DineInCommand { get; }
-        public IRelayCommand TakeawayCommand { get; }
+        public IRelayCommand OrderCommand { get; }
+        public IRelayCommand ReportsCommand { get; }
         public IRelayCommand BackOfficeCommand { get; }
 
         public HomeViewModel(INavigationService navigationService, AuthorizationService authorizationService)
@@ -25,11 +25,22 @@ namespace RestaurantPOS.ViewModels.Home
             _navigationService = navigationService;
             _authorizationService = authorizationService;
 
-            DineInCommand = new RelayCommand(() =>
+            OrderCommand = new RelayCommand(() =>
                 _navigationService.NavigateTo<TablesViewModel>());
 
-            TakeawayCommand = new RelayCommand(() => Navigate("Takeaway"));
+            ReportsCommand = new RelayCommand(GoToReports, CanGoToReports);
+
             BackOfficeCommand = new RelayCommand(GoToBackOffice, CanGoToBackOffice);
+        }
+
+        private bool CanGoToReports()
+        {
+            return _authorizationService.HasAccess(Domain.Entities.UserRole.Manager, Domain.Entities.UserRole.Admin);
+        }
+
+        private void GoToReports()
+        {
+            throw new NotImplementedException();
         }
 
         private bool CanGoToBackOffice()

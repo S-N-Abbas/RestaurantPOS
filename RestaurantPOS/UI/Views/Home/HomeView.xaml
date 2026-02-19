@@ -11,11 +11,11 @@
 
             <Button Content="ORDER"
                     Style="{StaticResource PosTileButton}"
-                    Command="{Binding DineInCommand}" />
+                    Command="{Binding OrderCommand}" />
 
-            <Button Content="TAKEAWAY"
+            <Button Content="REPORTS"
                     Style="{StaticResource PosTileButton}"
-                    Command="{Binding TakeawayCommand}" />
+                    Command="{Binding ReportsCommand}" />
 
             <Button Content="BACK OFFICE"
                     Style="{StaticResource PosTileButton}"
