@@ -53,13 +53,5 @@ namespace RestaurantPOS.ViewModels.Home
         {
             _navigationService.NavigateTo<BackOfficeViewModel>();
         }
-
-        private void Navigate(string mode)
-        {
-            // Later:
-            // - Tables for DineIn
-            // - Order screen for Takeaway / Delivery
-        }
-
     }
 }

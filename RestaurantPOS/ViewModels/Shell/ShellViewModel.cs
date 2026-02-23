@@ -15,8 +15,15 @@ namespace RestaurantPOS.ViewModels.Shell
     {
         private readonly INavigationService _navigationService;
         private readonly UserSessionService _userSessionService;
+        private readonly SettingsService _settingsService;
         public ViewModelBase CurrentViewModel
             => _navigationService.CurrentViewModel;
+
+        // Command for the Shell Back Button
+        public IRelayCommand GoBackCommand { get; }
+
+        // Visibility helper: Only show back button if history exists
+        public Visibility BackButtonVisibility => _navigationService.CanGoBack ? Visibility.Visible : Visibility.Collapsed;
 
         // --- NEW BINDABLE PROPERTIES ---
         private string _restaurantName = "NAWAB PALACE";
@@ -40,6 +47,8 @@ namespace RestaurantPOS.ViewModels.Shell
                 OnPropertyChanged(nameof(TerminalInfo));
             }
         }
+
+        public bool IsLoggedIn => _userSessionService.IsLoggedIn;
 
         private string _currentUserName;
         public string CurrentUserName
@@ -66,19 +75,35 @@ namespace RestaurantPOS.ViewModels.Shell
         public IRelayCommand LogoutCommand { get; }
         public IRelayCommand CloseCommand { get; }
         
-        public ShellViewModel(INavigationService navigationService, UserSessionService userSessionService)
+        public ShellViewModel(INavigationService navigationService, UserSessionService userSessionService, SettingsService settingsService)
         {
             _navigationService = navigationService;
             _userSessionService = userSessionService;
+            _settingsService = settingsService;
 
             // Subscribe to changes
             _userSessionService.UserChanged += UpdateUserProperties;
+            _settingsService.SettingsChanged += SettingsChanged;
 
             _navigationService.CurrentViewModelChanged += () =>
                 OnPropertyChanged(nameof(CurrentViewModel));
 
             LogoutCommand = new RelayCommand(OnLogout);
             CloseCommand = new RelayCommand(OnClose);
+
+            GoBackCommand = new RelayCommand(() => _navigationService.GoBack());
+
+            // Refresh visibility whenever navigation happens
+            _navigationService.CurrentViewModelChanged += () => {
+                OnPropertyChanged(nameof(BackButtonVisibility));
+            };
+        }
+
+        private void SettingsChanged()
+        {
+            RestaurantName = _settingsService.Settings.BusinessName;
+            TerminalInfo = _settingsService.Settings.TillNo;
+
         }
 
         private void UpdateUserProperties()
@@ -86,6 +111,7 @@ namespace RestaurantPOS.ViewModels.Shell
             // Update the properties that the View is bound to
             CurrentUserName = _userSessionService.CurrentUser?.Username ?? "Guest";
             CurrentUserRole = _userSessionService.CurrentUser?.Role ?? "Unknown";
+            OnPropertyChanged(nameof(IsLoggedIn));
         }
 
         private void OnLogout()

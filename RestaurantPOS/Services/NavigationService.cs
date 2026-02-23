@@ -10,6 +10,8 @@ namespace RestaurantPOS.Services
 {
     public class NavigationService : INavigationService
     {
+        private readonly Stack<ViewModelBase> _history = new();
+
         private readonly IServiceProvider _serviceProvider;
 
         private ViewModelBase _currentViewModel;
@@ -23,6 +25,8 @@ namespace RestaurantPOS.Services
             }
         }
 
+        public bool CanGoBack => _history.Count > 1;
+
         public event Action? CurrentViewModelChanged;
 
         public NavigationService(IServiceProvider serviceProvider)
@@ -32,14 +36,28 @@ namespace RestaurantPOS.Services
 
         public void NavigateTo<TViewModel>() where TViewModel : ViewModelBase
         {
+            if (CurrentViewModel != null)
+                _history.Push(CurrentViewModel);
             CurrentViewModel = _serviceProvider.GetRequiredService<TViewModel>();
         }
 
         public void NavigateTo<TViewModel>(object parameter)
             where TViewModel : ViewModelBase
         {
+            if (CurrentViewModel != null)
+                _history.Push(CurrentViewModel);
             CurrentViewModel = (ViewModelBase)ActivatorUtilities
                 .CreateInstance(_serviceProvider, typeof(TViewModel), parameter);
+        }
+
+        public void GoBack()
+        {
+            if (_history.Count > 0)
+            {
+                var previous = _history.Pop();
+                // Logic to set CurrentViewModel to previous without pushing to history
+                CurrentViewModel = previous;
+            }
         }
     }
 }

@@ -13,42 +13,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Border Background="{StaticResource SurfaceWhite}"
-                Height="64"
-                Padding="20,0"
-                BorderBrush="{StaticResource BorderGray}"
-                BorderThickness="0,0,0,1">
-            <Grid>
-                <StackPanel Orientation="Horizontal"
-                            VerticalAlignment="Center">
-                    <iconPacks:PackIconMaterial Kind="Table"
-                                                Foreground="{StaticResource PrimaryAccent}"
-                                                Margin="0,0,12,0"
-                                                VerticalAlignment="Center" />
-                    <TextBlock Text="{Binding TableLabel}"
-                               Foreground="{StaticResource TextDark}"
-                               FontSize="22"
-                               FontWeight="Bold"
-                               VerticalAlignment="Center" />
-                </StackPanel>
-
-                <Button HorizontalAlignment="Right"
-                        Style="{StaticResource KeypadActionButton}"
-                        Width="100"
-                        Height="40"
-                        Command="{Binding CancelCommand}">
-                    <StackPanel Orientation="Horizontal">
-                        <iconPacks:PackIconMaterial Kind="ArrowLeft"
-                                                    Width="14"
-                                                    Margin="0,0,8,0"
-                                                    VerticalAlignment="Center" />
-                        <TextBlock Text="BACK"
-                                   VerticalAlignment="Center"
-                                   FontWeight="Bold" />
-                    </StackPanel>
-                </Button>
-            </Grid>
-        </Border>
+        
 
         <Grid Grid.Row="1"
               Margin="24">
