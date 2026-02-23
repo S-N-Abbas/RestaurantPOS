@@ -12,7 +12,7 @@
 
                 <Button Content="USERS"
                         Style="{StaticResource PosTileButton}"
-                        Command="{Binding UserManagementCommand}" />
+                        Command="{Binding UsersCommand}" />
 
                 <Button Content="CATEGORIES"
                         Style="{StaticResource PosTileButton}"

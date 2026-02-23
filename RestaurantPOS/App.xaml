@@ -17,6 +17,10 @@
              xmlns:paymentsViews="clr-namespace:RestaurantPOS.UI.Views.Payments"
              xmlns:vmCovers="clr-namespace:RestaurantPOS.ViewModels.Cover"
              xmlns:coversViews="clr-namespace:RestaurantPOS.UI.Views.Cover"
+             xmlns:vmBackOffice="clr-namespace:RestaurantPOS.ViewModels.BackOffice"
+             xmlns:backOfficeViews="clr-namespace:RestaurantPOS.UI.Views.BackOffice"
+             xmlns:vmSettings="clr-namespace:RestaurantPOS.ViewModels.BackOffice.Settings"
+             xmlns:settingsViews="clr-namespace:RestaurantPOS.UI.Views.BackOffice.Settings"
              xmlns:vmUsers="clr-namespace:RestaurantPOS.ViewModels.BackOffice.Users"
              xmlns:usersViews="clr-namespace:RestaurantPOS.UI.Views.BackOffice.Users">
     <Application.Resources>
@@ -73,6 +77,14 @@
 
             <DataTemplate DataType="{x:Type vmUsers:UsersViewModel}">
                 <usersViews:UsersView />
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type vmBackOffice:BackOfficeViewModel}">
+                <backOfficeViews:BackOfficeView />
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type vmSettings:SettingsViewModel}">
+                <settingsViews:SettingsView />
             </DataTemplate>
 
         </ResourceDictionary>

@@ -17,6 +17,8 @@ using System.Data;
 using System.IO;
 using System.Windows;
 using RestaurantPOS.ViewModels.BackOffice.Users;
+using RestaurantPOS.ViewModels.BackOffice.Settings;
+using RestaurantPOS.ViewModels.BackOffice;
 
 namespace RestaurantPOS
 {
@@ -89,6 +91,7 @@ namespace RestaurantPOS
             services.AddSingleton<TableStore>();
             services.AddSingleton<UserSessionService>();
             services.AddSingleton<AuthorizationService>();
+            services.AddSingleton<SettingsService>();
 
 
             // Shell
@@ -103,6 +106,8 @@ namespace RestaurantPOS
             services.AddTransient<PaymentViewModel>();
             services.AddTransient<CoverSelectorViewModel>();
             services.AddTransient<UsersViewModel>();
+            services.AddTransient<BackOfficeViewModel>();
+            services.AddTransient<SettingsViewModel>();
         }
     }
 

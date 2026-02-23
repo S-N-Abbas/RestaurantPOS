@@ -22,6 +22,7 @@ namespace RestaurantPOS.ViewModels.Payments
         private readonly OrderService _orderService;
         private readonly IPricingService _pricingService;
         private readonly INavigationService _navigationService;
+        private readonly UserSessionService _userSessionService;
 
         private readonly ReceiptBuilder _receiptBuilder;
         public ICommand PrintReceiptCommand => new RelayCommand(PrintReceipt);
@@ -113,15 +114,16 @@ namespace RestaurantPOS.ViewModels.Payments
             EnteredAmount > 0 &&
             EnteredAmount <= Due;
 
-        public PaymentViewModel(OrderState orderState, OrderService orderService, OrderStore orderStore, IPricingService pricingService, INavigationService navigationService)
+        public PaymentViewModel(OrderState orderState, OrderService orderService, OrderStore orderStore, IPricingService pricingService, INavigationService navigationService, UserSessionService userSessionService)
         {
             _orderState = orderState;
             _orderService = orderService;
             _orderStore = orderStore;
             _pricingService = pricingService;
             _navigationService = navigationService;
+            _userSessionService = userSessionService;
 
-            _receiptBuilder = new ReceiptBuilder(pricingService);
+            _receiptBuilder = new ReceiptBuilder(pricingService, _userSessionService);
 
 
 

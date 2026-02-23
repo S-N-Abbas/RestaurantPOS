@@ -350,5 +350,68 @@
             </Setter.Value>
         </Setter>
     </Style>
+    
+    <!-- SETTINGS MENU BUTTON STYLE -->
+    <Style x:Key="MenuButtonStyle"
+           TargetType="RadioButton">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RadioButton">
+                    <Border x:Name="bg"
+                            Background="Transparent"
+                            CornerRadius="8"
+                            Margin="0,2"
+                            Padding="15,12">
+                        <ContentPresenter />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked"
+                                 Value="True">
+                            <Setter TargetName="bg"
+                                    Property="Background"
+                                    Value="#EFF6FF" />
+                            <Setter Property="Foreground"
+                                    Value="{StaticResource PrimaryAccent}" />
+                            <Setter Property="FontWeight"
+                                    Value="Bold" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver"
+                                 Value="True">
+                            <Setter TargetName="bg"
+                                    Property="Background"
+                                    Value="#F8FAFC" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="FieldLabel"
+           TargetType="TextBlock">
+        <Setter Property="FontSize"
+                Value="11" />
+        <Setter Property="FontWeight"
+                Value="Bold" />
+        <Setter Property="Foreground"
+                Value="{StaticResource TextMuted}" />
+        <Setter Property="Margin"
+                Value="0,15,0,5" />
+    </Style>
+
+    <Style TargetType="TextBox">
+        <Setter Property="Height"
+                Value="40" />
+        <Setter Property="VerticalContentAlignment"
+                Value="Center" />
+        <Setter Property="Padding"
+                Value="10,0" />
+        <Setter Property="Background"
+                Value="#F8FAFC" />
+        <Setter Property="BorderBrush"
+                Value="{StaticResource BorderGray}" />
+        <Setter Property="BorderThickness"
+                Value="1" />
+    </Style>
 
 </ResourceDictionary>

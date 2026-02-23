@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using RestaurantPOS.ViewModels.BackOffice.Users;
+using RestaurantPOS.ViewModels.BackOffice;
 
 namespace RestaurantPOS.ViewModels.Home
 {
@@ -50,7 +51,7 @@ namespace RestaurantPOS.ViewModels.Home
 
         private void GoToBackOffice()
         {
-            _navigationService.NavigateTo<UsersViewModel>();
+            _navigationService.NavigateTo<BackOfficeViewModel>();
         }
 
         private void Navigate(string mode)
