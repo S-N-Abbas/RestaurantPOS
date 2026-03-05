@@ -15,12 +15,12 @@ namespace RestaurantPOS.Services
     public class OrderService
     {
         private readonly PosDbContext _db;
-        private readonly IPricingService _pricingService;
+        private readonly SettingsService _settingsService;
 
-        public OrderService(PosDbContext db, IPricingService pricingService)
+        public OrderService(PosDbContext db, SettingsService settingsService)
         {
             _db = db;
-            _pricingService = pricingService;
+            _settingsService = settingsService;
         }
 
         public async Task<List<Order>> GetOpenOrdersAsync()
@@ -67,8 +67,8 @@ namespace RestaurantPOS.Services
             if (order.IsClosed)
                 throw new InvalidOperationException("Order already closed");
 
-            var orderTotal = order.ItemsTotal + order.ChildCovers * _pricingService.ChildCoverRate
-                + order.AdultCovers * _pricingService.AdultCoverRate;
+            var orderTotal = order.ItemsTotal + order.ChildCovers * _settingsService.Settings.ChildCoverPrice
+                + order.AdultCovers * _settingsService.Settings.AdultCoverPrice;
 
             var remaining = orderTotal - order.PaidAmount;
 
@@ -146,6 +146,9 @@ namespace RestaurantPOS.Services
             {
                 var product = await _db.Products.FindAsync(itemId);
 
+                if(product == null)
+                    throw new InvalidOperationException("Product not found");
+
                 existing = new OrderItem
                 {
                     ProductId = product.Id,
@@ -204,6 +207,10 @@ namespace RestaurantPOS.Services
             else
             {
                 var item = await _db.Products.FindAsync(itemId);
+
+                if (item == null)
+                    throw new InvalidOperationException("Product not found");
+
                 _db.OrderItems.Add(new OrderItem
                 {
                     OrderId = order.Id,
@@ -233,8 +240,8 @@ namespace RestaurantPOS.Services
             if (order.IsClosed)
                 return;
 
-            var orderTotal = order.ItemsTotal + order.ChildCovers * _pricingService.ChildCoverRate
-                + order.AdultCovers * _pricingService.AdultCoverRate;
+            var orderTotal = order.ItemsTotal + order.ChildCovers * _settingsService.Settings.ChildCoverPrice
+                + order.AdultCovers * _settingsService.Settings.AdultCoverPrice;
 
             if (order.PaidAmount < orderTotal)
                 throw new InvalidOperationException("Order not fully paid");

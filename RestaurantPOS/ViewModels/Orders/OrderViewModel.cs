@@ -72,7 +72,7 @@ namespace RestaurantPOS.ViewModels.Orders
 
         public decimal CoversTotal =>
             _orderState.Order == null ? 0 :
-            _pricing.CalculateCoverCharge(_orderState.Order);
+            _settingsService.CalculateCoverCharge(_orderState.Order);
         public bool CanPay => _orderState?.Order != null && OrderItems.Any();
         public decimal ItemsTotal =>
             OrderItems.Sum(i => i.Total);
@@ -88,7 +88,7 @@ namespace RestaurantPOS.ViewModels.Orders
         private readonly OrderService _orderService;
         private readonly INavigationService _navigationService;
         private readonly TableStore _tableStore;
-        private readonly IPricingService _pricing;
+        private readonly SettingsService _settingsService;
 
         private int _tableNumber;
         public int TableNumber
@@ -106,14 +106,14 @@ namespace RestaurantPOS.ViewModels.Orders
             OrderService orderService,
             INavigationService navigationService,
             TableStore tableStore,
-            IPricingService pricing)
+            SettingsService settingsService)
         {
             _menuService = menuService;
             _tableSession = tableSession;
             _orderStore = orderStore;
             _orderService = orderService;
             _navigationService = navigationService;
-            _pricing = pricing;
+            _settingsService = settingsService;
 
             Categories = new();
             AllItems = new();
@@ -325,6 +325,10 @@ namespace RestaurantPOS.ViewModels.Orders
             }
 
             UpdateOrderState();
+
+            if(_orderState.Order == null)
+                throw new InvalidOperationException("Order should not be null here");
+
             var updatedOrder = await _orderService.GetByIdAsync(_orderState.Order.Id);
             _orderState.UpdateFrom(updatedOrder);
         }

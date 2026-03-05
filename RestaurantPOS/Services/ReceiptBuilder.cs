@@ -12,19 +12,19 @@ namespace RestaurantPOS.Services
 {
     public class ReceiptBuilder
     {
-        private readonly IPricingService _princingService;
+        private readonly SettingsService _settingsService;
         private readonly UserSessionService _userSessionService;
 
-        public ReceiptBuilder(IPricingService pricingService, UserSessionService userSessionService)
+        public ReceiptBuilder(SettingsService settingsService, UserSessionService userSessionService)
         {
-            _princingService = pricingService;
+            _settingsService = settingsService;
             _userSessionService = userSessionService;
         }
         public FlowDocument Build(Order order)
         {
             // Calculation Logic
-            var adultCoverTotal = _princingService.AdultCoverRate * order.AdultCovers;
-            var childCoverTotal = _princingService.ChildCoverRate * order.ChildCovers;
+            var adultCoverTotal = _settingsService.Settings.AdultCoverPrice * order.AdultCovers;
+            var childCoverTotal = _settingsService.Settings.ChildCoverPrice * order.ChildCovers;
             var grandTotal = adultCoverTotal + childCoverTotal + order.ItemsTotal;
 
             var cashPaid = order.Payments.Where(p => p.Method == "Cash").Sum(p => p.Amount);

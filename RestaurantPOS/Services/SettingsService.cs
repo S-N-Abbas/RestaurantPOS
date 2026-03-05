@@ -1,4 +1,5 @@
-﻿using RestaurantPOS.Domain.Settings;
+﻿using RestaurantPOS.Domain.Entities;
+using RestaurantPOS.Domain.Settings;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -66,6 +67,15 @@ namespace RestaurantPOS.Services
 
                 return defaults;
             }
+        }
+
+        public decimal CalculateCoverCharge(Order order)
+        {
+            if (order == null)
+                return 0;
+
+            return (order.AdultCovers * Settings.AdultCoverPrice)
+                 + (order.ChildCovers * Settings.ChildCoverPrice);
         }
 
         // ✅ PUBLIC SAVE

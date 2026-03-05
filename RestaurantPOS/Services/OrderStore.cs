@@ -10,7 +10,7 @@ namespace RestaurantPOS.Services
     public class OrderStore
     {
         private readonly OrderService _orderService;
-        private readonly IPricingService _pricingService;
+        private readonly SettingsService _settingsService;
         private readonly Dictionary<int, OrderState> _orders = new();
 
         public event Action<int>? OrderStateChanged;
@@ -20,10 +20,10 @@ namespace RestaurantPOS.Services
         public bool HasOrder(int tableNumber)
        => _orders.ContainsKey(tableNumber);
         
-        public OrderStore(OrderService orderService)
+        public OrderStore(OrderService orderService, SettingsService settingsService)
         {
             _orderService = orderService;
-            _pricingService = new PricingService();
+            _settingsService = settingsService;
         }
 
         public async Task InitializeAsync()
@@ -76,8 +76,8 @@ namespace RestaurantPOS.Services
                 return 0;
 
             return state.Order!.ItemsTotal
-                + state.Order.ChildCovers * _pricingService.ChildCoverRate
-                + state.Order.AdultCovers * _pricingService.AdultCoverRate;
+                + state.Order.ChildCovers * _settingsService.Settings.ChildCoverPrice
+                + state.Order.AdultCovers * _settingsService.Settings.AdultCoverPrice;
         }
     }
 }

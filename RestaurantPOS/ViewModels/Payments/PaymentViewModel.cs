@@ -20,7 +20,7 @@ namespace RestaurantPOS.ViewModels.Payments
     public class PaymentViewModel : ViewModelBase
     {
         private readonly OrderService _orderService;
-        private readonly IPricingService _pricingService;
+        private readonly SettingsService _settingsService;
         private readonly INavigationService _navigationService;
         private readonly UserSessionService _userSessionService;
 
@@ -38,8 +38,8 @@ namespace RestaurantPOS.ViewModels.Payments
         public int AdultCount => _orderState.Order?.AdultCovers ?? 0;
         public int ChildCount => _orderState.Order?.ChildCovers ?? 0;
 
-        public decimal AdultCoverTotal => AdultCount * _pricingService.AdultCoverRate;
-        public decimal ChildCoverTotal => ChildCount * _pricingService.ChildCoverRate;
+        public decimal AdultCoverTotal => AdultCount * _settingsService.Settings.AdultCoverPrice;
+        public decimal ChildCoverTotal => ChildCount * _settingsService.Settings.ChildCoverPrice;
 
         public decimal Total =>
             (_orderState.Order?.ItemsTotal
@@ -114,16 +114,16 @@ namespace RestaurantPOS.ViewModels.Payments
             EnteredAmount > 0 &&
             EnteredAmount <= Due;
 
-        public PaymentViewModel(OrderState orderState, OrderService orderService, OrderStore orderStore, IPricingService pricingService, INavigationService navigationService, UserSessionService userSessionService)
+        public PaymentViewModel(OrderState orderState, OrderService orderService, OrderStore orderStore, SettingsService settingsService, INavigationService navigationService, UserSessionService userSessionService)
         {
             _orderState = orderState;
             _orderService = orderService;
             _orderStore = orderStore;
-            _pricingService = pricingService;
+            _settingsService = settingsService;
             _navigationService = navigationService;
             _userSessionService = userSessionService;
 
-            _receiptBuilder = new ReceiptBuilder(pricingService, _userSessionService);
+            _receiptBuilder = new ReceiptBuilder(_settingsService, _userSessionService);
 
 
 
