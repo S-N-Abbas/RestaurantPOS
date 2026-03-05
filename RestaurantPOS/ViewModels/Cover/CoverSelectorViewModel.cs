@@ -143,7 +143,7 @@ namespace RestaurantPOS.ViewModels.Cover
         {
             if (_orderState.Order == null)
             {
-                var order = await _orderService.CreateOrderAsync(_orderState.TableNumber);
+                var order = await _orderService.CreateOrderAsync(_orderState.ContextId);
                 _orderState.AttachOrder(order);
             }
 

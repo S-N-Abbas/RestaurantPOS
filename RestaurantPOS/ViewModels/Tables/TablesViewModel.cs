@@ -19,12 +19,12 @@ namespace RestaurantPOS.ViewModels.Tables
         private readonly TableStore _tableStore;
         public ICommand SelectTableCommand { get; }
 
-        private readonly ITableSessionService _tableSession;
+        private readonly IOrderContextService _tableSession;
         private readonly INavigationService _navigation;
 
         public TablesViewModel(
          TableStore tableStore,
-         ITableSessionService tableSession,
+         IOrderContextService tableSession,
          INavigationService navigation)
         {
             _tableStore = tableStore;
@@ -41,7 +41,7 @@ namespace RestaurantPOS.ViewModels.Tables
         }
         private void OnSelectTable(TableViewModel table)
         {
-            _tableSession.SwitchTable(table.Number);
+            _tableSession.SwitchContext(table.tableNumber);
 
             _navigation.NavigateTo<OrderViewModel>();
         }

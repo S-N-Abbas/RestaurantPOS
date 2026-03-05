@@ -11,20 +11,20 @@ namespace RestaurantPOS.Services
 {
     public class OrderState
     {
-        public int TableNumber { get; }
+        public int ContextId { get; }
         public Order? Order { get; private set; }
 
         public ObservableCollection<OrderItemViewModel> Items { get; }
 
-        public OrderState(int tableNumber, Order? order,
+        public OrderState(int contextId, Order? order,
             Action<OrderItemViewModel> removeCallback)
         {
-            TableNumber = tableNumber;
+            ContextId = contextId;
             Order = order;
 
             Items = new ObservableCollection<OrderItemViewModel>(
                 order?.Items.Select(i =>
-                    new OrderItemViewModel(i, tableNumber, removeCallback))
+                    new OrderItemViewModel(i, contextId, removeCallback))
                 ?? Enumerable.Empty<OrderItemViewModel>()
             );
         }

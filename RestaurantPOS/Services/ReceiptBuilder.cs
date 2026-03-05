@@ -55,7 +55,7 @@ namespace RestaurantPOS.Services
             metaTable.Columns.Add(new TableColumn { Width = new GridLength(1, GridUnitType.Star) });
             metaTable.Columns.Add(new TableColumn { Width = new GridLength(1, GridUnitType.Star) });
             var metaRow = new TableRow();
-            metaRow.Cells.Add(Cell($"Table: {order.TableNumber}", fontWeight: FontWeights.Bold));
+            metaRow.Cells.Add(Cell($"Table: {order.ContextId}", fontWeight: FontWeights.Bold));
             metaRow.Cells.Add(Cell($"ID: #{order.Id}", TextAlignment.Right));
             metaTable.RowGroups.Add(new TableRowGroup());
             metaTable.RowGroups[0].Rows.Add(metaRow);

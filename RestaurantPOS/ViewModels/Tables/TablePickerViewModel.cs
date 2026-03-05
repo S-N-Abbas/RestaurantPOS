@@ -13,7 +13,7 @@ namespace RestaurantPOS.ViewModels.Tables
 {
     public class TablePickerViewModel : ViewModelBase
     {
-        private readonly ITableSessionService _tableSession;
+        private readonly IOrderContextService _tableSession;
         private readonly OrderStore _orderStore;
 
         public ObservableCollection<TableViewModel> Tables => _tableStore.Tables;
@@ -23,7 +23,7 @@ namespace RestaurantPOS.ViewModels.Tables
         public ICommand SelectTableCommand { get; }
 
         public TablePickerViewModel(
-            ITableSessionService tableSession,
+            IOrderContextService tableSession,
             OrderStore orderStore,
             TableStore tableStore)
         {
@@ -42,7 +42,7 @@ namespace RestaurantPOS.ViewModels.Tables
 
         private void SelectTable(TableViewModel table)
         {
-            _tableSession.SwitchTable(table.Number);
+            _tableSession.SwitchContext(table.tableNumber);
         }
     }
 

@@ -82,7 +82,7 @@ namespace RestaurantPOS.ViewModels.Orders
         public ICommand AddItemCommand { get; }
         public ICommand PayCommand { get; }
 
-        private readonly ITableSessionService _tableSession;
+        private readonly IOrderContextService _orderContextService;
         private readonly OrderStore _orderStore;
         private OrderState _orderState;
         private readonly OrderService _orderService;
@@ -100,7 +100,7 @@ namespace RestaurantPOS.ViewModels.Orders
         private readonly IMenuDataService _menuService;
 
         public OrderViewModel(
-            ITableSessionService tableSession,
+            IOrderContextService orderContextService,
             OrderStore orderStore,
             IMenuDataService menuService,
             OrderService orderService,
@@ -109,7 +109,7 @@ namespace RestaurantPOS.ViewModels.Orders
             SettingsService settingsService)
         {
             _menuService = menuService;
-            _tableSession = tableSession;
+            _orderContextService = orderContextService;
             _orderStore = orderStore;
             _orderService = orderService;
             _navigationService = navigationService;
@@ -138,9 +138,9 @@ namespace RestaurantPOS.ViewModels.Orders
 
             _ = LoadMenuAsync();
 
-            _tableSession.TableChanged += OnTableChanged;
+            _orderContextService.ContextChanged += OnTableChanged;
 
-            TablePicker = new TablePickerViewModel(tableSession, orderStore, tableStore);
+            TablePicker = new TablePickerViewModel(orderContextService, orderStore, tableStore);
 
             OpenTablePickerCommand = new RelayCommand(() => IsTablePickerOpen = true);
             CloseTablePickerCommand = new RelayCommand(() => IsTablePickerOpen = false);
@@ -148,9 +148,9 @@ namespace RestaurantPOS.ViewModels.Orders
             OpenCoverSelectorCommand = new RelayCommand(() => IsCoverSelectorOpen = true);
             CloseCoverSelectorCommand = new RelayCommand(() => IsCoverSelectorOpen = false);
 
-            _tableSession.TableChanged += _ => IsTablePickerOpen = false;
+            _orderContextService.ContextChanged += _ => IsTablePickerOpen = false;
 
-            LoadTable(_tableSession.CurrentTable);
+            LoadTable(_orderContextService.CurrentContext);
 
             coverSelectorViewModel = new CoverSelectorViewModel(
                 _orderState,

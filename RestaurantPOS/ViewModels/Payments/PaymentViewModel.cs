@@ -31,7 +31,7 @@ namespace RestaurantPOS.ViewModels.Payments
         public OrderStore _orderStore { get; }
 
         // UK currency labels
-        public string TableLabel => $"Table {_orderState.TableNumber}";
+        public string TableLabel => $"Table {_orderState.ContextId}";
 
         // Payment amounts
 
@@ -161,7 +161,7 @@ namespace RestaurantPOS.ViewModels.Payments
                 var updatedOrder = await _orderService.GetByIdAsync(_orderState.Order.Id);
                 _orderState.UpdateFrom(updatedOrder);
 
-                _orderStore.CloseOrder(_orderState.Order.TableNumber);
+                _orderStore.CloseOrder(_orderState.Order.ContextId);
 
                 PrintReceipt();
 

@@ -14,45 +14,45 @@ namespace RestaurantPOS.ViewModels.Tables
     public class TableViewModel : ViewModelBase
     {
         private readonly OrderStore _orderStore;
-        private readonly ITableSessionService _tableSession;
+        private readonly IOrderContextService _orderContextService;
 
-        public int Number { get; }
+        public int tableNumber { get; }
 
-        public bool HasOrder => _orderStore.HasOrder(Number);
+        public bool HasOrder => _orderStore.HasOrder(tableNumber);
 
-        public bool IsCurrent => _tableSession.CurrentTable == Number;
+        public bool IsCurrent => _orderContextService.CurrentContext == tableNumber;
 
         public bool IsLocked => HasOrder && !IsCurrent;
 
-        public decimal CurrentTotal => _orderStore.GetOrderTotal(Number);
+        public decimal CurrentTotal => _orderStore.GetOrderTotal(tableNumber);
 
         public ICommand SelectTableCommand { get; }
 
         public TableViewModel(
             int number,
-            ITableSessionService tableSession,
+            IOrderContextService orderContextService,
             OrderStore orderStore)
         {
-            Number = number;
+            tableNumber = number;
 
-            _tableSession = tableSession;
+            _orderContextService = orderContextService;
             _orderStore = orderStore;
 
             SelectTableCommand = new RelayCommand(SelectTable, CanSelectTable);
 
             _orderStore.OrderStateChanged += OnOrderStateChanged;
-            _tableSession.TableChanged += _ => RaiseAll();
+            _orderContextService.ContextChanged += _ => RaiseAll();
         }
 
         private bool CanSelectTable()
         => !IsLocked;
 
         private void SelectTable()
-            => _tableSession.SwitchTable(Number);
+            => _orderContextService.SwitchContext(tableNumber);
 
         private void OnOrderStateChanged(int tableNumber)
         {
-            if (tableNumber == Number)
+            if (tableNumber == this.tableNumber)
                 RaiseAll();
         }
 

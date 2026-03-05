@@ -302,7 +302,7 @@
                                         Height="80"
                                         Command="{Binding DataContext.TablePicker.SelectTableCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                         CommandParameter="{Binding}">
-                                    <TextBlock Text="{Binding Number}"
+                                    <TextBlock Text="{Binding tableNumber}"
                                                FontSize="22"
                                                FontWeight="Bold" />
                                 </Button>

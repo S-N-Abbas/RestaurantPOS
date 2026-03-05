@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace RestaurantPOS.Services
 {
-    public interface ITableSessionService
+    public interface IOrderContextService
     {
-        int CurrentTable { get; }
+        int CurrentContext{ get; }
 
-        event Action<int>? TableChanged;
+        event Action<int>? ContextChanged;
 
-        void SwitchTable(int tableNumber);
+        void SwitchContext(int contextId);
     }
 }

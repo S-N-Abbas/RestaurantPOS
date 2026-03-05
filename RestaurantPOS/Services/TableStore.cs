@@ -13,12 +13,12 @@ namespace RestaurantPOS.Services
         public ObservableCollection<TableViewModel> Tables { get; }
 
         private readonly ITableService _tableService;
-        private readonly ITableSessionService _tableSession;
+        private readonly IOrderContextService _tableSession;
         private readonly OrderStore _orderStore;
 
         public TableStore(
             ITableService tableService,
-        ITableSessionService tableSession,
+        IOrderContextService tableSession,
         OrderStore orderStore)
         {
             _tableService = tableService;

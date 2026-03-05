@@ -90,22 +90,24 @@ namespace RestaurantPOS.Services
         }
 
 
-        public async Task<Order?> GetOpenOrderAsync(int tableNumber)
+        public async Task<Order?> GetOpenOrderAsync(int contextId)
         {
             return await _db.Orders
                 .Include(o => o.Items)
                 .FirstOrDefaultAsync(o =>
-                    o.TableNumber == tableNumber &&
+                    o.ContextId == contextId &&
                     o.ClosedAt == null);
         }
 
-        public async Task<Order> CreateOrderAsync(int tableNumber)
+        public async Task<Order> CreateOrderAsync(int contextId)
         {
-            var table = await _db.Tables.FirstAsync(t => t.Number == tableNumber);
+            Table? table = null;
+            if (contextId > 0)
+                table = await _db.Tables.FirstAsync(t => t.Number == contextId);
 
             var order = new Order
             {
-                TableNumber = tableNumber,
+                ContextId = contextId,
                 TableId = table.Id,
                 CreatedAt = DateTime.Now
             };

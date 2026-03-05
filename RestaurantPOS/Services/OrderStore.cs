@@ -11,14 +11,15 @@ namespace RestaurantPOS.Services
     {
         private readonly OrderService _orderService;
         private readonly SettingsService _settingsService;
+
         private readonly Dictionary<int, OrderState> _orders = new();
 
         public event Action<int>? OrderStateChanged;
 
 
 
-        public bool HasOrder(int tableNumber)
-       => _orders.ContainsKey(tableNumber);
+        public bool HasOrder(int contextId)
+       => _orders.ContainsKey(contextId);
         
         public OrderStore(OrderService orderService, SettingsService settingsService)
         {
@@ -32,8 +33,8 @@ namespace RestaurantPOS.Services
 
             foreach (var order in openOrders)
             {
-                _orders[order.TableNumber] =
-                    new OrderState(order.TableNumber, order, RemoveItem);
+                _orders[order.ContextId] =
+                    new OrderState(order.ContextId, order, RemoveItem);
             }
         }
 
@@ -49,29 +50,29 @@ namespace RestaurantPOS.Services
 
 
         public async Task<OrderState> GetOrCreateAsync(
-            int tableNumber,
+            int contextId,
             Action<OrderItemViewModel> removeCallback)
         {
-            if (_orders.TryGetValue(tableNumber, out var state))
+            if (_orders.TryGetValue(contextId, out var state))
                 return state;
 
-            var order = await _orderService.GetOpenOrderAsync(tableNumber);
+            var order = await _orderService.GetOpenOrderAsync(contextId);
 
-            state = new OrderState(tableNumber, order, removeCallback);
-            _orders[tableNumber] = state;
+            state = new OrderState(contextId, order, removeCallback);
+            _orders[contextId] = state;
 
             return state;
         }
 
-        public void CloseOrder(int tableNumber)
+        public void CloseOrder(int contextId)
         {
-            if (_orders.Remove(tableNumber))
-                OrderStateChanged?.Invoke(tableNumber);
+            if (_orders.Remove(contextId))
+                OrderStateChanged?.Invoke(contextId);
         }
 
-        public decimal GetOrderTotal(int number)
+        public decimal GetOrderTotal(int contextId)
         {
-            _orders.TryGetValue(number, out var state);
+            _orders.TryGetValue(contextId, out var state);
             if (state == null)
                 return 0;
 

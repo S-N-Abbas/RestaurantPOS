@@ -19,7 +19,7 @@ namespace RestaurantPOS.Domain.Entities
     {
         public int Id { get; set; }
 
-        public int TableNumber { get; set; }
+        public int ContextId { get; set; }
         public int TableId { get; set; }
 
         public Table? Table { get; set; } = null!;
