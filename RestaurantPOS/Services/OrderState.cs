@@ -39,6 +39,19 @@ namespace RestaurantPOS.Services
         {
             Order = order;
         }
+
+        /// <summary>
+        /// Holds the intended OrderType for a reserved slot that has no DB Order yet.
+        /// Once an Order is created and attached, read OrderType from Order directly.
+        /// </summary>
+        public OrderType? PendingOrderType { get; set; }
+
+        /// <summary>
+        /// The effective OrderType — from the live Order if it exists,
+        /// otherwise from the reservation. Never null for a valid slot.
+        /// </summary>
+        public OrderType EffectiveOrderType
+            => Order?.OrderType ?? PendingOrderType ?? OrderType.TakeAway;
     }
 
 }

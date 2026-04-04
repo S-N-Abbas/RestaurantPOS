@@ -1,16 +1,23 @@
 ﻿<UserControl x:Class="RestaurantPOS.UI.Views.Orders.OrderView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:RestaurantPOS.UI.Views.Orders"
              xmlns:converter="clr-namespace:RestaurantPOS.UI.Converters"
              xmlns:views="clr-namespace:RestaurantPOS.UI.Views.Cover"
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             mc:Ignorable="d"
+             d:DesignHeight="450"
+             d:DesignWidth="800">
     <Grid Background="{StaticResource BackgroundGray}">
         <DockPanel>
+
+            <!-- ══════════════════════════════════════════════════════
+                 TOP HEADER BAR
+                 Now shows ContextLabel instead of raw TableNumber,
+                 and "Switch Order" instead of "Switch Table"
+                 ══════════════════════════════════════════════════════ -->
             <Border DockPanel.Dock="Top"
                     Height="80"
                     Background="White"
@@ -23,15 +30,16 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
+                    <!-- Context Label: "TABLE 3" / "TAKEAWAY #1" / "DELIVERY #2" -->
                     <StackPanel Orientation="Horizontal"
                                 VerticalAlignment="Center">
-                        <iconPacks:PackIconMaterial Kind="TableChair"
+                        <iconPacks:PackIconMaterial Kind="{Binding ContextIcon}"
                                                     Foreground="{StaticResource PrimaryAccent}"
                                                     VerticalAlignment="Center"
                                                     Width="24"
                                                     Height="24"
                                                     Margin="0,0,12,0" />
-                        <TextBlock Text="{Binding TableNumber, StringFormat=TABLE {0}}"
+                        <TextBlock Text="{Binding ContextLabel}"
                                    FontSize="28"
                                    FontWeight="Black"
                                    Foreground="{StaticResource TextDark}"
@@ -40,15 +48,16 @@
 
                     <StackPanel Grid.Column="1"
                                 Orientation="Horizontal">
+                        <!-- Renamed from "Switch Table" to "Switch Order" -->
                         <Button Style="{StaticResource ModernButton}"
-                                Command="{Binding OpenTablePickerCommand}"
+                                Command="{Binding OpenOrderSwitcherCommand}"
                                 Margin="0,0,12,0">
                             <StackPanel Orientation="Horizontal">
                                 <iconPacks:PackIconMaterial Kind="SwapHorizontal"
                                                             Margin="0,0,8,0"
                                                             VerticalAlignment="Center"
                                                             Width="14" />
-                                <TextBlock Text="Switch Table"
+                                <TextBlock Text="Switch Order"
                                            VerticalAlignment="Center"
                                            FontWeight="SemiBold" />
                             </StackPanel>
@@ -69,6 +78,7 @@
                 </Grid>
             </Border>
 
+            <!-- Categories, Order Panel, Menu Items — UNCHANGED -->
             <Border DockPanel.Dock="Left"
                     Width="240"
                     Background="White"
@@ -80,8 +90,7 @@
                                Margin="20,20,20,10"
                                FontSize="12"
                                FontWeight="Bold"
-                               Foreground="{StaticResource TextMuted}"
-                                />
+                               Foreground="{StaticResource TextMuted}" />
                     <ListBox ItemsSource="{Binding Categories}"
                              SelectedItem="{Binding SelectedCategory}"
                              DisplayMemberPath="Name"
@@ -104,7 +113,6 @@
                                       ShadowDepth="2"
                                       Opacity="0.05" />
                 </Border.Effect>
-
                 <Grid Margin="20">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -161,7 +169,6 @@
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
-
                                         <StackPanel VerticalAlignment="Center"
                                                     Margin="0,0,16,0">
                                             <TextBlock Text="{Binding Name}"
@@ -169,20 +176,17 @@
                                                        Foreground="{StaticResource TextDark}"
                                                        FontSize="15"
                                                        TextWrapping="Wrap" />
-                                            <TextBlock Text="{Binding Price, StringFormat='£{0:N2}'}"
+                                            <TextBlock Text="{Binding UnitPrice, StringFormat='£{0:N2}'}"
                                                        Foreground="{StaticResource TextMuted}"
                                                        FontSize="13"
                                                        Margin="0,2,0,0" />
                                         </StackPanel>
-
                                         <StackPanel Grid.Column="1"
                                                     Orientation="Horizontal"
                                                     VerticalAlignment="Center">
-
                                             <Button Style="{StaticResource CircleActionButton}"
                                                     Command="{Binding DecreaseCommand}"
                                                     Content="−" />
-
                                             <TextBlock Text="{Binding Quantity}"
                                                        Width="40"
                                                        TextAlignment="Center"
@@ -191,7 +195,6 @@
                                                        Foreground="{StaticResource PrimaryAccent}"
                                                        FontSize="16"
                                                        Margin="4,0" />
-
                                             <Button Style="{StaticResource CircleActionButton}"
                                                     Command="{Binding IncreaseCommand}"
                                                     Content="+" />
@@ -217,7 +220,6 @@
                                        Foreground="{StaticResource TextDark}"
                                        HorizontalAlignment="Right" />
                         </Grid>
-
                         <Button Content="PROCESS PAYMENT"
                                 Height="65"
                                 FontSize="18"
@@ -246,7 +248,6 @@
                             <UniformGrid Columns="4" />
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
-
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Button Style="{StaticResource MenuItemTile}"
@@ -276,45 +277,331 @@
             </ScrollViewer>
         </DockPanel>
 
+        <!-- ══════════════════════════════════════════════════════════════════
+             ORDER SWITCHER OVERLAY  (replaces old "Select a Table" overlay)
+             Three sections: Dine-In | TakeAway | Delivery
+             ══════════════════════════════════════════════════════════════════ -->
         <Border Background="#CC1E293B"
-                Visibility="{Binding IsTablePickerOpen, Converter={StaticResource BoolToVisibilityConverter}}">
-            <Border Width="600"
+                Visibility="{Binding IsOrderSwitcherOpen,
+                             Converter={StaticResource BoolToVisibilityConverter}}">
+
+            <!-- Modal card — scrollable so it never clips on small screens -->
+            <Border Width="680"
+                    MaxHeight="680"
                     Background="White"
                     CornerRadius="20"
-                    Padding="30"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Center">
-                <StackPanel>
-                    <TextBlock Text="Select a Table"
-                               FontSize="24"
-                               FontWeight="Bold"
-                               Margin="0,0,0,20"
-                               HorizontalAlignment="Center" />
-                    <ItemsControl ItemsSource="{Binding TablePicker.Tables}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <UniformGrid Columns="4" />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Button Style="{StaticResource MenuItemTile}"
-                                        Height="80"
-                                        Command="{Binding DataContext.TablePicker.SelectTableCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                        CommandParameter="{Binding}">
-                                    <TextBlock Text="{Binding tableNumber}"
-                                               FontSize="22"
-                                               FontWeight="Bold" />
-                                </Button>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </StackPanel>
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="40"
+                                      ShadowDepth="4"
+                                      Opacity="0.15" />
+                </Border.Effect>
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <!-- Header -->
+                        <RowDefinition Height="*" />
+                        <!-- Scrollable content -->
+                        <RowDefinition Height="Auto" />
+                        <!-- Action buttons -->
+                    </Grid.RowDefinitions>
+
+                    <!-- ── Modal Header ── -->
+                    <Border Grid.Row="0"
+                            BorderBrush="{StaticResource BorderGray}"
+                            BorderThickness="0,0,0,1"
+                            Padding="28,20">
+                        <Grid>
+                            <StackPanel Orientation="Horizontal"
+                                        VerticalAlignment="Center">
+                                <iconPacks:PackIconMaterial Kind="SwapHorizontal"
+                                                            Foreground="{StaticResource PrimaryAccent}"
+                                                            Width="20"
+                                                            Height="20"
+                                                            VerticalAlignment="Center"
+                                                            Margin="0,0,12,0" />
+                                <TextBlock Text="Switch Order"
+                                           FontSize="20"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource TextDark}"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+                            <!-- Close button -->
+                            <Button HorizontalAlignment="Right"
+                                    VerticalAlignment="Center"
+                                    Command="{Binding CloseOrderSwitcherCommand}"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Width="36"
+                                    Height="36">
+                                <iconPacks:PackIconMaterial Kind="Close"
+                                                            Width="14"
+                                                            Height="14"
+                                                            Foreground="{StaticResource TextMuted}" />
+                            </Button>
+                        </Grid>
+                    </Border>
+
+                    <!-- ── Scrollable Sections ── -->
+                    <ScrollViewer Grid.Row="1"
+                                  VerticalScrollBarVisibility="Auto"
+                                  Padding="28,20">
+                        <StackPanel>
+
+                            <!-- ─ SECTION 1: DINE-IN TABLES ─ -->
+                            <TextBlock Text="DINE-IN TABLES"
+                                       FontSize="11"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource TextMuted}"
+                                       Margin="0,0,0,12"
+                                        />
+
+                            <ItemsControl ItemsSource="{Binding OrderSwitcher.Tables}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Columns="5" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <!-- Table slot card -->
+                                        <Button Height="80"
+                                                Margin="4"
+                                                Command="{Binding SelectTableCommand}"
+                                                >
+                                            <Button.Style>
+                                                <Style TargetType="Button"
+                                                       BasedOn="{StaticResource MenuItemTile}">
+                                                    <Style.Triggers>
+                                                        <!-- Active/current table gets accent border -->
+                                                        <DataTrigger Binding="{Binding IsCurrent}"
+                                                                     Value="True">
+                                                            <Setter Property="BorderBrush"
+                                                                    Value="{StaticResource PrimaryAccent}" />
+                                                            <Setter Property="BorderThickness"
+                                                                    Value="2" />
+                                                        </DataTrigger>
+                                                        <!-- Occupied-by-other dims the card -->
+                                                        <DataTrigger Binding="{Binding IsLocked}"
+                                                                     Value="True">
+                                                            <Setter Property="Opacity"
+                                                                    Value="0.4" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                            <StackPanel VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding tableNumber}"
+                                                           FontSize="20"
+                                                           FontWeight="Black"
+                                                           TextAlignment="Center"
+                                                           Foreground="{StaticResource TextDark}" />
+                                                <!-- Show total only when occupied -->
+                                                <TextBlock FontSize="11"
+                                                           TextAlignment="Center"
+                                                           Foreground="{StaticResource PrimaryAccent}"
+                                                           FontWeight="SemiBold"
+                                                           Margin="0,2,0,0">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Visibility"
+                                                                    Value="Collapsed" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding HasOrder}"
+                                                                             Value="True">
+                                                                    <Setter Property="Visibility"
+                                                                            Value="Visible" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                    <Run Text="£" />
+                                                    <Run Text="{Binding CurrentTotal, StringFormat={}{0:N2}, Mode=OneWay}" />
+                                                </TextBlock>
+                                            </StackPanel>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <!-- ─ SECTION 2: TAKEAWAY SLOTS ─
+                                 Entire section hidden when no slots are open -->
+                            <StackPanel Margin="0,24,0,0"
+                                        Visibility="{Binding OrderSwitcher.HasTakeAwaySlots,
+                                                     Converter={StaticResource BoolToVisibilityConverter}}">
+                                <TextBlock Text="TAKEAWAY"
+                                           FontSize="11"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource TextMuted}"
+                                           Margin="0,0,0,12" />
+
+                                <ItemsControl ItemsSource="{Binding OrderSwitcher.TakeAwaySlots}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Button Height="80"
+                                                    Width="120"
+                                                    Margin="4"
+                                                    Command="{Binding SelectSlotCommand}">
+                                                <Button.Style>
+                                                    <Style TargetType="Button"
+                                                           BasedOn="{StaticResource MenuItemTile}">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsCurrent}"
+                                                                         Value="True">
+                                                                <Setter Property="BorderBrush"
+                                                                        Value="{StaticResource PrimaryAccent}" />
+                                                                <Setter Property="BorderThickness"
+                                                                        Value="2" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                                <StackPanel VerticalAlignment="Center">
+                                                    <iconPacks:PackIconMaterial Kind="BagPersonal"
+                                                                                Width="16"
+                                                                                Height="16"
+                                                                                HorizontalAlignment="Center"
+                                                                                Foreground="{StaticResource TextMuted}"
+                                                                                Margin="0,0,0,4" />
+                                                    <TextBlock Text="{Binding SlotLabel}"
+                                                               FontSize="14"
+                                                               FontWeight="Bold"
+                                                               TextAlignment="Center"
+                                                               Foreground="{StaticResource TextDark}" />
+                                                    <TextBlock FontSize="11"
+                                                               TextAlignment="Center"
+                                                               Foreground="{StaticResource PrimaryAccent}"
+                                                               FontWeight="SemiBold"
+                                                               Margin="0,2,0,0">
+                                                        <Run Text="£" />
+                                                        <Run Text="{Binding CurrentTotal, StringFormat={}{0:N2}, Mode=OneWay}" />
+                                                    </TextBlock>
+                                                </StackPanel>
+                                            </Button>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+
+                            <!-- ─ SECTION 3: DELIVERY SLOTS ─
+                                 Entire section hidden when no slots are open -->
+                            <StackPanel Margin="0,24,0,0"
+                                        Visibility="{Binding OrderSwitcher.HasDeliverySlots,
+                                                     Converter={StaticResource BoolToVisibilityConverter}}">
+                                <TextBlock Text="DELIVERY"
+                                           FontSize="11"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource TextMuted}"
+                                           Margin="0,0,0,12" />
+
+                                <ItemsControl ItemsSource="{Binding OrderSwitcher.DeliverySlots}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Button Height="80"
+                                                    Width="120"
+                                                    Margin="4"
+                                                    Command="{Binding SelectSlotCommand}">
+                                                <Button.Style>
+                                                    <Style TargetType="Button"
+                                                           BasedOn="{StaticResource MenuItemTile}">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsCurrent}"
+                                                                         Value="True">
+                                                                <Setter Property="BorderBrush"
+                                                                        Value="{StaticResource PrimaryAccent}" />
+                                                                <Setter Property="BorderThickness"
+                                                                        Value="2" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                                <StackPanel VerticalAlignment="Center">
+                                                    <iconPacks:PackIconMaterial Kind="Moped"
+                                                                                Width="16"
+                                                                                Height="16"
+                                                                                HorizontalAlignment="Center"
+                                                                                Foreground="{StaticResource TextMuted}"
+                                                                                Margin="0,0,0,4" />
+                                                    <TextBlock Text="{Binding SlotLabel}"
+                                                               FontSize="14"
+                                                               FontWeight="Bold"
+                                                               TextAlignment="Center"
+                                                               Foreground="{StaticResource TextDark}" />
+                                                    <TextBlock FontSize="11"
+                                                               TextAlignment="Center"
+                                                               Foreground="{StaticResource PrimaryAccent}"
+                                                               FontWeight="SemiBold"
+                                                               Margin="0,2,0,0">
+                                                        <Run Text="£" />
+                                                        <Run Text="{Binding CurrentTotal, StringFormat={}{0:N2}, Mode=OneWay}" />
+                                                    </TextBlock>
+                                                </StackPanel>
+                                            </Button>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <!-- ── Bottom Action Buttons: New TakeAway / New Delivery ── -->
+                    <Border Grid.Row="2"
+                            BorderBrush="{StaticResource BorderGray}"
+                            BorderThickness="0,1,0,0"
+                            Padding="28,16">
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Right">
+                            <Button Style="{StaticResource ModernButton}"
+                                    Command="{Binding OrderSwitcher.NewTakeAwayCommand}"
+                                    Margin="0,0,12,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <iconPacks:PackIconMaterial Kind="BagPersonal"
+                                                                Width="14"
+                                                                Height="14"
+                                                                VerticalAlignment="Center"
+                                                                Margin="0,0,8,0" />
+                                    <TextBlock Text="New TakeAway"
+                                               VerticalAlignment="Center"
+                                               FontWeight="SemiBold" />
+                                </StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource ModernButton}"
+                                    Command="{Binding OrderSwitcher.NewDeliveryCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <iconPacks:PackIconMaterial Kind="Moped"
+                                                                Width="14"
+                                                                Height="14"
+                                                                VerticalAlignment="Center"
+                                                                Margin="0,0,8,0" />
+                                    <TextBlock Text="New Delivery"
+                                               VerticalAlignment="Center"
+                                               FontWeight="SemiBold" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Border>
+
+                </Grid>
             </Border>
         </Border>
 
+        <!-- Cover Selector Overlay — unchanged -->
         <Border Background="#CC1E293B"
-                Visibility="{Binding IsCoverSelectorOpen, Converter={StaticResource BoolToVisibilityConverter}}">
+                Visibility="{Binding IsCoverSelectorOpen,
+                             Converter={StaticResource BoolToVisibilityConverter}}">
             <views:CoverSelectorView DataContext="{Binding coverSelectorViewModel}"
                                      VerticalAlignment="Center"
                                      HorizontalAlignment="Center" />

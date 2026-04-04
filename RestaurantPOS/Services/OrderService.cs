@@ -99,21 +99,34 @@ namespace RestaurantPOS.Services
                     o.ClosedAt == null);
         }
 
-        public async Task<Order> CreateOrderAsync(int contextId)
+        /// <summary>
+        /// Creates a new open order.
+        /// For DineIn: contextId is the table number (positive int).
+        /// For TakeAway: contextId is a negative slot id (e.g. -1, -2).
+        /// </summary>
+        public async Task<Order> CreateOrderAsync(int contextId, OrderType orderType = OrderType.DineIn)
         {
-            Table? table = null;
-            if (contextId > 0)
-                table = await _db.Tables.FirstAsync(t => t.Number == contextId);
+            int? tableId = null;
+
+            if (orderType == OrderType.DineIn)
+            {
+                // contextId IS the table number for dine-in
+                var table = await _db.Tables.FirstOrDefaultAsync(t => t.Number == contextId);
+                if (table == null)
+                    throw new InvalidOperationException($"No active table found for number {contextId}.");
+                tableId = table.Id;
+            }
+            // TakeAway: tableId stays null — no table row needed
 
             var order = new Order
             {
                 ContextId = contextId,
-                TableId = table.Id,
+                TableId = tableId,
+                OrderType = orderType,
                 CreatedAt = DateTime.Now
             };
 
             _db.Orders.Add(order);
-
             await _db.SaveChangesAsync();
 
             return order;

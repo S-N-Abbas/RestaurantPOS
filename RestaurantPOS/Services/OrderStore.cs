@@ -1,4 +1,5 @@
-﻿using RestaurantPOS.ViewModels.Orders;
+﻿using RestaurantPOS.Domain.Entities;
+using RestaurantPOS.ViewModels.Orders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -79,6 +80,55 @@ namespace RestaurantPOS.Services
             return state.Order!.ItemsTotal
                 + state.Order.ChildCovers * _settingsService.Settings.ChildCoverPrice
                 + state.Order.AdultCovers * _settingsService.Settings.AdultCoverPrice;
+        }
+
+        /// <summary>
+        /// Returns the OrderType of the active order in a given context slot.
+        /// Returns DineIn as a safe default if no order exists.
+        /// </summary>
+        public OrderType GetOrderType(int contextId)
+        {
+            if (_orders.TryGetValue(contextId, out var state))
+                return state.EffectiveOrderType;
+
+            return OrderType.DineIn;
+        }
+
+        /// <summary>
+        /// Returns all currently active negative ContextIds that match the given OrderType.
+        /// Used by OrderSwitcherViewModel to build the slot lists.
+        /// </summary>
+        public IReadOnlyList<int> GetActiveSlots(OrderType orderType)
+        {
+            return _orders
+                .Where(kvp =>
+                    kvp.Key < 0 &&                                    // negative = non-table slot
+                    kvp.Value.Order?.OrderType == orderType)          // matches requested type
+                .Select(kvp => kvp.Key)
+                .OrderBy(id => id)                                    // -1 before -2 before -3
+                .ToList();
+        }
+
+        /// <summary>
+        /// Reserves a slot in the store with no Order record yet.
+        /// This makes the slot visible in the switcher immediately on creation,
+        /// before the user adds the first item (which triggers actual DB order creation).
+        /// </summary>
+        public void ReserveSlot(int contextId, OrderType orderType)
+        {
+            if (_orders.ContainsKey(contextId))
+                return;
+
+            // Create an OrderState with a null Order — same pattern as dine-in tables
+            // that have no active order. The VM handles null Order gracefully already.
+            var state = new OrderState(contextId, null, RemoveItem);
+
+            // Stamp the intended OrderType so the slot label renders correctly
+            // before the DB record exists
+            state.PendingOrderType = orderType;   // see OrderState addition below
+
+            _orders[contextId] = state;
+            OrderStateChanged?.Invoke(contextId);
         }
     }
 }

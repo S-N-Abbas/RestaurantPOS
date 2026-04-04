@@ -21,13 +21,15 @@ namespace RestaurantPOS.ViewModels.Cover
     {
         private OrderState _orderState;
         private readonly OrderService _orderService;
+        private readonly IOrderContextService _orderContextService;
 
         public event Action? RequestClose;
 
-        public CoverSelectorViewModel(OrderState orderState, OrderService orderService)
+        public CoverSelectorViewModel(OrderState orderState, OrderService orderService, IOrderContextService orderContextService)
         {
             _orderState = orderState;
             _orderService = orderService;
+            _orderContextService = orderContextService;
 
             _adultCovers = orderState.Order?.AdultCovers ?? 0;
             _childCovers = orderState.Order?.ChildCovers ?? 0;
@@ -143,7 +145,9 @@ namespace RestaurantPOS.ViewModels.Cover
         {
             if (_orderState.Order == null)
             {
-                var order = await _orderService.CreateOrderAsync(_orderState.ContextId);
+                var order = await _orderService.CreateOrderAsync(
+                            _orderState.ContextId,
+                            _orderContextService.CurrentOrderType);
                 _orderState.AttachOrder(order);
             }
 

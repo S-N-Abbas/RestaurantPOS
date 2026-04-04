@@ -107,6 +107,7 @@ namespace RestaurantPOS
             services.AddTransient<UsersViewModel>();
             services.AddTransient<BackOfficeViewModel>();
             services.AddTransient<SettingsViewModel>();
+            services.AddTransient<OrderSwitcherViewModel>();
         }
     }
 

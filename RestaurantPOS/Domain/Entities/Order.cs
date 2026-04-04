@@ -15,14 +15,24 @@ namespace RestaurantPOS.Domain.Entities
         Cancelled = 3
     }
 
+    public enum OrderType
+    {
+        DineIn = 1,
+        TakeAway = 2,
+        Delivery = 3
+    }
+
     public class Order
     {
         public int Id { get; set; }
 
         public int ContextId { get; set; }
-        public int TableId { get; set; }
+        public int? TableId { get; set; }
 
         public Table? Table { get; set; } = null!;
+
+        //Distinguishes order type explicitly
+        public OrderType OrderType { get; set; } = OrderType.DineIn;
 
         // ✅ Covers (Persisted)
         public int AdultCovers { get; set; }

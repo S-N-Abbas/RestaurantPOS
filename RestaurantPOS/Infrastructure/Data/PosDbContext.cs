@@ -39,6 +39,12 @@ namespace RestaurantPOS.Infrastructure.Data
                 .WithOne(i => i.Order)
                 .HasForeignKey(i => i.OrderId);
 
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.Table)
+                .WithMany()
+                .HasForeignKey(o => o.TableId)
+                .IsRequired(false);   // ✅ TakeAway orders have no table
+
             modelBuilder.Entity<MenuProduct>()
                 .Property(p => p.Price)
                 .HasColumnType("decimal(10,2)");
@@ -48,28 +54,28 @@ namespace RestaurantPOS.Infrastructure.Data
                 .HasColumnType("decimal(10,2)");
 
             modelBuilder.Entity<Category>().HasData(
-    new Category { Id = 1, Name = "Drinks", IsActive = true },
-    new Category { Id = 2, Name = "Food", IsActive = true }
-);
+                new Category { Id = 1, Name = "Drinks", IsActive = true },
+                new Category { Id = 2, Name = "Food", IsActive = true }
+            );
 
             modelBuilder.Entity<MenuProduct>().HasData(
-    new MenuProduct { Id = 1, Name = "Tea", Price = 150, CategoryId = 1, IsActive = true },
-    new MenuProduct { Id = 2, Name = "Coffee", Price = 200, CategoryId = 1, IsActive = true },
-    new MenuProduct { Id = 3, Name = "Burger", Price = 550, CategoryId = 2, IsActive = true },
-    new MenuProduct { Id = 4, Name = "Pizza", Price = 900, CategoryId = 2, IsActive = true }
-);
+                new MenuProduct { Id = 1, Name = "Tea", Price = 150, CategoryId = 1, IsActive = true },
+                new MenuProduct { Id = 2, Name = "Coffee", Price = 200, CategoryId = 1, IsActive = true },
+                new MenuProduct { Id = 3, Name = "Burger", Price = 550, CategoryId = 2, IsActive = true },
+                new MenuProduct { Id = 4, Name = "Pizza", Price = 900, CategoryId = 2, IsActive = true }
+            );
 
 
             modelBuilder.Entity<Table>().HasData(
-    Enumerable.Range(1, 12).Select(i =>
-        new Table
-        {
-            Id = i,
-            Number = i,
-            IsActive = true
-        }
-    )
-);
+                Enumerable.Range(1, 12).Select(i =>
+                    new Table
+                    {
+                        Id = i,
+                        Number = i,
+                        IsActive = true
+                    }
+                )
+            );
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RestaurantPOS.Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,7 @@ namespace RestaurantPOS.Services
     public interface IOrderContextService
     {
         int CurrentContext{ get; }
+        OrderType CurrentOrderType { get; }
 
         event Action<int>? ContextChanged;
 

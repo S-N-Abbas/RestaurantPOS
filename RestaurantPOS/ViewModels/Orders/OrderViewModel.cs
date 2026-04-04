@@ -38,11 +38,11 @@ namespace RestaurantPOS.ViewModels.Orders
             }
         }
 
-        private bool _isTablePickerOpen;
-        public bool IsTablePickerOpen
+        private bool _isOrderSwitcherOpen;
+        public bool IsOrderSwitcherOpen
         {
-            get => _isTablePickerOpen;
-            set => SetProperty(ref _isTablePickerOpen, value);
+            get => _isOrderSwitcherOpen;
+            set => SetProperty(ref _isOrderSwitcherOpen, value);
         }
 
 
@@ -62,13 +62,13 @@ namespace RestaurantPOS.ViewModels.Orders
 
 
 
-        public ICommand OpenTablePickerCommand { get; }
-        public ICommand CloseTablePickerCommand { get; }
+        public ICommand OpenOrderSwitcherCommand { get; }
+        public ICommand CloseOrderSwitcherCommand { get; }
 
         public ICommand OpenCoverSelectorCommand { get; }
         public ICommand CloseCoverSelectorCommand { get; }
 
-        public TablePickerViewModel TablePicker { get; }
+        public OrderSwitcherViewModel OrderSwitcher { get; }
 
         public decimal CoversTotal =>
             _orderState.Order == null ? 0 :
@@ -140,21 +140,22 @@ namespace RestaurantPOS.ViewModels.Orders
 
             _orderContextService.ContextChanged += OnTableChanged;
 
-            TablePicker = new TablePickerViewModel(orderContextService, orderStore, tableStore);
+            OrderSwitcher = new OrderSwitcherViewModel(orderContextService, orderStore, tableStore);
 
-            OpenTablePickerCommand = new RelayCommand(() => IsTablePickerOpen = true);
-            CloseTablePickerCommand = new RelayCommand(() => IsTablePickerOpen = false);
+            OpenOrderSwitcherCommand = new RelayCommand(() => IsOrderSwitcherOpen = true);
+            CloseOrderSwitcherCommand = new RelayCommand(() => IsOrderSwitcherOpen = false);
 
             OpenCoverSelectorCommand = new RelayCommand(() => IsCoverSelectorOpen = true);
             CloseCoverSelectorCommand = new RelayCommand(() => IsCoverSelectorOpen = false);
 
-            _orderContextService.ContextChanged += _ => IsTablePickerOpen = false;
+            _orderContextService.ContextChanged += _ => IsOrderSwitcherOpen = false;
 
             LoadTable(_orderContextService.CurrentContext);
 
             coverSelectorViewModel = new CoverSelectorViewModel(
                 _orderState,
-                _orderService);
+                _orderService,
+                _orderContextService);
 
             coverSelectorViewModel.RequestClose += CloseCoverSelector;
         }
@@ -209,11 +210,28 @@ namespace RestaurantPOS.ViewModels.Orders
         }
 
 
-        private void OnTableChanged(int tableNumber)
+        private void OnTableChanged(int contextId)
         {
-            LoadTable(tableNumber);
+            LoadTable(contextId);
+            OnPropertyChanged(nameof(ContextLabel));
+            OnPropertyChanged(nameof(ContextIcon));
         }
 
+
+        public string ContextLabel => _orderContextService.CurrentOrderType switch
+        {
+            OrderType.TakeAway => $"TAKEAWAY #{Math.Abs(_orderContextService.CurrentContext)}",
+            OrderType.Delivery => $"DELIVERY #{Math.Abs(_orderContextService.CurrentContext)}",
+            _ => $"TABLE {_orderContextService.CurrentContext}"
+        };
+
+        // MahApps icon kind as a string — WPF resolves it via the enum converter
+        public string ContextIcon => _orderContextService.CurrentOrderType switch
+        {
+            OrderType.TakeAway => "BagPersonal",
+            OrderType.Delivery => "Moped",
+            _ => "TableChair"
+        };
 
         private async Task LoadMenuAsync()
         {
@@ -289,7 +307,10 @@ namespace RestaurantPOS.ViewModels.Orders
         {
             if (_orderState.Order == null)
             {
-                var order = await _orderService.CreateOrderAsync(TableNumber);
+                var order = await _orderService.CreateOrderAsync(
+                    TableNumber,
+                    _orderContextService.CurrentOrderType);
+
                 _orderState.AttachOrder(order);
             }
 
