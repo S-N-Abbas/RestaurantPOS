@@ -102,10 +102,10 @@ namespace RestaurantPOS.Services
         {
             return _orders
                 .Where(kvp =>
-                    kvp.Key < 0 &&                                    // negative = non-table slot
-                    kvp.Value.Order?.OrderType == orderType)          // matches requested type
+                    kvp.Key < 0 &&
+                    kvp.Value.EffectiveOrderType == orderType) // ✅ was: kvp.Value.Order?.OrderType == orderType
                 .Select(kvp => kvp.Key)
-                .OrderBy(id => id)                                    // -1 before -2 before -3
+                .OrderBy(id => id)
                 .ToList();
         }
 
@@ -130,5 +130,12 @@ namespace RestaurantPOS.Services
             _orders[contextId] = state;
             OrderStateChanged?.Invoke(contextId);
         }
+
+        /// <summary>
+        /// Allows OrderViewModel to signal the switcher after a lazy-created
+        /// order is attached, so slot lists refresh immediately.
+        /// </summary>
+        public void NotifyOrderStateChanged(int contextId)
+            => OrderStateChanged?.Invoke(contextId);
     }
 }

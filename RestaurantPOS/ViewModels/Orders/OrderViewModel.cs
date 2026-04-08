@@ -316,9 +316,10 @@ namespace RestaurantPOS.ViewModels.Orders
             {
                 var order = await _orderService.CreateOrderAsync(
                     TableNumber,
-                    _orderContextService.CurrentOrderType);
+                    _orderContextService.CurrentOrderType); // ✅ pass correct OrderType
 
                 _orderState.AttachOrder(order);
+                _orderStore.NotifyOrderStateChanged(TableNumber); // ✅ tell switcher a real order now exists
             }
 
             await _orderService.AddItemAsync(_orderState.Order!.Id, item.Id);
@@ -329,6 +330,7 @@ namespace RestaurantPOS.ViewModels.Orders
                 existing.Quantity++;
             else
                 OrderItems.Add(new OrderItemViewModel(item, RemoveItem));
+
             UpdateOrderState();
             var updatedOrder = await _orderService.GetByIdAsync(_orderState.Order.Id);
             _orderState.UpdateFrom(updatedOrder);
