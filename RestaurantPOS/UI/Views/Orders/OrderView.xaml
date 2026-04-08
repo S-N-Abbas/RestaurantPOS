@@ -63,7 +63,9 @@
                             </StackPanel>
                         </Button>
                         <Button Style="{StaticResource ModernButton}"
-                                Command="{Binding OpenCoverSelectorCommand}">
+                                Command="{Binding OpenCoverSelectorCommand}"
+                                Visibility="{Binding IsDineIn,
+                     Converter={StaticResource BoolToVisibilityConverter}}">
                             <StackPanel Orientation="Horizontal">
                                 <iconPacks:PackIconMaterial Kind="AccountGroup"
                                                             Margin="0,0,8,0"
@@ -131,7 +133,8 @@
                             Background="#F8FAFC"
                             CornerRadius="8"
                             Padding="12"
-                            Margin="0,0,0,15">
+                            Margin="0,0,0,15"
+                            Visibility="{Binding IsDineIn, Converter={StaticResource BoolToVisibilityConverter}}">
                         <Grid>
                             <StackPanel Orientation="Horizontal">
                                 <iconPacks:PackIconMaterial Kind="Account"

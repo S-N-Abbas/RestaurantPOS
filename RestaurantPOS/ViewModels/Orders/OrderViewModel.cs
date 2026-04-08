@@ -60,7 +60,7 @@ namespace RestaurantPOS.ViewModels.Orders
         public string CoversDisplay =>
             $"Adults: {_orderState.Order?.AdultCovers ?? 0}   •   Children: {_orderState.Order?.ChildCovers ?? 0}";
 
-
+        public bool IsDineIn => _orderContextService.CurrentOrderType == OrderType.DineIn;
 
         public ICommand OpenOrderSwitcherCommand { get; }
         public ICommand CloseOrderSwitcherCommand { get; }
@@ -163,19 +163,25 @@ namespace RestaurantPOS.ViewModels.Orders
         private void UpdateOrderState()
         {
             if (coverSelectorViewModel != null)
-            {
                 coverSelectorViewModel.Reload(_orderState);
+
+            // ✅ Cover selector only applies to Dine-In orders
+            if (_orderContextService.CurrentOrderType == OrderType.DineIn)
+            {
+                if (_orderState.Order == null ||
+                    (_orderState.Order.AdultCovers == 0 && _orderState.Order.ChildCovers == 0))
+                    IsCoverSelectorOpen = true;
             }
-
-
-            if (_orderState.Order == null || (_orderState.Order!.AdultCovers == 0 && _orderState.Order!.ChildCovers == 0))
-                IsCoverSelectorOpen = true;
+            else
+            {
+                // ✅ Always close it for TakeAway / Delivery — covers are irrelevant
+                IsCoverSelectorOpen = false;
+            }
 
             OnPropertyChanged(nameof(CoversDisplay));
             OnPropertyChanged(nameof(GrandTotal));
             OnPropertyChanged(nameof(CanPay));
             ((RelayCommand)PayCommand).NotifyCanExecuteChanged();
-            
         }
 
         private async void LoadTable(int tableNumber)
@@ -215,6 +221,7 @@ namespace RestaurantPOS.ViewModels.Orders
             LoadTable(contextId);
             OnPropertyChanged(nameof(ContextLabel));
             OnPropertyChanged(nameof(ContextIcon));
+            OnPropertyChanged(nameof(IsDineIn));
         }
 
 

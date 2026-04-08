@@ -74,7 +74,7 @@ namespace RestaurantPOS.Services
         public decimal GetOrderTotal(int contextId)
         {
             _orders.TryGetValue(contextId, out var state);
-            if (state == null)
+            if (state == null || state.Order == null)
                 return 0;
 
             return state.Order!.ItemsTotal
