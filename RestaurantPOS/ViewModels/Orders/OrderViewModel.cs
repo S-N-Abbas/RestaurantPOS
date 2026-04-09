@@ -13,6 +13,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Navigation;
 
@@ -20,6 +21,15 @@ namespace RestaurantPOS.ViewModels.Orders
 {
     public class OrderViewModel : ViewModelBase
     {
+        private readonly IOrderContextService _orderContextService;
+        private readonly OrderStore _orderStore;
+        private OrderState _orderState;
+        private readonly OrderService _orderService;
+        private readonly INavigationService _navigationService;
+        private readonly TableStore _tableStore;
+        private readonly SettingsService _settingsService;
+        private readonly AuthorizationService _authorizationService;
+
         public CoverSelectorViewModel coverSelectorViewModel { get; set; }
 
         public ObservableCollection<CategoryViewModel> Categories { get; }
@@ -68,6 +78,9 @@ namespace RestaurantPOS.ViewModels.Orders
         public ICommand OpenCoverSelectorCommand { get; }
         public ICommand CloseCoverSelectorCommand { get; }
 
+        public ICommand CancelOrderCommand { get; }
+
+        public bool CanCancel => _orderState?.Order != null;
         public OrderSwitcherViewModel OrderSwitcher { get; }
 
         public decimal CoversTotal =>
@@ -81,14 +94,6 @@ namespace RestaurantPOS.ViewModels.Orders
 
         public ICommand AddItemCommand { get; }
         public ICommand PayCommand { get; }
-
-        private readonly IOrderContextService _orderContextService;
-        private readonly OrderStore _orderStore;
-        private OrderState _orderState;
-        private readonly OrderService _orderService;
-        private readonly INavigationService _navigationService;
-        private readonly TableStore _tableStore;
-        private readonly SettingsService _settingsService;
 
         private int _tableNumber;
         public int TableNumber
@@ -106,7 +111,8 @@ namespace RestaurantPOS.ViewModels.Orders
             OrderService orderService,
             INavigationService navigationService,
             TableStore tableStore,
-            SettingsService settingsService)
+            SettingsService settingsService,
+            AuthorizationService authorizationService)
         {
             _menuService = menuService;
             _orderContextService = orderContextService;
@@ -114,6 +120,12 @@ namespace RestaurantPOS.ViewModels.Orders
             _orderService = orderService;
             _navigationService = navigationService;
             _settingsService = settingsService;
+            _authorizationService = authorizationService;
+
+            CancelOrderCommand = new RelayCommand(
+                () => _ = CancelOrderAsync(),
+                () => CanCancel
+            );
 
             Categories = new();
             AllItems = new();
@@ -165,7 +177,6 @@ namespace RestaurantPOS.ViewModels.Orders
             if (coverSelectorViewModel != null)
                 coverSelectorViewModel.Reload(_orderState);
 
-            // ✅ Cover selector only applies to Dine-In orders
             if (_orderContextService.CurrentOrderType == OrderType.DineIn)
             {
                 if (_orderState.Order == null ||
@@ -174,14 +185,15 @@ namespace RestaurantPOS.ViewModels.Orders
             }
             else
             {
-                // ✅ Always close it for TakeAway / Delivery — covers are irrelevant
                 IsCoverSelectorOpen = false;
             }
 
             OnPropertyChanged(nameof(CoversDisplay));
             OnPropertyChanged(nameof(GrandTotal));
             OnPropertyChanged(nameof(CanPay));
+            OnPropertyChanged(nameof(CanCancel));
             ((RelayCommand)PayCommand).NotifyCanExecuteChanged();
+            ((RelayCommand)CancelOrderCommand).NotifyCanExecuteChanged();
         }
 
         private async void LoadTable(int tableNumber)
@@ -366,6 +378,63 @@ namespace RestaurantPOS.ViewModels.Orders
         private void ExecutePay()
         {
             _navigationService.NavigateTo<PaymentViewModel>(_orderState);
+        }
+
+        private async Task CancelOrderAsync()
+        {
+            if (_orderState.Order == null)
+                return;
+
+            // ── Guard: payments already recorded requires manager ──────────────────
+            bool hasPaidAmount = _orderState.Order.PaidAmount > 0;
+
+            if (hasPaidAmount)
+            {
+                bool isManager = _authorizationService
+                    .HasAccess(UserRole.Manager, UserRole.Admin);
+
+                if (!isManager)
+                {
+                    MessageBox.Show(
+                        "This order has payments recorded.\nA Manager or Admin is required to cancel it.",
+                        "Authorisation Required",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                    return;
+                }
+            }
+
+            // ── Confirmation dialog ─────────────────────────────────────────────────
+            string summary = $"Order #{_orderState.Order.Id}  •  {OrderItems.Count} item(s)  •  £{GrandTotal:N2}";
+
+            var result = MessageBox.Show(
+                $"Are you sure you want to cancel this order?\n\n{summary}\n\nThis cannot be undone.",
+                "Cancel Order",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+
+            if (result != MessageBoxResult.Yes)
+                return;
+
+            try
+            {
+                // ── Mark as cancelled in DB ─────────────────────────────────────────
+                await _orderService.CancelOrderAsync(_orderState.Order.Id);
+
+                // ── Remove from in-memory store ─────────────────────────────────────
+                _orderStore.CloseOrder(_orderState.ContextId);
+
+                // ── Navigate back to tables ─────────────────────────────────────────
+                _navigationService.NavigateTo<TablesViewModel>();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Failed to cancel order: {ex.Message}",
+                    "Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
         }
     }
 }

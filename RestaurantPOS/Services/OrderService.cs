@@ -267,5 +267,23 @@ namespace RestaurantPOS.Services
 
             await _db.SaveChangesAsync();
         }
+
+        /// <summary>
+        /// Marks an order as Cancelled, closes it, and persists to DB.
+        /// Throws if the order has payments recorded (requires manager override upstream).
+        /// </summary>
+        public async Task CancelOrderAsync(int orderId)
+        {
+            var order = await LoadOrderAsync(orderId);
+
+            if (order.IsClosed)
+                throw new InvalidOperationException("Order is already closed.");
+
+            order.IsClosed = true;
+            order.Status = OrderStatus.Cancelled;
+            order.ClosedAt = DateTime.UtcNow;
+
+            await _db.SaveChangesAsync();
+        }
     }
 }

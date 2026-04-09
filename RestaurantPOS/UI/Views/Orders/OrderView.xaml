@@ -212,6 +212,8 @@
                                 Margin="0,15,0,0">
                         <Separator Background="{StaticResource BorderGray}"
                                    Margin="0,0,0,15" />
+
+                        <!-- Grand Total -->
                         <Grid Margin="0,0,0,20">
                             <TextBlock Text="Total Payable"
                                        FontSize="14"
@@ -223,22 +225,68 @@
                                        Foreground="{StaticResource TextDark}"
                                        HorizontalAlignment="Right" />
                         </Grid>
-                        <Button Content="PROCESS PAYMENT"
-                                Height="65"
-                                FontSize="18"
-                                FontWeight="Bold"
-                                Background="{StaticResource SuccessGreen}"
-                                Foreground="White"
-                                BorderThickness="0"
-                                Command="{Binding PayCommand}"
-                                IsEnabled="{Binding CanPay}">
-                            <Button.Resources>
-                                <Style TargetType="Border">
-                                    <Setter Property="CornerRadius"
-                                            Value="12" />
-                                </Style>
-                            </Button.Resources>
-                        </Button>
+
+                        <!-- ✅ Two-button row: Cancel (left) + Pay (right) -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="12" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Cancel Order — only shown when an order exists -->
+                            <Button Grid.Column="0"
+                                    Width="110"
+                                    Height="65"
+                                    FontSize="13"
+                                    FontWeight="Bold"
+                                    Background="#FEE2E2"
+                                    Foreground="#DC2626"
+                                    BorderBrush="#FECACA"
+                                    BorderThickness="1"
+                                    Command="{Binding CancelOrderCommand}"
+                                    Visibility="{Binding CanCancel,
+                             Converter={StaticResource BoolToVisibilityConverter}}">
+                                <Button.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius"
+                                                Value="12" />
+                                    </Style>
+                                </Button.Resources>
+                                <StackPanel VerticalAlignment="Center">
+                                    <iconPacks:PackIconMaterial Kind="CloseCircleOutline"
+                                                                Width="18"
+                                                                Height="18"
+                                                                HorizontalAlignment="Center"
+                                                                Margin="0,0,0,4" />
+                                    <TextBlock Text="Cancel Order"
+                                               TextAlignment="Center"
+                                               FontSize="12"
+                                               FontWeight="Bold" />
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Process Payment -->
+                            <Button Grid.Column="2"
+                                    Height="65"
+                                    FontSize="18"
+                                    FontWeight="Bold"
+                                    Background="{StaticResource SuccessGreen}"
+                                    Foreground="White"
+                                    BorderThickness="0"
+                                    Command="{Binding PayCommand}"
+                                    IsEnabled="{Binding CanPay}">
+                                <Button.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius"
+                                                Value="12" />
+                                    </Style>
+                                </Button.Resources>
+                                <TextBlock Text="PROCESS PAYMENT"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
+                            </Button>
+                        </Grid>
                     </StackPanel>
                 </Grid>
             </Border>
