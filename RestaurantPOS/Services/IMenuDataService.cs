@@ -11,5 +11,6 @@ namespace RestaurantPOS.Services
     {
         Task<IReadOnlyList<Category>> GetCategoriesAsync();
         Task<IReadOnlyList<MenuProduct>> GetProductsAsync();
+        void InvalidateCache();
     }
 }

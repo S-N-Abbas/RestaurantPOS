@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:RestaurantPOS.UI.Views.Payments"
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="900">
+             d:DesignHeight="600" d:DesignWidth="1300">
     <Grid Background="{StaticResource BackgroundGray}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -188,7 +188,7 @@
                                       Opacity="0.05" />
                 </Border.Effect>
 
-                <Grid MaxWidth="450"
+                <Grid Width="500"
                       HorizontalAlignment="Center">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />

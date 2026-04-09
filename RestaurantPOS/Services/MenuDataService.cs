@@ -48,5 +48,11 @@ namespace RestaurantPOS.Services
 
             return _productsCache;
         }
+
+        public void InvalidateCache()
+        {
+            _categoriesCache = null;
+            _productsCache = null;
+        }
     }
 }

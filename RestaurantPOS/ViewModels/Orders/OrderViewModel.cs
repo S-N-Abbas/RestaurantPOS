@@ -29,6 +29,13 @@ namespace RestaurantPOS.ViewModels.Orders
         private readonly TableStore _tableStore;
         private readonly SettingsService _settingsService;
         private readonly AuthorizationService _authorizationService;
+        private readonly IMenuAdminService _menuAdmin;
+
+        /// <summary>True for Admin and Manager — drives + button visibility in XAML.</summary>
+        public bool CanEditMenu => _authorizationService
+            .HasAccess(UserRole.Admin, UserRole.Manager);
+
+        public InlineMenuEditorViewModel MenuEditor { get; }
 
         public CoverSelectorViewModel coverSelectorViewModel { get; set; }
 
@@ -80,6 +87,9 @@ namespace RestaurantPOS.ViewModels.Orders
 
         public ICommand CancelOrderCommand { get; }
 
+        public ICommand AddCategoryCommand { get; }
+        public ICommand AddProductCommand { get; }
+
         public bool CanCancel => _orderState?.Order != null;
         public OrderSwitcherViewModel OrderSwitcher { get; }
 
@@ -112,7 +122,8 @@ namespace RestaurantPOS.ViewModels.Orders
             INavigationService navigationService,
             TableStore tableStore,
             SettingsService settingsService,
-            AuthorizationService authorizationService)
+            AuthorizationService authorizationService,
+            IMenuAdminService menuAdmin)
         {
             _menuService = menuService;
             _orderContextService = orderContextService;
@@ -121,6 +132,21 @@ namespace RestaurantPOS.ViewModels.Orders
             _navigationService = navigationService;
             _settingsService = settingsService;
             _authorizationService = authorizationService;
+            _menuAdmin = menuAdmin;
+
+            MenuEditor = new InlineMenuEditorViewModel(menuAdmin);
+
+            // After save, reload menu live and close editor
+            MenuEditor.SavedSuccessfully += async _ =>
+            {
+                await ReloadMenuAsync();
+            };
+
+            AddCategoryCommand = new RelayCommand(() =>
+                MenuEditor.OpenForCategory());
+
+            AddProductCommand = new RelayCommand(() =>
+                MenuEditor.OpenForProduct(Categories, SelectedCategory));
 
             CancelOrderCommand = new RelayCommand(
                 () => _ = CancelOrderAsync(),
@@ -267,6 +293,16 @@ namespace RestaurantPOS.ViewModels.Orders
 
             SelectedCategory = Categories.FirstOrDefault();
             FilterItems();
+        }
+
+        /// <summary>
+        /// Called after an inline save. Reloads categories and products live
+        /// without navigating away. MenuDataService cache was already invalidated
+        /// by MenuAdminService before this fires.
+        /// </summary>
+        private async Task ReloadMenuAsync()
+        {
+            await LoadMenuAsync();  // cache was busted by MenuAdminService — fresh DB read
         }
 
         private void FilterItems()

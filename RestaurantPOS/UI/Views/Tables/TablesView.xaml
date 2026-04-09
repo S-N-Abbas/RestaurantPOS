@@ -29,7 +29,7 @@
                         <Grid>
                             <StackPanel VerticalAlignment="Center"
                                         HorizontalAlignment="Center">
-                                <iconPacks:PackIconMaterial Kind="TableChair"
+                                <iconPacks:PackIconMaterial Kind="SilverwareForkKnife"
                                                             HorizontalAlignment="Center"
                                                             Width="30"
                                                             Height="30"

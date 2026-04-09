@@ -72,8 +72,8 @@ namespace RestaurantPOS.Services
 
             var remaining = orderTotal - order.PaidAmount;
 
-            if (method == "Card" && amount != remaining)
-                throw new InvalidOperationException("Card must pay exact amount");
+            //if (method == "Card" && amount != remaining)
+            //    throw new InvalidOperationException("Card must pay exact amount");
 
             var applied = Math.Min(amount, remaining);
 

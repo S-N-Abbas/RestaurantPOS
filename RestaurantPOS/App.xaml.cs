@@ -91,6 +91,7 @@ namespace RestaurantPOS
             services.AddSingleton<UserSessionService>();
             services.AddSingleton<AuthorizationService>();
             services.AddSingleton<SettingsService>();
+            services.AddScoped<IMenuAdminService, MenuAdminService>();
 
 
             // Shell

@@ -12,6 +12,16 @@ namespace RestaurantPOS.ViewModels.Orders
         public int Id { get; }
         public string Name { get; }
 
+        private bool _isSelected;
+        public bool IsSelected
+        {
+            get => _isSelected;
+            private set => SetProperty(ref _isSelected, value);
+        }
+
+        public void RaiseIsSelected(int? selectedId)
+            => IsSelected = selectedId == Id;
+
         public CategoryViewModel(int id, string name)
         {
             Id = id;
