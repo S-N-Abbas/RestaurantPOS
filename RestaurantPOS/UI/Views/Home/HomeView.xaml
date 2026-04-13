@@ -1,26 +1,126 @@
 ﻿<UserControl x:Class="RestaurantPOS.UI.Views.Home.HomeView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:RestaurantPOS.UI.Views.Home"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid Margin="20">
-        <UniformGrid Columns="3">
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             mc:Ignorable="d"
+             d:DesignHeight="700"
+             d:DesignWidth="1100">
 
-            <Button Content="ORDER"
-                    Style="{StaticResource PosTileButton}"
-                    Command="{Binding OrderCommand}" />
+    <Grid Background="{StaticResource BackgroundGray}">
+        <StackPanel VerticalAlignment="Center"
+                    HorizontalAlignment="Center">
 
-            <Button Content="REPORTS"
-                    Style="{StaticResource PosTileButton}"
-                    Command="{Binding ReportsCommand}" />
+            <TextBlock Text="Welcome Back"
+                       FontSize="32"
+                       FontWeight="Black"
+                       Foreground="{StaticResource TextDark}"
+                       HorizontalAlignment="Center"
+                       Margin="0,0,0,8" />
+            <TextBlock Text="Select a module to get started"
+                       FontSize="16"
+                       Foreground="{StaticResource TextMuted}"
+                       HorizontalAlignment="Center"
+                       Margin="0,0,0,40" />
 
-            <Button Content="BACK OFFICE"
-                    Style="{StaticResource PosTileButton}"
-                    Command="{Binding BackOfficeCommand}" />
+            <UniformGrid Columns="2"
+                         Width="700">
 
-        </UniformGrid>
+                <Button Style="{StaticResource MenuItemTile}"
+                        Height="180"
+                        Margin="10"
+                        Command="{Binding OrderCommand}">
+                    <StackPanel VerticalAlignment="Center">
+                        <iconPacks:PackIconMaterial Kind="TableChair"
+                                                    Width="40"
+                                                    Height="40"
+                                                    Foreground="{StaticResource PrimaryAccent}"
+                                                    HorizontalAlignment="Center"
+                                                    Margin="0,0,0,15" />
+                        <TextBlock Text="DINE-IN"
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource TextDark}"
+                                   TextAlignment="Center" />
+                        <TextBlock Text="Manage Tables"
+                                   FontSize="12"
+                                   Foreground="{StaticResource TextMuted}"
+                                   TextAlignment="Center" />
+                    </StackPanel>
+                </Button>
+
+                <Button Style="{StaticResource MenuItemTile}"
+                        Height="180"
+                        Margin="10"
+                        Command="{Binding TakeawayCommand}">
+                    <StackPanel VerticalAlignment="Center">
+                        <iconPacks:PackIconMaterial Kind="BagPersonal"
+                                                    Width="40"
+                                                    Height="40"
+                                                    Foreground="#10B981"
+                                                    HorizontalAlignment="Center"
+                                                    Margin="0,0,0,15" />
+                        <TextBlock Text="TAKEAWAY"
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource TextDark}"
+                                   TextAlignment="Center" />
+                        <TextBlock Text="Fast Counter Order"
+                                   FontSize="12"
+                                   Foreground="{StaticResource TextMuted}"
+                                   TextAlignment="Center" />
+                    </StackPanel>
+                </Button>
+
+                <Button Style="{StaticResource MenuItemTile}"
+                        Height="180"
+                        Margin="10"
+                        Command="{Binding ReportsCommand}">
+                    <StackPanel VerticalAlignment="Center">
+                        <iconPacks:PackIconMaterial Kind="ChartBar"
+                                                    Width="40"
+                                                    Height="40"
+                                                    Foreground="#6366F1"
+                                                    HorizontalAlignment="Center"
+                                                    Margin="0,0,0,15" />
+                        <TextBlock Text="REPORTS"
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource TextDark}"
+                                   TextAlignment="Center" />
+                        <TextBlock Text="Sales &amp; Analytics"
+                                   FontSize="12"
+                                   Foreground="{StaticResource TextMuted}"
+                                   TextAlignment="Center" />
+                    </StackPanel>
+                </Button>
+
+                <Button Style="{StaticResource MenuItemTile}"
+                        Height="180"
+                        Margin="10"
+                        Command="{Binding BackOfficeCommand}">
+                    <StackPanel VerticalAlignment="Center">
+                        <iconPacks:PackIconMaterial Kind="Cog"
+                                                    Width="40"
+                                                    Height="40"
+                                                    Foreground="#F59E0B"
+                                                    HorizontalAlignment="Center"
+                                                    Margin="0,0,0,15" />
+                        <TextBlock Text="BACK OFFICE"
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource TextDark}"
+                                   TextAlignment="Center" />
+                        <TextBlock Text="Inventory &amp; Settings"
+                                   FontSize="12"
+                                   Foreground="{StaticResource TextMuted}"
+                                   TextAlignment="Center" />
+                    </StackPanel>
+                </Button>
+
+            </UniformGrid>
+        </StackPanel>
     </Grid>
 </UserControl>
