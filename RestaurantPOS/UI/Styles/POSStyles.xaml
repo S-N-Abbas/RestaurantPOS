@@ -204,6 +204,54 @@
         </Style.Triggers>
     </Style>
 
+    <Style x:Key="ItemTile"
+           TargetType="Button">
+        <Setter Property="Background"
+                Value="White" />
+        <Setter Property="BorderThickness"
+                Value="0" />
+        <Setter Property="Margin"
+                Value="8" />
+        <Setter Property="Padding"
+                Value="12" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="12"
+                            BorderThickness="1"
+                            BorderBrush="{StaticResource BorderGray}">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="10"
+                                              ShadowDepth="1"
+                                              Opacity="0.05" />
+                        </Border.Effect>
+                        <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver"
+                                 Value="True">
+                            <Setter TargetName="border"
+                                    Property="Background"
+                                    Value="#F8FAFC" />
+                            <Setter TargetName="border"
+                                    Property="BorderBrush"
+                                    Value="{StaticResource PrimaryAccent}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed"
+                                 Value="True">
+                            <Setter TargetName="border"
+                                    Property="Background"
+                                    Value="#F1F5F9" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style x:Key="CircleActionButton"
            TargetType="Button">
         <Setter Property="Width"
@@ -454,6 +502,38 @@
                             <Setter TargetName="border"
                                     Property="Background"
                                     Value="#E2E8F0" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="IconButtonSmall"
+           TargetType="Button">
+        <Setter Property="Width"
+                Value="28" />
+        <Setter Property="Height"
+                Value="28" />
+        <Setter Property="Background"
+                Value="White" />
+        <Setter Property="BorderThickness"
+                Value="0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}"
+                            CornerRadius="6"
+                            x:Name="bd">
+                        <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver"
+                                 Value="True">
+                            <Setter TargetName="bd"
+                                    Property="Background"
+                                    Value="#F1F5F9" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

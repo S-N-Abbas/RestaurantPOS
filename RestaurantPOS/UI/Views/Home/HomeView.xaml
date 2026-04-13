@@ -28,7 +28,7 @@
             <UniformGrid Columns="2"
                          Width="700">
 
-                <Button Style="{StaticResource MenuItemTile}"
+                <Button Style="{StaticResource ItemTile}"
                         Height="180"
                         Margin="10"
                         Command="{Binding OrderCommand}">
@@ -51,7 +51,7 @@
                     </StackPanel>
                 </Button>
 
-                <Button Style="{StaticResource MenuItemTile}"
+                <Button Style="{StaticResource ItemTile}"
                         Height="180"
                         Margin="10"
                         Command="{Binding TakeawayCommand}">
@@ -74,7 +74,7 @@
                     </StackPanel>
                 </Button>
 
-                <Button Style="{StaticResource MenuItemTile}"
+                <Button Style="{StaticResource ItemTile}"
                         Height="180"
                         Margin="10"
                         Command="{Binding ReportsCommand}">
@@ -97,7 +97,7 @@
                     </StackPanel>
                 </Button>
 
-                <Button Style="{StaticResource MenuItemTile}"
+                <Button Style="{StaticResource ItemTile}"
                         Height="180"
                         Margin="10"
                         Command="{Binding BackOfficeCommand}">

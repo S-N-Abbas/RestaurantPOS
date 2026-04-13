@@ -157,84 +157,100 @@
                         </StackPanel>
                     </Button>
 
-                    <ItemsControl ItemsSource="{Binding Categories}"
-                                  Margin="10,0">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border Height="48"
-                                        CornerRadius="8"
-                                        Margin="0,2">
-                                    <Border.Style>
-                                        <Style TargetType="Border">
-                                            <Setter Property="Background"
-                                                    Value="Transparent" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsSelected}"
-                                                             Value="True">
-                                                    <Setter Property="Background"
+                    <ListBox ItemsSource="{Binding Categories}"
+                             SelectedItem="{Binding SelectedCategory}"
+                             Background="Transparent"
+                             BorderThickness="0"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                             Margin="10,0">
+
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListBoxItem">
+                                            <Border x:Name="ItemBorder"
+                                                    Height="48"
+                                                    CornerRadius="8"
+                                                    Margin="0,2"
+                                                    Background="Transparent"
+                                                    SnapsToDevicePixels="True">
+                                                <Grid>
+                                                    <ContentPresenter VerticalAlignment="Center"
+                                                                      Margin="14,0" />
+
+                                                    <Rectangle x:Name="Indicator"
+                                                               HorizontalAlignment="Left"
+                                                               Width="4"
+                                                               Height="20"
+                                                               Fill="{StaticResource PrimaryAccent}"
+                                                               Visibility="Collapsed"
+                                                               Margin="2,0,0,0"
+                                                               RadiusX="2"
+                                                               RadiusY="2" />
+                                                </Grid>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsSelected"
+                                                         Value="True">
+                                                    <Setter TargetName="ItemBorder"
+                                                            Property="Background"
                                                             Value="#EFF6FF" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Border.Style>
-                                    <Grid>
-                                        <!-- Category name — tapping selects it -->
-                                        <Button Background="Transparent"
-                                                BorderThickness="0"
-                                                HorizontalContentAlignment="Left"
-                                                Padding="14,0"
-                                                Command="{Binding DataContext.SelectCategoryCommand,
-                                      RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    <Setter Property="Foreground"
+                                                            Value="{StaticResource PrimaryAccent}" />
+                                                    <Setter TargetName="Indicator"
+                                                            Property="Visibility"
+                                                            Value="Visible" />
+                                                </Trigger>
+                                                <Trigger Property="IsMouseOver"
+                                                         Value="True">
+                                                    <Setter TargetName="ItemBorder"
+                                                            Property="Background"
+                                                            Value="#F8FAFC" />
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid d:DesignWidth="250">
+                                    <TextBlock Text="{Binding Name}"
+                                               FontSize="14"
+                                               FontWeight="Medium"
+                                               VerticalAlignment="Center" />
+
+                                    <StackPanel Orientation="Horizontal"
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Center"
+                                                Visibility="{Binding DataContext.IsEditMenuMode, 
+                                         RelativeSource={RelativeSource AncestorType=UserControl}, 
+                                         Converter={StaticResource BoolToVisibilityConverter}}">
+
+                                        <Button Style="{StaticResource IconButtonSmall}"
+                                                Command="{Binding DataContext.EditCategoryCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                 CommandParameter="{Binding}">
-                                            <TextBlock Text="{Binding Name}"
-                                                       FontSize="14"
-                                                       FontWeight="Medium"
-                                                       Foreground="{StaticResource TextDark}"
-                                                       VerticalAlignment="Center" />
+                                            <iconPacks:PackIconMaterial Kind="Pencil"
+                                                                        Foreground="{StaticResource PrimaryAccent}"
+                                                                        Width="12" />
                                         </Button>
 
-                                        <!-- Edit / Delete icons — only in edit mode -->
-                                        <StackPanel Orientation="Horizontal"
-                                                    HorizontalAlignment="Right"
-                                                    VerticalAlignment="Center"
-                                                    Margin="0,0,8,0"
-                                                    Visibility="{Binding DataContext.IsEditMenuMode,
-                                             RelativeSource={RelativeSource AncestorType=UserControl},
-                                             Converter={StaticResource BoolToVisibilityConverter}}">
-
-                                            <Button Width="32"
-                                                    Height="32"
-                                                    Background="Transparent"
-                                                    BorderThickness="0"
-                                                    Command="{Binding DataContext.EditCategoryCommand,
-                                          RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                    CommandParameter="{Binding}"
-                                                    ToolTip="Edit">
-                                                <iconPacks:PackIconMaterial Kind="Pencil"
-                                                                            Width="13"
-                                                                            Height="13"
-                                                                            Foreground="{StaticResource PrimaryAccent}" />
-                                            </Button>
-
-                                            <Button Width="32"
-                                                    Height="32"
-                                                    Background="Transparent"
-                                                    BorderThickness="0"
-                                                    Command="{Binding DataContext.DeleteCategoryCommand,
-                                          RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                    CommandParameter="{Binding}"
-                                                    ToolTip="Delete">
-                                                <iconPacks:PackIconMaterial Kind="TrashCanOutline"
-                                                                            Width="13"
-                                                                            Height="13"
-                                                                            Foreground="#DC2626" />
-                                            </Button>
-                                        </StackPanel>
-                                    </Grid>
-                                </Border>
+                                        <Button Style="{StaticResource IconButtonSmall}"
+                                                Command="{Binding DataContext.DeleteCategoryCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}"
+                                                Margin="4,0,0,0">
+                                            <iconPacks:PackIconMaterial Kind="TrashCanOutline"
+                                                                        Foreground="#DC2626"
+                                                                        Width="12" />
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
                             </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
                 </DockPanel>
             </Border>
 
@@ -439,7 +455,7 @@
                     </ItemsControl.ItemsPanel>
 
                     <!-- ✅ + Add Product tile — Admin/Manager only -->
-                    <Button Style="{StaticResource MenuItemTile}"
+                    <Button Style="{StaticResource ItemTile}"
                             Height="130"
                             Width="160"
                             Margin="4"
@@ -469,7 +485,7 @@
                                   Grid.Row="0">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <WrapPanel Orientation="Horizontal" MaxWidth="680" />
+                                <WrapPanel Orientation="Horizontal" />
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
 
@@ -477,13 +493,12 @@
                             <DataTemplate>
                                 <Button Height="130"
                                         Width="160"
-                                        Margin="4">
+                                        Margin="6">
                                     <Button.Style>
                                         <Style TargetType="Button"
-                                               BasedOn="{StaticResource MenuItemTile}">
+                                               BasedOn="{StaticResource ItemTile}">
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding DataContext.IsEditMenuMode,
-                                 RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                <DataTrigger Binding="{Binding DataContext.IsEditMenuMode, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                              Value="True">
                                                     <Setter Property="Background"
                                                             Value="#FFFBEB" />
@@ -503,72 +518,51 @@
                                         <Binding />
                                     </Button.CommandParameter>
 
-                                    <!-- ✅ Everything lives inside a Grid within the button -->
-                                    <Grid Width="152">
-                                        <StackPanel VerticalAlignment="Center">
+                                    <Grid Width="140"
+                                          Height="110">
+
+                                        <StackPanel VerticalAlignment="Center"
+                                                    HorizontalAlignment="Center">
                                             <TextBlock Text="{Binding Name}"
                                                        TextAlignment="Center"
                                                        FontWeight="Bold"
-                                                       FontSize="16"
+                                                       FontSize="15"
                                                        Foreground="{StaticResource TextDark}"
                                                        TextWrapping="Wrap"
                                                        MaxHeight="60" />
                                             <TextBlock Text="{Binding Price, StringFormat='£{0:N2}'}"
                                                        TextAlignment="Center"
-                                                       Margin="0,8,0,0"
+                                                       Margin="0,4,0,0"
                                                        Foreground="{StaticResource PrimaryAccent}"
                                                        FontWeight="SemiBold" />
                                         </StackPanel>
 
-                                        <!-- Edit badge — bottom-left -->
-                                        <Button Width="32"
-                                                Height="32"
-                                                HorizontalAlignment="Left"
-                                                VerticalAlignment="Bottom"
-                                                Background="{StaticResource PrimaryAccent}"
-                                                BorderThickness="0"
-                                                Command="{Binding DataContext.EditProductCommand,
-                              RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                CommandParameter="{Binding}"
-                                                Visibility="{Binding DataContext.IsEditMenuMode,
-                                 RelativeSource={RelativeSource AncestorType=UserControl},
-                                 Converter={StaticResource BoolToVisibilityConverter}}">
-                                            <Button.Resources>
-                                                <Style TargetType="Border">
-                                                    <Setter Property="CornerRadius"
-                                                            Value="8" />
-                                                </Style>
-                                            </Button.Resources>
-                                            <iconPacks:PackIconMaterial Kind="Pencil"
-                                                                        Width="13"
-                                                                        Height="13"
-                                                                        Foreground="White" />
-                                        </Button>
+                                        <Grid Visibility="{Binding DataContext.IsEditMenuMode, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibilityConverter}}">
 
-                                        <!-- Delete badge — bottom-right -->
-                                        <Button Width="32"
-                                                Height="32"
-                                                HorizontalAlignment="Right"
-                                                VerticalAlignment="Bottom"
-                                                Background="#DC2626"
-                                                BorderThickness="0"
-                                                Command="{Binding DataContext.DeleteProductCommand,
-                              RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                CommandParameter="{Binding}"
-                                                Visibility="{Binding DataContext.IsEditMenuMode,
-                                 RelativeSource={RelativeSource AncestorType=UserControl},
-                                 Converter={StaticResource BoolToVisibilityConverter}}">
-                                            <Button.Resources>
-                                                <Style TargetType="Border">
-                                                    <Setter Property="CornerRadius"
-                                                            Value="8" />
-                                                </Style>
-                                            </Button.Resources>
-                                            <iconPacks:PackIconMaterial Kind="TrashCanOutline"
-                                                                        Width="13"
-                                                                        Height="13"
-                                                                        Foreground="White" />
-                                        </Button>
+                                            <Button Style="{StaticResource IconButtonSmall}"
+                                                    VerticalAlignment="Top"
+                                                    HorizontalAlignment="Right"
+                                                    Background="{StaticResource PrimaryAccent}"
+                                                    Command="{Binding DataContext.EditProductCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}">
+                                                <iconPacks:PackIconMaterial Kind="Pencil"
+                                                                            Width="12"
+                                                                            Height="12"
+                                                                            Foreground="White" />
+                                            </Button>
+
+                                            <Button Style="{StaticResource IconButtonSmall}"
+                                                    VerticalAlignment="Top"
+                                                    HorizontalAlignment="Left"
+                                                    Background="#DC2626"
+                                                    Command="{Binding DataContext.DeleteProductCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}">
+                                                <iconPacks:PackIconMaterial Kind="TrashCanOutline"
+                                                                            Width="12"
+                                                                            Height="12"
+                                                                            Foreground="White" />
+                                            </Button>
+                                        </Grid>
                                     </Grid>
                                 </Button>
                             </DataTemplate>
@@ -674,7 +668,7 @@
                                                 >
                                             <Button.Style>
                                                 <Style TargetType="Button"
-                                                       BasedOn="{StaticResource MenuItemTile}">
+                                                       BasedOn="{StaticResource ItemTile}">
                                                     <Style.Triggers>
                                                         <!-- Active/current table gets accent border -->
                                                         <DataTrigger Binding="{Binding IsCurrent}"
@@ -752,7 +746,7 @@
                                                     Command="{Binding SelectSlotCommand}">
                                                 <Button.Style>
                                                     <Style TargetType="Button"
-                                                           BasedOn="{StaticResource MenuItemTile}">
+                                                           BasedOn="{StaticResource ItemTile}">
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding IsCurrent}"
                                                                          Value="True">
@@ -816,7 +810,7 @@
                                                     Command="{Binding SelectSlotCommand}">
                                                 <Button.Style>
                                                     <Style TargetType="Button"
-                                                           BasedOn="{StaticResource MenuItemTile}">
+                                                           BasedOn="{StaticResource ItemTile}">
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding IsCurrent}"
                                                                          Value="True">
