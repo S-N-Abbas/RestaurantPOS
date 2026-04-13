@@ -323,17 +323,22 @@
             </Border>
 
             <ScrollViewer Margin="10,20,0,20"
-                          VerticalScrollBarVisibility="Auto">
+                          HorizontalScrollBarVisibility="Disabled"
+                          VerticalScrollBarVisibility="Auto"
+                          VerticalAlignment="Top"
+                          HorizontalAlignment="Left">
                 <ItemsControl>
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <UniformGrid Columns="4" />
+                            <StackPanel Orientation="Horizontal" />
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
 
-                    <!-- ✅ + Add Product tile — Admin/Manager only, first in grid -->
+                    <!-- ✅ + Add Product tile — Admin/Manager only -->
                     <Button Style="{StaticResource MenuItemTile}"
                             Height="130"
+                            Width="160"
+                            Margin="4"
                             Command="{Binding AddProductCommand}"
                             Visibility="{Binding CanEditMenu,
                              Converter={StaticResource BoolToVisibilityConverter}}"
@@ -356,21 +361,22 @@
                     </Button>
 
                     <!-- Existing products -->
-                    <ItemsControl ItemsSource="{Binding Items}">
+                    <ItemsControl ItemsSource="{Binding Items}"
+                                  Grid.Row="0">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <!-- Use WrapPanel inside so it flows after the + tile -->
-                                <WrapPanel />
+                                <WrapPanel Orientation="Horizontal" MaxWidth="680" />
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
+
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Button Style="{StaticResource MenuItemTile}"
                                         Height="130"
                                         Width="160"
                                         Margin="4"
-                                        Command="{Binding DataContext.AddItemCommand,
-                                      RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        Command="{Binding DataContext.AddItemCommand, 
+                              RelativeSource={RelativeSource AncestorType=UserControl}}"
                                         CommandParameter="{Binding}">
                                     <Grid>
                                         <StackPanel VerticalAlignment="Center">

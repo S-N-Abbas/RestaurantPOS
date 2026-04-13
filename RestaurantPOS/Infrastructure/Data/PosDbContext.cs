@@ -55,15 +55,50 @@ namespace RestaurantPOS.Infrastructure.Data
 
             modelBuilder.Entity<Category>().HasData(
                 new Category { Id = 1, Name = "Drinks", IsActive = true },
-                new Category { Id = 2, Name = "Food", IsActive = true }
+                new Category { Id = 2, Name = "Starters", IsActive = true },
+                new Category { Id = 3, Name = "Main Course", IsActive = true },
+                new Category { Id = 4, Name = "BBQ", IsActive = true },
+                new Category { Id = 5, Name = "Biryani & Rice", IsActive = true },
+                new Category { Id = 6, Name = "Desserts", IsActive = true }
             );
 
             modelBuilder.Entity<MenuProduct>().HasData(
-                new MenuProduct { Id = 1, Name = "Tea", Price = 150, CategoryId = 1, IsActive = true },
-                new MenuProduct { Id = 2, Name = "Coffee", Price = 200, CategoryId = 1, IsActive = true },
-                new MenuProduct { Id = 3, Name = "Burger", Price = 550, CategoryId = 2, IsActive = true },
-                new MenuProduct { Id = 4, Name = "Pizza", Price = 900, CategoryId = 2, IsActive = true }
-            );
+
+    // Drinks
+    new MenuProduct { Id = 1, Name = "Masala Chai", Price = 2.50m, CategoryId = 1, IsActive = true },
+    new MenuProduct { Id = 2, Name = "Karak Chai", Price = 2.80m, CategoryId = 1, IsActive = true },
+    new MenuProduct { Id = 3, Name = "Mango Lassi", Price = 3.50m, CategoryId = 1, IsActive = true },
+    new MenuProduct { Id = 4, Name = "Soft Drink (Can)", Price = 1.50m, CategoryId = 1, IsActive = true },
+    new MenuProduct { Id = 5, Name = "Fresh Lime Soda", Price = 2.80m, CategoryId = 1, IsActive = true },
+
+    // Starters
+    new MenuProduct { Id = 6, Name = "Samosa (2 pcs)", Price = 3.00m, CategoryId = 2, IsActive = true },
+    new MenuProduct { Id = 7, Name = "Chicken Pakora", Price = 5.50m, CategoryId = 2, IsActive = true },
+    new MenuProduct { Id = 8, Name = "Chana Chaat", Price = 4.50m, CategoryId = 2, IsActive = true },
+
+    // Main Course
+    new MenuProduct { Id = 9, Name = "Chicken Karahi", Price = 11.99m, CategoryId = 3, IsActive = true },
+    new MenuProduct { Id = 10, Name = "Lamb Karahi", Price = 13.99m, CategoryId = 3, IsActive = true },
+    new MenuProduct { Id = 11, Name = "Chicken Curry", Price = 9.99m, CategoryId = 3, IsActive = true },
+    new MenuProduct { Id = 12, Name = "Daal Tarka", Price = 7.99m, CategoryId = 3, IsActive = true },
+    new MenuProduct { Id = 13, Name = "Paneer Karahi", Price = 9.50m, CategoryId = 3, IsActive = true },
+
+    // BBQ
+    new MenuProduct { Id = 14, Name = "Chicken Tikka (Full)", Price = 8.99m, CategoryId = 4, IsActive = true },
+    new MenuProduct { Id = 15, Name = "Seekh Kebab (2 pcs)", Price = 7.50m, CategoryId = 4, IsActive = true },
+    new MenuProduct { Id = 16, Name = "Mixed Grill", Price = 15.99m, CategoryId = 4, IsActive = true },
+
+    // Biryani & Rice
+    new MenuProduct { Id = 17, Name = "Chicken Biryani", Price = 8.99m, CategoryId = 5, IsActive = true },
+    new MenuProduct { Id = 18, Name = "Lamb Biryani", Price = 10.99m, CategoryId = 5, IsActive = true },
+    new MenuProduct { Id = 19, Name = "Plain Rice", Price = 3.50m, CategoryId = 5, IsActive = true },
+    new MenuProduct { Id = 20, Name = "Pilau Rice", Price = 4.00m, CategoryId = 5, IsActive = true },
+
+    // Desserts
+    new MenuProduct { Id = 21, Name = "Gulab Jamun (2 pcs)", Price = 3.99m, CategoryId = 6, IsActive = true },
+    new MenuProduct { Id = 22, Name = "Kheer", Price = 3.50m, CategoryId = 6, IsActive = true },
+    new MenuProduct { Id = 23, Name = "Ras Malai", Price = 4.50m, CategoryId = 6, IsActive = true }
+);
 
 
             modelBuilder.Entity<Table>().HasData(
