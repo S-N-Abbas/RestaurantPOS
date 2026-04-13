@@ -102,6 +102,29 @@ namespace RestaurantPOS.ViewModels.Orders
         public decimal GrandTotal => 
             CoversTotal + OrderItems.Sum(i => i.Total);
 
+
+        // ─── Edit Mode ────────────────────────────────────────────────────────────────
+
+        private bool _isEditMenuMode;
+        public bool IsEditMenuMode
+        {
+            get => _isEditMenuMode;
+            set
+            {
+                if (SetProperty(ref _isEditMenuMode, value))
+                    OnPropertyChanged(nameof(EditMenuButtonLabel));
+            }
+        }
+
+        public string EditMenuButtonLabel
+            => IsEditMenuMode ? "Done Editing" : "Edit Menu";
+
+        public ICommand ToggleEditMenuCommand { get; }
+        public ICommand EditCategoryCommand { get; }
+        public ICommand DeleteCategoryCommand { get; }
+        public ICommand EditProductCommand { get; }
+        public ICommand DeleteProductCommand { get; }
+
         public ICommand AddItemCommand { get; }
         public ICommand PayCommand { get; }
 
@@ -135,6 +158,22 @@ namespace RestaurantPOS.ViewModels.Orders
             _menuAdmin = menuAdmin;
 
             MenuEditor = new InlineMenuEditorViewModel(menuAdmin);
+
+            ToggleEditMenuCommand = new RelayCommand(
+                () => IsEditMenuMode = !IsEditMenuMode,
+                () => CanEditMenu);
+
+            EditCategoryCommand = new RelayCommand<CategoryViewModel>(
+                async c => await EditCategoryAsync(c));
+
+            DeleteCategoryCommand = new RelayCommand<CategoryViewModel>(
+                async c => await DeleteCategoryAsync(c));
+
+            EditProductCommand = new RelayCommand<MenuItemViewModel>(
+                async p => await EditProductAsync(p));
+
+            DeleteProductCommand = new RelayCommand<MenuItemViewModel>(
+                async p => await DeleteProductAsync(p));
 
             // After save, reload menu live and close editor
             MenuEditor.SavedSuccessfully += async _ =>
@@ -470,6 +509,66 @@ namespace RestaurantPOS.ViewModels.Orders
                     "Error",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
+            }
+        }
+
+        private async Task EditCategoryAsync(CategoryViewModel? category)
+        {
+            if (category == null) return;
+            MenuEditor.OpenForEditCategory(category);
+        }
+
+        private async Task DeleteCategoryAsync(CategoryViewModel? category)
+        {
+            if (category == null) return;
+
+            var result = MessageBox.Show(
+                $"Delete category '{category.Name}'?\n\nAll products in this category will be hidden.",
+                "Delete Category",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+
+            if (result != MessageBoxResult.Yes) return;
+
+            try
+            {
+                await _menuAdmin.DeleteCategoryAsync(category.Id);
+                await ReloadMenuAsync();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private async Task EditProductAsync(MenuItemViewModel? product)
+        {
+            if (product == null) return;
+            MenuEditor.OpenForEditProduct(product, Categories, SelectedCategory);
+        }
+
+        private async Task DeleteProductAsync(MenuItemViewModel? product)
+        {
+            if (product == null) return;
+
+            var result = MessageBox.Show(
+                $"Delete '{product.Name}'?",
+                "Delete Product",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+
+            if (result != MessageBoxResult.Yes) return;
+
+            try
+            {
+                await _menuAdmin.DeleteProductAsync(product.Id);
+                await ReloadMenuAsync();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

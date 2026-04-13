@@ -74,5 +74,33 @@ namespace RestaurantPOS.Services
             _menuDataService.InvalidateCache(); // ✅ fresh load next time
             return product;
         }
+
+        public async Task DeleteCategoryAsync(int id)
+        {
+            var category = await _db.Categories
+                .Include(c => c.Products)
+                .FirstOrDefaultAsync(c => c.Id == id)
+                ?? throw new InvalidOperationException("Category not found.");
+
+            // Soft delete — hide from order screen but preserve history
+            category.IsActive = false;
+            foreach (var p in category.Products)
+                p.IsActive = false;
+
+            await _db.SaveChangesAsync();
+            _menuDataService.InvalidateCache();
+        }
+
+        public async Task DeleteProductAsync(int id)
+        {
+            var product = await _db.Products.FindAsync(id)
+                ?? throw new InvalidOperationException("Product not found.");
+
+            // Soft delete — preserves it in historical order records
+            product.IsActive = false;
+
+            await _db.SaveChangesAsync();
+            _menuDataService.InvalidateCache();
+        }
     }
 }

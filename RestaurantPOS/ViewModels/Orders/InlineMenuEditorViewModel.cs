@@ -7,6 +7,7 @@ using System.Windows.Input;
 
 namespace RestaurantPOS.ViewModels.Orders
 {
+    
     public enum InlineEditorMode
     {
         Category,
@@ -21,6 +22,7 @@ namespace RestaurantPOS.ViewModels.Orders
 
     public class InlineMenuEditorViewModel : ViewModelBase
     {
+        private int? _editingId;
         private readonly IMenuAdminService _menuAdmin;
 
         // ─── Mode ─────────────────────────────────────────────────────────────
@@ -43,9 +45,11 @@ namespace RestaurantPOS.ViewModels.Orders
         public bool IsCategoryMode => Mode == InlineEditorMode.Category;
         public bool IsProductMode => Mode == InlineEditorMode.Product;
 
-        public string Title => Mode == InlineEditorMode.Category
-            ? "New Category"
-            : "New Product";
+        public string Title => Mode switch
+        {
+            InlineEditorMode.Category => _editingId == null ? "New Category" : "Edit Category",
+            _ => _editingId == null ? "New Product" : "Edit Product"
+        };
 
         // ─── Fields ───────────────────────────────────────────────────────────
 
@@ -201,6 +205,42 @@ namespace RestaurantPOS.ViewModels.Orders
             else Price = string.Empty;
         }
 
+
+        public void OpenForEditCategory(CategoryViewModel category)
+        {
+            Mode = InlineEditorMode.Category;
+            _editingId = category.Id;        // ← add private int? _editingId field
+            Name = category.Name;
+            Price = string.Empty;
+            _activeField = InlineEditorField.Name;
+            RaiseFieldFocus();
+            OnPropertyChanged(nameof(Title));
+            IsOpen = true;
+        }
+
+        public void OpenForEditProduct(MenuItemViewModel product,
+                                       IEnumerable<CategoryViewModel> categories,
+                                       CategoryViewModel? currentCategory)
+        {
+            Mode = InlineEditorMode.Product;
+            _editingId = product.Id;
+            Name = product.Name;
+            Price = product.Price.ToString("N2");
+            _activeField = InlineEditorField.Name;
+
+            Categories.Clear();
+            foreach (var c in categories) Categories.Add(c);
+
+            SelectedCategory = Categories.FirstOrDefault(c => c.Id == product.CategoryId)
+                               ?? currentCategory;
+
+            foreach (var c in Categories)
+                c.RaiseIsSelected(SelectedCategory?.Id);
+
+            RaiseFieldFocus();
+            OnPropertyChanged(nameof(Title));
+            IsOpen = true;
+        }
         // ─── Save ─────────────────────────────────────────────────────────────
 
         private async Task SaveAsync()
@@ -211,18 +251,16 @@ namespace RestaurantPOS.ViewModels.Orders
             {
                 if (Mode == InlineEditorMode.Category)
                 {
-                    var saved = await _menuAdmin.SaveCategoryAsync(null, Name);
+                    var saved = await _menuAdmin.SaveCategoryAsync(_editingId, Name);
                     SavedSuccessfully?.Invoke(saved);
                 }
                 else
                 {
-                    if (!decimal.TryParse(Price, out decimal price) || price < 0)
-                        return;
-
+                    if (!decimal.TryParse(Price, out decimal price) || price < 0) return;
                     if (SelectedCategory == null) return;
 
                     var saved = await _menuAdmin.SaveProductAsync(
-                        null, Name, price, SelectedCategory.Id);
+                        _editingId, Name, price, SelectedCategory.Id);
                     SavedSuccessfully?.Invoke(saved);
                 }
 
@@ -230,7 +268,6 @@ namespace RestaurantPOS.ViewModels.Orders
             }
             catch (Exception ex)
             {
-                // Surface error without leaving the screen
                 Name = $"[Error: {ex.Message}]";
             }
         }
