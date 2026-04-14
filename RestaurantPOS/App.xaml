@@ -46,6 +46,7 @@
             <converters:StringToBoolConverter x:Key="StringToBoolConverter" />
             <converters:StatusToBrushConverter x:Key="StatusToBrushConverter" />
             <converters:StatusToTextConverter x:Key="StatusToTextConverter" />
+            <converters:CurrencyFormatConverter x:Key="CurrencyFormatConverter" />
 
             <!-- DATA TEMPLATES -->
             <DataTemplate DataType="{x:Type vmShell:ShellViewModel}">

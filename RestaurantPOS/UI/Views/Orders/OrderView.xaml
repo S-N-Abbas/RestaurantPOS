@@ -330,10 +330,17 @@
                                                        Foreground="{StaticResource TextDark}"
                                                        FontSize="15"
                                                        TextWrapping="Wrap" />
-                                            <TextBlock Text="{Binding UnitPrice, StringFormat='£{0:N2}'}"
-                                                       Foreground="{StaticResource TextMuted}"
+                                            <TextBlock Foreground="{StaticResource TextMuted}"
                                                        FontSize="13"
-                                                       Margin="0,2,0,0" />
+                                                       Margin="0,2,0,0">
+                                                <TextBlock.Text>
+                                                    <MultiBinding Converter="{StaticResource CurrencyFormatConverter}"
+                                                                  Mode="OneWay">
+                                                        <Binding Path="UnitPrice" />
+                                                        <Binding Path="CurrencySymbol" />
+                                                    </MultiBinding>
+                                                </TextBlock.Text>
+                                            </TextBlock>
                                         </StackPanel>
                                         <StackPanel Grid.Column="1"
                                                     Orientation="Horizontal"
@@ -370,11 +377,18 @@
                                        FontSize="14"
                                        Foreground="{StaticResource TextMuted}"
                                        VerticalAlignment="Bottom" />
-                            <TextBlock Text="{Binding GrandTotal, StringFormat='£{0:N2}'}"
-                                       FontSize="32"
+                            <TextBlock FontSize="32"
                                        FontWeight="Black"
                                        Foreground="{StaticResource TextDark}"
-                                       HorizontalAlignment="Right" />
+                                       HorizontalAlignment="Right">
+                                <TextBlock.Text>
+                                    <MultiBinding Converter="{StaticResource CurrencyFormatConverter}"
+                                                  Mode="OneWay">
+                                        <Binding Path="GrandTotal" />
+                                        <Binding Path="CurrencySymbol" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
                         </Grid>
 
                         <!-- ✅ Two-button row: Cancel (left) + Pay (right) -->
@@ -530,11 +544,18 @@
                                                        Foreground="{StaticResource TextDark}"
                                                        TextWrapping="Wrap"
                                                        MaxHeight="60" />
-                                            <TextBlock Text="{Binding Price, StringFormat='£{0:N2}'}"
-                                                       TextAlignment="Center"
+                                            <TextBlock TextAlignment="Center"
                                                        Margin="0,4,0,0"
                                                        Foreground="{StaticResource PrimaryAccent}"
-                                                       FontWeight="SemiBold" />
+                                                       FontWeight="SemiBold">
+                                                <TextBlock.Text>
+                                                    <MultiBinding Converter="{StaticResource CurrencyFormatConverter}"
+                                                                  Mode="OneWay">
+                                                        <Binding Path="Price" />
+                                                        <Binding Path="CurrencySymbol"/>
+                                                    </MultiBinding>
+                                                </TextBlock.Text>
+                                            </TextBlock>
                                         </StackPanel>
 
                                         <Grid Visibility="{Binding DataContext.IsEditMenuMode, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibilityConverter}}">
@@ -712,7 +733,7 @@
                                                             </Style.Triggers>
                                                         </Style>
                                                     </TextBlock.Style>
-                                                    <Run Text="£" />
+                                                    <Run Text="{Binding CurrencySymbol, Mode=OneWay}"/>
                                                     <Run Text="{Binding CurrentTotal, StringFormat={}{0:N2}, Mode=OneWay}" />
                                                 </TextBlock>
                                             </StackPanel>
@@ -775,7 +796,7 @@
                                                                Foreground="{StaticResource PrimaryAccent}"
                                                                FontWeight="SemiBold"
                                                                Margin="0,2,0,0">
-                                                        <Run Text="£" />
+                                                        <Run Text="{Binding CurrencySymbol, Mode=OneWay}" />
                                                         <Run Text="{Binding CurrentTotal, StringFormat={}{0:N2}, Mode=OneWay}" />
                                                     </TextBlock>
                                                 </StackPanel>
@@ -839,7 +860,7 @@
                                                                Foreground="{StaticResource PrimaryAccent}"
                                                                FontWeight="SemiBold"
                                                                Margin="0,2,0,0">
-                                                        <Run Text="£" />
+                                                        <Run Text="{Binding CurrencySymbol, Mode=OneWay}" />
                                                         <Run Text="{Binding CurrentTotal, StringFormat={}{0:N2}, Mode=OneWay}" />
                                                     </TextBlock>
                                                 </StackPanel>
@@ -984,11 +1005,13 @@
                     <StackPanel Visibility="{Binding IsProductMode,
                                      Converter={StaticResource BoolToVisibilityConverter}}"
                                 Margin="0,0,0,16">
-                        <TextBlock Text="Price (£)"
-                                   FontSize="12"
+                        <TextBlock FontSize="12"
                                    FontWeight="Bold"
                                    Foreground="{StaticResource TextMuted}"
-                                   Margin="0,0,0,6" />
+                                   Margin="0,0,0,6">
+                            <Run Text="Price " />
+                            <Run Text="{Binding CurrencySymbol, Mode=OneWay}" />
+                        </TextBlock>
                         <Border Height="56"
                                 BorderThickness="2"
                                 CornerRadius="12">

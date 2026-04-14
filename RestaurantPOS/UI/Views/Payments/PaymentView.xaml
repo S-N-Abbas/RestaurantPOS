@@ -68,9 +68,16 @@
                                                    Foreground="{StaticResource TextMuted}"
                                                    FontSize="11" />
                                     </StackPanel>
-                                    <TextBlock Text="{Binding AdultCoverTotal, StringFormat=£{0:F2}}"
-                                               HorizontalAlignment="Right"
-                                               Foreground="{StaticResource TextDark}" />
+                                    <TextBlock HorizontalAlignment="Right"
+                                               Foreground="{StaticResource TextDark}">
+                                        <TextBlock.Text>
+                                            <MultiBinding Converter="{StaticResource CurrencyFormatConverter}"
+                                                          Mode="OneWay">
+                                                <Binding Path="AdultCoverTotal" />
+                                                <Binding Path="CurrencySymbol"/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
                                 </Grid>
 
                                 <Grid Margin="0,0,0,12">
@@ -87,9 +94,16 @@
                                                    Foreground="{StaticResource TextMuted}"
                                                    FontSize="11" />
                                     </StackPanel>
-                                    <TextBlock Text="{Binding ChildCoverTotal, StringFormat=£{0:F2}}"
-                                               HorizontalAlignment="Right"
-                                               Foreground="{StaticResource TextDark}" />
+                                    <TextBlock HorizontalAlignment="Right"
+                                               Foreground="{StaticResource TextDark}">
+                                        <TextBlock.Text>
+                                            <MultiBinding Converter="{StaticResource CurrencyFormatConverter}"
+                                                          Mode="OneWay">
+                                                <Binding Path="ChildCoverTotal" />
+                                                <Binding Path="CurrencySymbol"/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
                                 </Grid>
 
                                 <Separator Background="{StaticResource BorderGray}"
@@ -98,18 +112,32 @@
                                 <Grid Margin="0,0,0,8">
                                     <TextBlock Text="Subtotal"
                                                Foreground="{StaticResource TextMuted}" />
-                                    <TextBlock Text="{Binding Total, StringFormat=£{0:F2}}"
-                                               HorizontalAlignment="Right"
-                                               Foreground="{StaticResource TextDark}" />
+                                    <TextBlock HorizontalAlignment="Right"
+                                               Foreground="{StaticResource TextDark}">
+                                        <TextBlock.Text>
+                                            <MultiBinding Converter="{StaticResource CurrencyFormatConverter}"
+                                                          Mode="OneWay">
+                                                <Binding Path="Total" />
+                                                <Binding Path="CurrencySymbol" />
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
                                 </Grid>
 
                                 <Grid Margin="0,0,0,12">
                                     <TextBlock Text="Paid to date"
                                                Foreground="{StaticResource TextMuted}" />
-                                    <TextBlock Text="{Binding AlreadyPaid, StringFormat=£{0:F2}}"
-                                               HorizontalAlignment="Right"
+                                    <TextBlock HorizontalAlignment="Right"
                                                Foreground="{StaticResource SuccessGreen}"
-                                               FontWeight="Bold" />
+                                               FontWeight="Bold">
+                                        <TextBlock.Text>
+                                            <MultiBinding Converter="{StaticResource CurrencyFormatConverter}"
+                                                          Mode="OneWay">
+                                                <Binding Path="AlreadyPaid" />
+                                                <Binding Path="CurrencySymbol"/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
                                 </Grid>
 
                                 <Separator Background="{StaticResource BorderGray}"
@@ -120,11 +148,18 @@
                                                FontSize="16"
                                                FontWeight="Black"
                                                Foreground="{StaticResource TextDark}" />
-                                    <TextBlock Text="{Binding Due, StringFormat=£{0:F2}}"
-                                               FontSize="22"
+                                    <TextBlock FontSize="22"
                                                FontWeight="Black"
                                                Foreground="{StaticResource DangerRed}"
-                                               HorizontalAlignment="Right" />
+                                               HorizontalAlignment="Right">
+                                        <TextBlock.Text>
+                                            <MultiBinding Converter="{StaticResource CurrencyFormatConverter}"
+                                                          Mode="OneWay">
+                                                <Binding Path="Due" />
+                                                <Binding Path="CurrencySymbol"/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
                                 </Grid>
                             </StackPanel>
                         </Border>
@@ -152,10 +187,17 @@
                                                    Foreground="{StaticResource TextMuted}"
                                                    Margin="15,0" />
                                         <TextBlock Grid.Column="2"
-                                                   Text="{Binding LineTotal, StringFormat=£{0:F2}}"
                                                    Foreground="{StaticResource TextDark}"
                                                    FontWeight="Bold"
-                                                   HorizontalAlignment="Right" />
+                                                   HorizontalAlignment="Right">
+                                            <TextBlock.Text>
+                                                <MultiBinding Converter="{StaticResource CurrencyFormatConverter}"
+                                                              Mode="OneWay">
+                                                    <Binding Path="LineTotal" />
+                                                    <Binding Path="CurrencySymbol" />
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
                                     </Grid>
                                 </DataTemplate>
                             </ListView.ItemTemplate>
@@ -220,7 +262,7 @@
                             Padding="16"
                             Margin="0,0,0,24">
                         <Grid>
-                            <TextBlock Text="£"
+                            <TextBlock Text="{Binding CurrencySymbol}"
                                        FontSize="20"
                                        FontWeight="Bold"
                                        VerticalAlignment="Center"

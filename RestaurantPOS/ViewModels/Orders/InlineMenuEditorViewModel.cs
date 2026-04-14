@@ -24,6 +24,7 @@ namespace RestaurantPOS.ViewModels.Orders
     {
         private int? _editingId;
         private readonly IMenuAdminService _menuAdmin;
+        private readonly SettingsService _settingsService;
 
         // ─── Mode ─────────────────────────────────────────────────────────────
 
@@ -92,6 +93,8 @@ namespace RestaurantPOS.ViewModels.Orders
             set => SetProperty(ref _isOpen, value);
         }
 
+        public string CurrencySymbol => _settingsService.Settings.CurrencySymbol;
+
         // ─── Events ───────────────────────────────────────────────────────────
 
         /// <summary>Fired after a successful save. Payload is the saved entity.</summary>
@@ -112,9 +115,11 @@ namespace RestaurantPOS.ViewModels.Orders
 
         // ─── Constructor ──────────────────────────────────────────────────────
 
-        public InlineMenuEditorViewModel(IMenuAdminService menuAdmin)
+        public InlineMenuEditorViewModel(IMenuAdminService menuAdmin,
+            SettingsService settingsService)
         {
             _menuAdmin = menuAdmin;
+            _settingsService = settingsService;
 
             SelectCategoryCommand = new RelayCommand<CategoryViewModel>(cat =>
             {
@@ -131,6 +136,11 @@ namespace RestaurantPOS.ViewModels.Orders
             ClearCommand = new RelayCommand(ClearActiveField);
             SaveCommand = new RelayCommand(async () => await SaveAsync());
             CancelCommand = new RelayCommand(Close);
+
+            _settingsService.SettingsChanged += () =>
+            {
+                OnPropertyChanged(nameof(CurrencySymbol));
+            };
         }
 
         // ─── Open API ─────────────────────────────────────────────────────────

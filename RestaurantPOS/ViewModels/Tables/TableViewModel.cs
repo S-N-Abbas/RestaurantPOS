@@ -15,6 +15,7 @@ namespace RestaurantPOS.ViewModels.Tables
     {
         private readonly OrderStore _orderStore;
         private readonly IOrderContextService _orderContextService;
+        private readonly SettingsService _settingsService;
 
         public int tableNumber { get; }
 
@@ -22,26 +23,33 @@ namespace RestaurantPOS.ViewModels.Tables
 
         public bool IsCurrent => _orderContextService.CurrentContext == tableNumber;
 
-        public bool IsLocked => HasOrder && !IsCurrent;
+        public bool IsLocked => false; // For future use, e.g., if we want to lock tables that are reserved
 
         public decimal CurrentTotal => _orderStore.GetOrderTotal(tableNumber);
+
+        public string CurrencySymbol => _settingsService.Settings.CurrencySymbol;
 
         public ICommand SelectTableCommand { get; }
 
         public TableViewModel(
             int number,
             IOrderContextService orderContextService,
-            OrderStore orderStore)
+            OrderStore orderStore,
+            SettingsService settingsService)
         {
             tableNumber = number;
 
             _orderContextService = orderContextService;
             _orderStore = orderStore;
+            _settingsService = settingsService;
 
             SelectTableCommand = new RelayCommand(SelectTable, CanSelectTable);
 
             _orderStore.OrderStateChanged += OnOrderStateChanged;
             _orderContextService.ContextChanged += _ => RaiseAll();
+
+            // Ensure the UI updates if settings change
+            _settingsService.SettingsChanged += () => OnPropertyChanged(nameof(CurrencySymbol));
         }
 
         private bool CanSelectTable()

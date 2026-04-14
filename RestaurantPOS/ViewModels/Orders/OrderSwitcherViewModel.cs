@@ -25,6 +25,9 @@ namespace RestaurantPOS.ViewModels.Orders
         private readonly IOrderContextService _orderContextService;
         private readonly OrderStore _orderStore;
         private readonly TableStore _tableStore;
+        private readonly SettingsService _settingsService;
+
+        public string CurrencySymbol => _settingsService.Settings.CurrencySymbol;
 
         // ─── Collections ─────────────────────────────────────────────────────────
 
@@ -59,12 +62,13 @@ namespace RestaurantPOS.ViewModels.Orders
         public OrderSwitcherViewModel(
             IOrderContextService orderContextService,
             OrderStore orderStore,
-            TableStore tableStore)
+            TableStore tableStore,
+            SettingsService settingsService)
         {
             _orderContextService = orderContextService;
             _orderStore = orderStore;
             _tableStore = tableStore;
-
+            _settingsService = settingsService;
             NewTakeAwayCommand = new RelayCommand(
                 () => OpenNewSlot(OrderType.TakeAway));
 
@@ -73,6 +77,8 @@ namespace RestaurantPOS.ViewModels.Orders
 
             // ✅ When any order closes or opens, rebuild the slot lists
             _orderStore.OrderStateChanged += _ => RefreshSlots();
+
+            settingsService.SettingsChanged += () => OnPropertyChanged(nameof(CurrencySymbol));
 
             _ = InitialiseAsync();
         }
@@ -125,7 +131,8 @@ namespace RestaurantPOS.ViewModels.Orders
                     collection.Add(new TakeAwaySlotViewModel(
                         contextId,
                         _orderContextService,
-                        _orderStore));
+                        _orderStore,
+                        _settingsService));
                 }
             }
         }

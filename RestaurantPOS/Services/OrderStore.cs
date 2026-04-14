@@ -35,7 +35,7 @@ namespace RestaurantPOS.Services
             foreach (var order in openOrders)
             {
                 _orders[order.ContextId] =
-                    new OrderState(order.ContextId, order, RemoveItem);
+                    new OrderState(order.ContextId, order, _settingsService, RemoveItem);
             }
         }
 
@@ -59,7 +59,7 @@ namespace RestaurantPOS.Services
 
             var order = await _orderService.GetOpenOrderAsync(contextId);
 
-            state = new OrderState(contextId, order, removeCallback);
+            state = new OrderState(contextId, order, _settingsService, removeCallback);
             _orders[contextId] = state;
 
             return state;
@@ -121,7 +121,7 @@ namespace RestaurantPOS.Services
 
             // Create an OrderState with a null Order — same pattern as dine-in tables
             // that have no active order. The VM handles null Order gracefully already.
-            var state = new OrderState(contextId, null, RemoveItem);
+            var state = new OrderState(contextId, null, _settingsService, RemoveItem);
 
             // Stamp the intended OrderType so the slot label renders correctly
             // before the DB record exists

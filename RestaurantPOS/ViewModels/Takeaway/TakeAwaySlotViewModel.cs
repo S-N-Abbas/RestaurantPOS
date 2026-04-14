@@ -20,6 +20,7 @@ namespace RestaurantPOS.ViewModels.Takeaway
     {
         private readonly OrderStore _orderStore;
         private readonly IOrderContextService _orderContextService;
+        private readonly SettingsService _settingsService;
 
         // ─── Identity ────────────────────────────────────────────────────────────
 
@@ -62,6 +63,8 @@ namespace RestaurantPOS.ViewModels.Takeaway
         public decimal CurrentTotal
             => _orderStore.GetOrderTotal(ContextId);
 
+        public string CurrencySymbol => _settingsService.Settings.CurrencySymbol;
+
         // ─── Commands ────────────────────────────────────────────────────────────
 
         public ICommand SelectSlotCommand { get; }
@@ -71,7 +74,8 @@ namespace RestaurantPOS.ViewModels.Takeaway
         public TakeAwaySlotViewModel(
             int contextId,
             IOrderContextService orderContextService,
-            OrderStore orderStore)
+            OrderStore orderStore,
+            SettingsService settingsService)
         {
             if (contextId >= 0)
                 throw new ArgumentException(
@@ -80,6 +84,9 @@ namespace RestaurantPOS.ViewModels.Takeaway
             ContextId = contextId;
             _orderContextService = orderContextService;
             _orderStore = orderStore;
+            _settingsService = settingsService;
+
+            settingsService.SettingsChanged += () => OnPropertyChanged(nameof(CurrencySymbol));
 
             SelectSlotCommand = new RelayCommand(SelectSlot);
 

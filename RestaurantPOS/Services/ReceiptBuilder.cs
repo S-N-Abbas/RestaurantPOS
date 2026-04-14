@@ -70,9 +70,9 @@ namespace RestaurantPOS.Services
             {
                 doc.Blocks.Add(SectionHeader("COVERS"));
                 if (order.AdultCovers > 0)
-                    doc.Blocks.Add(TwoColumn($"Adults (x{order.AdultCovers})", $"£{adultCoverTotal:F2}"));
+                    doc.Blocks.Add(TwoColumn($"Adults (x{order.AdultCovers})", $"{_settingsService.Settings.CurrencySymbol}{adultCoverTotal:F2}"));
                 if (order.ChildCovers > 0)
-                    doc.Blocks.Add(TwoColumn($"Children (x{order.ChildCovers})", $"£{childCoverTotal:F2}"));
+                    doc.Blocks.Add(TwoColumn($"Children (x{order.ChildCovers})", $"{_settingsService.Settings.CurrencySymbol}{childCoverTotal:F2}"));
                 doc.Blocks.Add(Spacer(4));
             }
 
@@ -117,7 +117,7 @@ namespace RestaurantPOS.Services
             p.Inlines.Add(new Run(label) { FontWeight = isHighlight ? FontWeights.Black : FontWeights.Normal });
 
             // This creates a "Right-Aligned" effect for the price
-            var priceRun = new Run($"£{value:F2}")
+            var priceRun = new Run($"{_settingsService.Settings.CurrencySymbol}{value:F2}")
             {
                 FontWeight = FontWeights.Bold,
                 FontSize = isHighlight ? 16 : 13
@@ -125,7 +125,7 @@ namespace RestaurantPOS.Services
 
             var container = new Figure(new BlockUIContainer(new TextBlock
             {
-                Text = $"£{value:F2}",
+                Text = $"{_settingsService.Settings.CurrencySymbol}{value:F2}",
                 FontWeight = priceRun.FontWeight,
                 FontSize = priceRun.FontSize,
                 TextAlignment = TextAlignment.Right,
@@ -135,7 +135,7 @@ namespace RestaurantPOS.Services
 
             p.Inlines.Add(new InlineUIContainer(new TextBlock
             {
-                Text = $"£{value:F2}",
+                Text = $"{_settingsService.Settings.CurrencySymbol}{value:F2}",
                 Width = 270,
                 TextAlignment = TextAlignment.Right,
                 FontWeight = priceRun.FontWeight,
@@ -218,7 +218,7 @@ namespace RestaurantPOS.Services
 
                 row.Cells.Add(Cell(item.ProductName));
                 row.Cells.Add(Cell($"x{item.Quantity}", TextAlignment.Center));
-                row.Cells.Add(Cell($"£{item.LineTotal:F2}", TextAlignment.Right));
+                row.Cells.Add(Cell($"{_settingsService.Settings.CurrencySymbol}{item.LineTotal:F2}", TextAlignment.Right));
 
                 group.Rows.Add(row);
             }

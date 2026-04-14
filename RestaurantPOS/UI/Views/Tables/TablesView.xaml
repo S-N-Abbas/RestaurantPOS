@@ -41,12 +41,19 @@
                                            FontWeight="Black"
                                            HorizontalAlignment="Center" />
 
-                                <TextBlock Text="{Binding CurrentTotal, StringFormat=£{0:F2}}"
-                                           FontSize="14"
+                                <TextBlock FontSize="14"
                                            FontWeight="SemiBold"
                                            Opacity="0.8"
                                            HorizontalAlignment="Center"
-                                           Visibility="{Binding HasOrder, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                           Visibility="{Binding HasOrder, Converter={StaticResource BoolToVisibilityConverter}}">
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{StaticResource CurrencyFormatConverter}"
+                                                      Mode="OneWay">
+                                            <Binding Path="CurrentTotal" />
+                                            <Binding Path="CurrencySymbol" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
                             </StackPanel>
                         </Grid>
                     </Button>

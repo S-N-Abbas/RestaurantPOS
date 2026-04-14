@@ -15,15 +15,18 @@ namespace RestaurantPOS.Services
         private readonly ITableService _tableService;
         private readonly IOrderContextService _tableSession;
         private readonly OrderStore _orderStore;
+        private readonly SettingsService _settingsService;
 
         public TableStore(
             ITableService tableService,
         IOrderContextService tableSession,
-        OrderStore orderStore)
+        OrderStore orderStore,
+        SettingsService settingsService)
         {
             _tableService = tableService;
             _tableSession = tableSession;
             _orderStore = orderStore;
+            _settingsService = settingsService;
 
             Tables = new ObservableCollection<TableViewModel>();
         }
@@ -40,7 +43,8 @@ namespace RestaurantPOS.Services
                     new TableViewModel(
                         table.Number,
                         _tableSession,
-                        _orderStore));
+                        _orderStore,
+                        _settingsService));
             }
         }
     }

@@ -79,6 +79,9 @@ namespace RestaurantPOS.ViewModels.Orders
 
         public bool IsDineIn => _orderContextService.CurrentOrderType == OrderType.DineIn;
 
+        // Expose the symbol for binding
+        public string CurrencySymbol => _settingsService.Settings.CurrencySymbol;
+
         public ICommand OpenOrderSwitcherCommand { get; }
         public ICommand CloseOrderSwitcherCommand { get; }
 
@@ -157,7 +160,7 @@ namespace RestaurantPOS.ViewModels.Orders
             _authorizationService = authorizationService;
             _menuAdmin = menuAdmin;
 
-            MenuEditor = new InlineMenuEditorViewModel(menuAdmin);
+            MenuEditor = new InlineMenuEditorViewModel(menuAdmin, _settingsService);
 
             ToggleEditMenuCommand = new RelayCommand(
                 () => IsEditMenuMode = !IsEditMenuMode,
@@ -217,7 +220,7 @@ namespace RestaurantPOS.ViewModels.Orders
 
             _orderContextService.ContextChanged += OnTableChanged;
 
-            OrderSwitcher = new OrderSwitcherViewModel(orderContextService, orderStore, tableStore);
+            OrderSwitcher = new OrderSwitcherViewModel(orderContextService, orderStore, tableStore, _settingsService);
 
             OpenOrderSwitcherCommand = new RelayCommand(() => IsOrderSwitcherOpen = true);
             CloseOrderSwitcherCommand = new RelayCommand(() => IsOrderSwitcherOpen = false);
@@ -235,6 +238,9 @@ namespace RestaurantPOS.ViewModels.Orders
                 _orderContextService);
 
             coverSelectorViewModel.RequestClose += CloseCoverSelector;
+
+            // Ensure the UI updates if settings change
+            _settingsService.SettingsChanged += () => OnPropertyChanged(nameof(CurrencySymbol));
         }
 
         private void UpdateOrderState()
@@ -328,7 +334,7 @@ namespace RestaurantPOS.ViewModels.Orders
 
             AllItems.Clear();
             foreach (var p in products)
-                AllItems.Add(new MenuItemViewModel(p.Id, p.Name, p.Price, p.CategoryId));
+                AllItems.Add(new MenuItemViewModel(p.Id, p.Name, p.Price, p.CategoryId, _settingsService));
 
             SelectedCategory = Categories.FirstOrDefault();
             FilterItems();
@@ -416,7 +422,7 @@ namespace RestaurantPOS.ViewModels.Orders
             if (existing != null)
                 existing.Quantity++;
             else
-                OrderItems.Add(new OrderItemViewModel(item, RemoveItem));
+                OrderItems.Add(new OrderItemViewModel(item, _settingsService, RemoveItem));
 
             UpdateOrderState();
             var updatedOrder = await _orderService.GetByIdAsync(_orderState.Order.Id);
@@ -480,7 +486,7 @@ namespace RestaurantPOS.ViewModels.Orders
             }
 
             // ── Confirmation dialog ─────────────────────────────────────────────────
-            string summary = $"Order #{_orderState.Order.Id}  •  {OrderItems.Count} item(s)  •  £{GrandTotal:N2}";
+            string summary = $"Order #{_orderState.Order.Id}  •  {OrderItems.Count} item(s)  •  {CurrencySymbol}{GrandTotal:N2}";
 
             var result = MessageBox.Show(
                 $"Are you sure you want to cancel this order?\n\n{summary}\n\nThis cannot be undone.",
