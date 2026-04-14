@@ -78,7 +78,7 @@ namespace RestaurantPOS.ViewModels.Orders
             // ✅ When any order closes or opens, rebuild the slot lists
             _orderStore.OrderStateChanged += _ => RefreshSlots();
 
-            settingsService.SettingsChanged += () => OnPropertyChanged(nameof(CurrencySymbol));
+            _settingsService.SettingsChanged += () => OnPropertyChanged(nameof(CurrencySymbol));
 
             _ = InitialiseAsync();
         }

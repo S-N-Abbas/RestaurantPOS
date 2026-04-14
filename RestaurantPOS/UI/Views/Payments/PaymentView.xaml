@@ -194,7 +194,8 @@
                                                 <MultiBinding Converter="{StaticResource CurrencyFormatConverter}"
                                                               Mode="OneWay">
                                                     <Binding Path="LineTotal" />
-                                                    <Binding Path="CurrencySymbol" />
+                                                    <Binding Path="DataContext.CurrencySymbol"
+                                                             RelativeSource="{RelativeSource AncestorType=UserControl}" />
                                                 </MultiBinding>
                                             </TextBlock.Text>
                                         </TextBlock>

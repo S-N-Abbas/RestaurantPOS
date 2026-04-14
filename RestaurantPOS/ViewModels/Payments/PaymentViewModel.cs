@@ -41,6 +41,8 @@ namespace RestaurantPOS.ViewModels.Payments
         public decimal AdultCoverTotal => AdultCount * _settingsService.Settings.AdultCoverPrice;
         public decimal ChildCoverTotal => ChildCount * _settingsService.Settings.ChildCoverPrice;
 
+        public string CurrencySymbol => _settingsService.Settings.CurrencySymbol;
+
         public decimal Total =>
             (_orderState.Order?.ItemsTotal
             + ChildCoverTotal
@@ -122,6 +124,8 @@ namespace RestaurantPOS.ViewModels.Payments
             _settingsService = settingsService;
             _navigationService = navigationService;
             _userSessionService = userSessionService;
+
+            _settingsService.SettingsChanged += () => OnPropertyChanged(nameof(CurrencySymbol));
 
             _receiptBuilder = new ReceiptBuilder(_settingsService, _userSessionService);
 
