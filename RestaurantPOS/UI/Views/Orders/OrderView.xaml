@@ -109,6 +109,21 @@
                                            FontWeight="SemiBold" />
                             </StackPanel>
                         </Button>
+                        <Button Style="{StaticResource ModernButton}"
+                                Command="{Binding OpenTableTransferCommand}"
+                                Visibility="{Binding CanTransferTable,
+                     Converter={StaticResource BoolToVisibilityConverter}}"
+                                Margin="0,0,12,0">
+                            <StackPanel Orientation="Horizontal">
+                                <iconPacks:PackIconMaterial Kind="TableArrowRight"
+                                                            Margin="0,0,8,0"
+                                                            VerticalAlignment="Center"
+                                                            Width="14" />
+                                <TextBlock Text="Move Table"
+                                           VerticalAlignment="Center"
+                                           FontWeight="SemiBold" />
+                            </StackPanel>
+                        </Button>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -1298,6 +1313,205 @@
                     </Grid>
 
                 </StackPanel>
+            </Border>
+        </Border>
+
+        <!-- ══════════════════════════════════════════════════════════════
+     TABLE TRANSFER OVERLAY
+     Only free tables are selectable. Occupied ones are dimmed.
+     ══════════════════════════════════════════════════════════════ -->
+        <Border Background="#CC1E293B"
+                Visibility="{Binding IsTableTransferOpen,
+                     Converter={StaticResource BoolToVisibilityConverter}}">
+
+            <Border Width="580"
+                    MaxHeight="520"
+                    Background="White"
+                    CornerRadius="20"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="40"
+                                      ShadowDepth="4"
+                                      Opacity="0.15" />
+                </Border.Effect>
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <!-- Header -->
+                        <RowDefinition Height="Auto" />
+                        <!-- Legend -->
+                        <RowDefinition Height="*" />
+                        <!-- Table grid -->
+                        <RowDefinition Height="Auto" />
+                        <!-- Footer -->
+                    </Grid.RowDefinitions>
+
+                    <!-- ── Header ── -->
+                    <Border Grid.Row="0"
+                            BorderBrush="{StaticResource BorderGray}"
+                            BorderThickness="0,0,0,1"
+                            Padding="28,20">
+                        <Grid>
+                            <StackPanel Orientation="Horizontal"
+                                        VerticalAlignment="Center">
+                                <iconPacks:PackIconMaterial Kind="TableArrowRight"
+                                                            Foreground="{StaticResource PrimaryAccent}"
+                                                            Width="20"
+                                                            Height="20"
+                                                            VerticalAlignment="Center"
+                                                            Margin="0,0,12,0" />
+                                <StackPanel>
+                                    <TextBlock Text="Move Order to Another Table"
+                                               FontSize="20"
+                                               FontWeight="Bold"
+                                               Foreground="{StaticResource TextDark}" />
+                                    <TextBlock Text="{Binding ContextLabel,
+                                               StringFormat='Moving order from {0}'}"
+                                               FontSize="12"
+                                               Foreground="{StaticResource TextMuted}"
+                                               Margin="0,3,0,0" />
+                                </StackPanel>
+                            </StackPanel>
+                            <Button HorizontalAlignment="Right"
+                                    VerticalAlignment="Center"
+                                    Command="{Binding CloseTableTransferCommand}"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Width="36"
+                                    Height="36">
+                                <iconPacks:PackIconMaterial Kind="Close"
+                                                            Width="14"
+                                                            Height="14"
+                                                            Foreground="{StaticResource TextMuted}" />
+                            </Button>
+                        </Grid>
+                    </Border>
+
+                    <!-- ── Legend ── -->
+                    <StackPanel Grid.Row="1"
+                                Orientation="Horizontal"
+                                Margin="28,16,28,8">
+                        <!-- Free -->
+                        <Border Width="14"
+                                Height="14"
+                                CornerRadius="3"
+                                Background="{StaticResource SuccessGreen}"
+                                Margin="0,0,6,0"
+                                VerticalAlignment="Center" />
+                        <TextBlock Text="Free — tap to move"
+                                   FontSize="12"
+                                   Foreground="{StaticResource TextMuted}"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,20,0" />
+                        <!-- Occupied -->
+                        <Border Width="14"
+                                Height="14"
+                                CornerRadius="3"
+                                Background="#E2E8F0"
+                                Margin="0,0,6,0"
+                                VerticalAlignment="Center" />
+                        <TextBlock Text="Occupied — unavailable"
+                                   FontSize="12"
+                                   Foreground="{StaticResource TextMuted}"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+
+                    <!-- ── Table grid ── -->
+                    <ScrollViewer Grid.Row="2"
+                                  VerticalScrollBarVisibility="Auto"
+                                  Padding="28,8,28,20">
+                        <ItemsControl ItemsSource="{Binding TableTransfer.Tables}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="5" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Height="80"
+                                            Margin="5"
+                                            Command="{Binding DataContext.TableTransfer.SelectTableCommand,
+                                              RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}"
+                                            IsEnabled="{Binding IsFree}">
+                                        <Button.Style>
+                                            <Style TargetType="Button"
+                                                   BasedOn="{StaticResource ItemTile}">
+                                                <Style.Triggers>
+
+                                                    <!-- Free table — green accent -->
+                                                    <DataTrigger Binding="{Binding IsFree}"
+                                                                 Value="True">
+                                                        <Setter Property="BorderBrush"
+                                                                Value="{StaticResource SuccessGreen}" />
+                                                        <Setter Property="BorderThickness"
+                                                                Value="2" />
+                                                    </DataTrigger>
+
+                                                    <!-- Occupied table — dimmed, not tappable -->
+                                                    <DataTrigger Binding="{Binding IsOccupied}"
+                                                                 Value="True">
+                                                        <Setter Property="Opacity"
+                                                                Value="0.35" />
+                                                        <Setter Property="Background"
+                                                                Value="#F1F5F9" />
+                                                    </DataTrigger>
+
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding TableNumber}"
+                                                       FontSize="22"
+                                                       FontWeight="Black"
+                                                       TextAlignment="Center"
+                                                       Foreground="{StaticResource TextDark}" />
+                                            <!-- Status label -->
+                                            <TextBlock FontSize="10"
+                                                       TextAlignment="Center"
+                                                       FontWeight="SemiBold"
+                                                       Margin="0,3,0,0">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Text"
+                                                                Value="FREE" />
+                                                        <Setter Property="Foreground"
+                                                                Value="{StaticResource SuccessGreen}" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsOccupied}"
+                                                                         Value="True">
+                                                                <Setter Property="Text"
+                                                                        Value="OCCUPIED" />
+                                                                <Setter Property="Foreground"
+                                                                        Value="{StaticResource TextMuted}" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+
+                    <!-- ── Footer ── -->
+                    <Border Grid.Row="3"
+                            BorderBrush="{StaticResource BorderGray}"
+                            BorderThickness="0,1,0,0"
+                            Padding="28,16">
+                        <Button Style="{StaticResource ModernButton}"
+                                HorizontalAlignment="Right"
+                                Command="{Binding CloseTableTransferCommand}">
+                            <TextBlock Text="Cancel"
+                                       FontWeight="SemiBold" />
+                        </Button>
+                    </Border>
+
+                </Grid>
             </Border>
         </Border>
     </Grid>

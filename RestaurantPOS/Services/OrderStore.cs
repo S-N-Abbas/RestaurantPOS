@@ -137,5 +137,22 @@ namespace RestaurantPOS.Services
         /// </summary>
         public void NotifyOrderStateChanged(int contextId)
             => OrderStateChanged?.Invoke(contextId);
+
+        /// <summary>
+        /// Moves an OrderState from one contextId key to another in the
+        /// in-memory store. Called after the DB transfer is committed.
+        /// </summary>
+        public void TransferOrder(int fromContextId, int toContextId)
+        {
+            if (!_orders.TryGetValue(fromContextId, out var state))
+                return;
+
+            _orders.Remove(fromContextId);
+            _orders[toContextId] = state;
+
+            // Notify both slots so TableViewModels refresh their HasOrder / CurrentTotal
+            OrderStateChanged?.Invoke(fromContextId);
+            OrderStateChanged?.Invoke(toContextId);
+        }
     }
 }

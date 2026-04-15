@@ -285,5 +285,39 @@ namespace RestaurantPOS.Services
 
             await _db.SaveChangesAsync();
         }
+
+        /// <summary>
+        /// Transfers an open DineIn order from one table to another.
+        /// Throws if the destination table already has an open order.
+        /// </summary>
+        public async Task TransferTableAsync(int orderId, int destinationTableNumber)
+        {
+            // ── Verify destination is free ──────────────────────────────────────────
+            bool destinationOccupied = await _db.Orders
+                .AnyAsync(o =>
+                    o.ContextId == destinationTableNumber &&
+                    o.ClosedAt == null);
+
+            if (destinationOccupied)
+                throw new InvalidOperationException(
+                    $"Table {destinationTableNumber} already has an open order.");
+
+            // ── Resolve destination table row ────────────────────────────────────────
+            var destinationTable = await _db.Tables
+                .FirstOrDefaultAsync(t => t.Number == destinationTableNumber)
+                ?? throw new InvalidOperationException(
+                    $"Table {destinationTableNumber} not found.");
+
+            // ── Update the order ─────────────────────────────────────────────────────
+            var order = await LoadOrderAsync(orderId);
+
+            if (order.IsClosed)
+                throw new InvalidOperationException("Cannot transfer a closed order.");
+
+            order.ContextId = destinationTableNumber;
+            order.TableId = destinationTable.Id;
+
+            await _db.SaveChangesAsync();
+        }
     }
 }

@@ -44,6 +44,24 @@ namespace RestaurantPOS.ViewModels.Orders
         public ObservableCollection<MenuItemViewModel> Items { get; }
         public ObservableCollection<OrderItemViewModel> OrderItems { get; private set; }
 
+        // ─── Transfer Table ─────────────────────────────────────────────────────────────
+        public bool IsTableTransferOpen
+        {
+            get => _isTableTransferOpen;
+            set => SetProperty(ref _isTableTransferOpen, value);
+        }
+        private bool _isTableTransferOpen;
+
+        // Only show for DineIn orders that have an actual order record
+        public bool CanTransferTable =>
+            _orderContextService.CurrentOrderType == OrderType.DineIn
+            && _orderState?.Order != null;
+
+        public TableTransferViewModel? TableTransfer { get; private set; }
+
+        public ICommand OpenTableTransferCommand { get; }
+        public ICommand CloseTableTransferCommand { get; }
+
         private CategoryViewModel? _selectedCategory;
         public CategoryViewModel? SelectedCategory
         {
@@ -155,6 +173,7 @@ namespace RestaurantPOS.ViewModels.Orders
             _orderContextService = orderContextService;
             _orderStore = orderStore;
             _orderService = orderService;
+            _tableStore = tableStore;
             _navigationService = navigationService;
             _settingsService = settingsService;
             _authorizationService = authorizationService;
@@ -209,6 +228,13 @@ namespace RestaurantPOS.ViewModels.Orders
                 () => _orderState?.Order != null && OrderItems.Any()
             );
 
+            OpenTableTransferCommand = new RelayCommand(
+                OpenTableTransfer,
+                () => CanTransferTable);
+
+            CloseTableTransferCommand = new RelayCommand(
+                () => IsTableTransferOpen = false);
+
             OrderItems = new ObservableCollection<OrderItemViewModel>();
             
             OrderItems.CollectionChanged += (_, __) =>
@@ -220,7 +246,7 @@ namespace RestaurantPOS.ViewModels.Orders
 
             _orderContextService.ContextChanged += OnTableChanged;
 
-            OrderSwitcher = new OrderSwitcherViewModel(orderContextService, orderStore, tableStore, _settingsService);
+            OrderSwitcher = new OrderSwitcherViewModel(_orderContextService, _orderStore, _tableStore, _settingsService);
 
             OpenOrderSwitcherCommand = new RelayCommand(() => IsOrderSwitcherOpen = true);
             CloseOrderSwitcherCommand = new RelayCommand(() => IsOrderSwitcherOpen = false);
@@ -265,6 +291,9 @@ namespace RestaurantPOS.ViewModels.Orders
             OnPropertyChanged(nameof(CanCancel));
             ((RelayCommand)PayCommand).NotifyCanExecuteChanged();
             ((RelayCommand)CancelOrderCommand).NotifyCanExecuteChanged();
+            
+            OnPropertyChanged(nameof(CanTransferTable));
+            ((RelayCommand)OpenTableTransferCommand).NotifyCanExecuteChanged();
         }
 
         private async void LoadTable(int tableNumber)
@@ -305,6 +334,7 @@ namespace RestaurantPOS.ViewModels.Orders
             OnPropertyChanged(nameof(ContextLabel));
             OnPropertyChanged(nameof(ContextIcon));
             OnPropertyChanged(nameof(IsDineIn));
+            OnPropertyChanged(nameof(CanTransferTable));
         }
 
 
@@ -575,6 +605,54 @@ namespace RestaurantPOS.ViewModels.Orders
             {
                 MessageBox.Show(ex.Message, "Error",
                     MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void OpenTableTransfer()
+        {
+            // Build fresh each time so occupied state is current
+            TableTransfer = new TableTransferViewModel(
+                _orderContextService.CurrentContext,
+                _orderStore,
+                _tableStore);
+
+            TableTransfer.TransferRequested += OnTransferRequested;
+            TableTransfer.Cancelled += () => IsTableTransferOpen = false;
+
+            OnPropertyChanged(nameof(TableTransfer));
+            IsTableTransferOpen = true;
+        }
+
+        private async void OnTransferRequested(int destinationTableNumber)
+        {
+            if (_orderState.Order == null) return;
+
+            try
+            {
+                int fromContextId = _orderContextService.CurrentContext;
+
+                // ── 1. Persist to DB ──────────────────────────────────────────────
+                await _orderService.TransferTableAsync(
+                    _orderState.Order.Id,
+                    destinationTableNumber);
+
+                // ── 2. Update in-memory store ─────────────────────────────────────
+                _orderStore.TransferOrder(fromContextId, destinationTableNumber);
+
+                // ── 3. Close the picker ───────────────────────────────────────────
+                IsTableTransferOpen = false;
+
+                // ── 4. Switch context to the new table — OrderViewModel reloads ──
+                _orderContextService.SwitchContext(destinationTableNumber);
+            }
+            catch (Exception ex)
+            {
+                IsTableTransferOpen = false;
+                MessageBox.Show(
+                    $"Transfer failed: {ex.Message}",
+                    "Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
         }
     }
