@@ -255,7 +255,8 @@ namespace RestaurantPOS.Services
             if (order.IsClosed)
                 return;
 
-            var orderTotal = order.ItemsTotal + order.ChildCovers * _settingsService.Settings.ChildCoverPrice
+            var orderTotal = order.ItemsTotal
+                + order.ChildCovers * _settingsService.Settings.ChildCoverPrice
                 + order.AdultCovers * _settingsService.Settings.AdultCoverPrice;
 
             if (order.PaidAmount < orderTotal)
@@ -264,6 +265,17 @@ namespace RestaurantPOS.Services
             order.IsClosed = true;
             order.Status = OrderStatus.Paid;
             order.ClosedAt = DateTime.UtcNow;
+
+            // ✅ Auto-complete any linked booking
+            var linkedBooking = await _db.Bookings
+                .FirstOrDefaultAsync(b => b.OrderId == orderId);
+
+            if (linkedBooking != null &&
+                linkedBooking.Status == BookingStatus.Seated)
+            {
+                linkedBooking.Status = BookingStatus.Completed;
+                linkedBooking.UpdatedAt = DateTime.UtcNow;
+            }
 
             await _db.SaveChangesAsync();
         }

@@ -26,6 +26,8 @@ namespace RestaurantPOS.Infrastructure.Data
         public DbSet<Payment> Payments => Set<Payment>();
         public DbSet<User> Users => Set<User>();
 
+        public DbSet<Booking> Bookings => Set<Booking>();
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -51,6 +53,27 @@ namespace RestaurantPOS.Infrastructure.Data
 
             modelBuilder.Entity<OrderItem>()
                 .Property(i => i.UnitPrice)
+                .HasColumnType("decimal(10,2)");
+
+            // ─── Booking → Table (optional) ───────────────────────────────────────────
+            modelBuilder.Entity<Booking>()
+                .HasOne(b => b.Table)
+                .WithMany()
+                .HasForeignKey(b => b.TableId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // ─── Booking → Order (optional, set when seated) ──────────────────────────
+            modelBuilder.Entity<Booking>()
+                .HasOne(b => b.Order)
+                .WithMany()
+                .HasForeignKey(b => b.OrderId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // ─── Deposit precision ────────────────────────────────────────────────────
+            modelBuilder.Entity<Booking>()
+                .Property(b => b.DepositAmount)
                 .HasColumnType("decimal(10,2)");
 
             modelBuilder.Entity<Category>().HasData(
