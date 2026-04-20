@@ -3,7 +3,11 @@ using Microsoft.Extensions.DependencyInjection;
 using RestaurantPOS.Infrastructure.Data;
 using RestaurantPOS.Services;
 using RestaurantPOS.ViewModels;
+using RestaurantPOS.ViewModels.BackOffice;
+using RestaurantPOS.ViewModels.BackOffice.Settings;
+using RestaurantPOS.ViewModels.BackOffice.Users;
 using RestaurantPOS.ViewModels.Base;
+using RestaurantPOS.ViewModels.Bookings;
 using RestaurantPOS.ViewModels.Cover;
 using RestaurantPOS.ViewModels.Home;
 using RestaurantPOS.ViewModels.Login;
@@ -16,9 +20,6 @@ using System.Configuration;
 using System.Data;
 using System.IO;
 using System.Windows;
-using RestaurantPOS.ViewModels.BackOffice.Users;
-using RestaurantPOS.ViewModels.BackOffice.Settings;
-using RestaurantPOS.ViewModels.BackOffice;
 
 namespace RestaurantPOS
 {
@@ -93,6 +94,8 @@ namespace RestaurantPOS
             services.AddSingleton<SettingsService>();
             services.AddScoped<IMenuAdminService, MenuAdminService>();
             services.AddScoped<IBookingService, BookingService>();
+            services.AddTransient<BookingsViewModel>();
+            services.AddTransient<BookingEditorViewModel>();
 
 
             // Shell

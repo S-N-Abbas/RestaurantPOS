@@ -55,7 +55,7 @@ namespace RestaurantPOS.Infrastructure.Data
                 .Property(i => i.UnitPrice)
                 .HasColumnType("decimal(10,2)");
 
-            // ─── Booking → Table (optional) ───────────────────────────────────────────
+            // ─── Bookings → Table (optional) ───────────────────────────────────────────
             modelBuilder.Entity<Booking>()
                 .HasOne(b => b.Table)
                 .WithMany()
@@ -63,7 +63,7 @@ namespace RestaurantPOS.Infrastructure.Data
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            // ─── Booking → Order (optional, set when seated) ──────────────────────────
+            // ─── Bookings → Order (optional, set when seated) ──────────────────────────
             modelBuilder.Entity<Booking>()
                 .HasOne(b => b.Order)
                 .WithMany()

@@ -154,5 +154,16 @@ namespace RestaurantPOS.Services
             OrderStateChanged?.Invoke(fromContextId);
             OrderStateChanged?.Invoke(toContextId);
         }
+
+        /// <summary>
+        /// Registers an already-created OrderState directly into the store.
+        /// Used when seating a booking — the order was created by BookingService
+        /// so we inject it into the store rather than lazy-creating it.
+        /// </summary>
+        public void RegisterOrder(int contextId, OrderState state)
+        {
+            _orders[contextId] = state;
+            OrderStateChanged?.Invoke(contextId);
+        }
     }
 }

@@ -27,7 +27,7 @@ namespace RestaurantPOS.Domain.Entities
         public string CustomerPhone { get; set; } = string.Empty;
         public string CustomerEmail { get; set; } = string.Empty;
 
-        // ─── Booking Details ──────────────────────────────────────────────────
+        // ─── Bookings Details ──────────────────────────────────────────────────
         public int PartySize { get; set; }
         public DateTime BookingDate { get; set; }    // Date + Time combined
         public string Notes { get; set; } = string.Empty;

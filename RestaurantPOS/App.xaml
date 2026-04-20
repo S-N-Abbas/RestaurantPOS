@@ -22,7 +22,9 @@
              xmlns:vmSettings="clr-namespace:RestaurantPOS.ViewModels.BackOffice.Settings"
              xmlns:settingsViews="clr-namespace:RestaurantPOS.UI.Views.BackOffice.Settings"
              xmlns:vmUsers="clr-namespace:RestaurantPOS.ViewModels.BackOffice.Users"
-             xmlns:usersViews="clr-namespace:RestaurantPOS.UI.Views.BackOffice.Users">
+             xmlns:usersViews="clr-namespace:RestaurantPOS.UI.Views.BackOffice.Users"
+             xmlns:vmBookings="clr-namespace:RestaurantPOS.ViewModels.Bookings"
+             xmlns:bookingsViews="clr-namespace:RestaurantPOS.UI.Views.Bookings">
     <Application.Resources>
 
         <!-- Buttons Style -->
@@ -89,6 +91,10 @@
                 <settingsViews:SettingsView />
             </DataTemplate>
 
+            <DataTemplate DataType="{x:Type vmBookings:BookingsViewModel}">
+                <bookingsViews:BookingsView />
+            </DataTemplate>
+            
         </ResourceDictionary>
     </Application.Resources>
 </Application>

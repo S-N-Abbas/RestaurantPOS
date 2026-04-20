@@ -1,0 +1,1787 @@
+﻿<UserControl x:Class="RestaurantPOS.UI.Views.Bookings.BookingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             mc:Ignorable="d"
+             d:DesignHeight="1000"
+             d:DesignWidth="1200">
+
+    <Grid Background="{StaticResource BackgroundGray}">
+
+        <!-- ══════════════════════════════════════════════════════════
+             MAIN LAYOUT
+             ══════════════════════════════════════════════════════════ -->
+        <DockPanel>
+
+            <!-- ── TOP HEADER ── -->
+            <Border DockPanel.Dock="Top"
+                    Height="80"
+                    Background="White"
+                    BorderBrush="{StaticResource BorderGray}"
+                    BorderThickness="0,0,0,1"
+                    Padding="28,0">
+                <Grid VerticalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Title + date navigation -->
+                    <StackPanel Orientation="Horizontal"
+                                VerticalAlignment="Center">
+                        <iconPacks:PackIconMaterial Kind="CalendarClock"
+                                                    Foreground="{StaticResource PrimaryAccent}"
+                                                    Width="24"
+                                                    Height="24"
+                                                    VerticalAlignment="Center"
+                                                    Margin="0,0,14,0" />
+                        <TextBlock Text="BOOKINGS"
+                                   FontSize="22"
+                                   FontWeight="Black"
+                                   Foreground="{StaticResource TextDark}"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,24,0" />
+
+                        <!-- Date navigation -->
+                        <Button Style="{StaticResource ModernButton}"
+                                Command="{Binding PreviousDayCommand}"
+                                Width="44"
+                                Height="44"
+                                Padding="0"
+                                Margin="0,0,8,0">
+                            <iconPacks:PackIconMaterial Kind="ChevronLeft"
+                                                        Width="16"
+                                                        Height="16" />
+                        </Button>
+
+                        <Border Background="#EFF6FF"
+                                CornerRadius="10"
+                                Padding="16,0"
+                                Height="44">
+                            <TextBlock Text="{Binding ViewingDateDisplay}"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource PrimaryAccent}"
+                                       VerticalAlignment="Center" />
+                        </Border>
+
+                        <Button Style="{StaticResource ModernButton}"
+                                Command="{Binding NextDayCommand}"
+                                Width="44"
+                                Height="44"
+                                Padding="0"
+                                Margin="8,0,12,0">
+                            <iconPacks:PackIconMaterial Kind="ChevronRight"
+                                                        Width="16"
+                                                        Height="16" />
+                        </Button>
+
+                        <!-- Today shortcut — hidden when already on today -->
+                        <Button Command="{Binding TodayCommand}"
+                                Height="44"
+                                Padding="16,0">
+                            <Button.Style>
+                                <Style TargetType="Button"
+                                       BasedOn="{StaticResource ModernButton}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsViewingToday}"
+                                                     Value="True">
+                                            <Setter Property="Visibility"
+                                                    Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                            <TextBlock Text="Today"
+                                       FontWeight="SemiBold"
+                                       VerticalAlignment="Center" />
+                        </Button>
+                    </StackPanel>
+
+                    <!-- Actions -->
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal">
+                        <Button Style="{StaticResource ModernButton}"
+                                Command="{Binding RefreshCommand}"
+                                Width="44"
+                                Height="44"
+                                Padding="0"
+                                Margin="0,0,12,0"
+                                ToolTip="Refresh">
+                            <iconPacks:PackIconMaterial Kind="Refresh"
+                                                        Width="16"
+                                                        Height="16" />
+                        </Button>
+
+                        <Button Height="44"
+                                Padding="20,0"
+                                FontSize="14"
+                                FontWeight="Bold"
+                                Background="{StaticResource PrimaryAccent}"
+                                Foreground="White"
+                                BorderThickness="0"
+                                Command="{Binding NewBookingCommand}">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius"
+                                            Value="10" />
+                                </Style>
+                            </Button.Resources>
+                            <StackPanel Orientation="Horizontal">
+                                <iconPacks:PackIconMaterial Kind="Plus"
+                                                            Width="14"
+                                                            Height="14"
+                                                            VerticalAlignment="Center"
+                                                            Margin="0,0,8,0" />
+                                <TextBlock Text="New Booking"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- ── BOOKING LIST ── -->
+            <Grid>
+
+                <!-- Loading indicator -->
+                <StackPanel VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            Visibility="{Binding IsLoading,
+                                         Converter={StaticResource BoolToVisibilityConverter}}">
+                    <iconPacks:PackIconMaterial Kind="Loading"
+                                                Width="40"
+                                                Height="40"
+                                                Foreground="{StaticResource TextMuted}"
+                                                HorizontalAlignment="Center" />
+                    <TextBlock Text="Loading bookings..."
+                               FontSize="14"
+                               Foreground="{StaticResource TextMuted}"
+                               HorizontalAlignment="Center"
+                               Margin="0,12,0,0" />
+                </StackPanel>
+
+                <!-- Empty state -->
+                <StackPanel VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            Visibility="{Binding IsEmpty,
+                                         Converter={StaticResource BoolToVisibilityConverter}}">
+                    <iconPacks:PackIconMaterial Kind="CalendarRemove"
+                                                Width="56"
+                                                Height="56"
+                                                Foreground="{StaticResource TextMuted}"
+                                                HorizontalAlignment="Center"
+                                                Opacity="0.4" />
+                    <TextBlock Text="{Binding EmptyMessage}"
+                               FontSize="18"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource TextMuted}"
+                               HorizontalAlignment="Center"
+                               Margin="0,16,0,0" />
+                    <Button Style="{StaticResource ModernButton}"
+                            Command="{Binding NewBookingCommand}"
+                            HorizontalAlignment="Center"
+                            Margin="0,16,0,0"
+                            Padding="24,12"
+                            FontSize="14">
+                        <TextBlock Text="Add First Booking"
+                                   FontWeight="SemiBold" />
+                    </Button>
+                </StackPanel>
+
+                <!-- Booking cards list -->
+                <ScrollViewer Padding="28,20"
+                              VerticalScrollBarVisibility="Auto"
+                              Visibility="{Binding IsLoading,
+                                           Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                    <ItemsControl ItemsSource="{Binding Bookings}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Vertical" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+
+                                <!-- ══════════════════════════════════════
+                                     BOOKING CARD
+                                     ══════════════════════════════════════ -->
+                                <Border Background="White"
+                                        CornerRadius="16"
+                                        Margin="0,0,0,12"
+                                        BorderBrush="{StaticResource BorderGray}"
+                                        BorderThickness="1">
+                                    <Border.Effect>
+                                        <DropShadowEffect BlurRadius="12"
+                                                          ShadowDepth="2"
+                                                          Opacity="0.04" />
+                                    </Border.Effect>
+
+                                    <Grid Margin="24,20">
+                                        <Grid.ColumnDefinitions>
+                                            <!-- Time column -->
+                                            <ColumnDefinition Width="100" />
+                                            <!-- Divider -->
+                                            <ColumnDefinition Width="1" />
+                                            <!-- Details column -->
+                                            <ColumnDefinition Width="*" />
+                                            <!-- Actions column -->
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- ── TIME COLUMN ── -->
+                                        <StackPanel Grid.Column="0"
+                                                    VerticalAlignment="Center"
+                                                    Margin="0,0,20,0">
+                                            <TextBlock Text="{Binding BookingTime}"
+                                                       FontSize="24"
+                                                       FontWeight="Black"
+                                                       Foreground="{StaticResource TextDark}"
+                                                       TextAlignment="Center" />
+                                            <TextBlock Text="{Binding TimeUntilDisplay}"
+                                                       FontSize="11"
+                                                       Foreground="{StaticResource TextMuted}"
+                                                       TextAlignment="Center"
+                                                       Margin="0,4,0,0" />
+                                        </StackPanel>
+
+                                        <!-- ── VERTICAL DIVIDER ── -->
+                                        <Rectangle Grid.Column="1"
+                                                   Fill="{StaticResource BorderGray}"
+                                                   Margin="0,4" />
+
+                                        <!-- ── DETAILS COLUMN ── -->
+                                        <Grid Grid.Column="2"
+                                              Margin="20,0">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+
+                                            <!-- Row 1: Name + Status badge -->
+                                            <Grid Grid.Row="0">
+                                                <StackPanel Orientation="Horizontal"
+                                                            VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding CustomerName}"
+                                                               FontSize="18"
+                                                               FontWeight="Bold"
+                                                               Foreground="{StaticResource TextDark}" />
+
+                                                    <!-- Party size chip -->
+                                                    <Border Background="#F1F5F9"
+                                                            CornerRadius="6"
+                                                            Padding="10,3"
+                                                            Margin="12,0,0,0"
+                                                            VerticalAlignment="Center">
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <iconPacks:PackIconMaterial Kind="AccountGroup"
+                                                                                        Width="12"
+                                                                                        Height="12"
+                                                                                        VerticalAlignment="Center"
+                                                                                        Foreground="{StaticResource TextMuted}"
+                                                                                        Margin="0,0,5,0" />
+                                                            <TextBlock Text="{Binding PartySize}"
+                                                                       FontSize="12"
+                                                                       FontWeight="SemiBold"
+                                                                       Foreground="{StaticResource TextMuted}"
+                                                                       VerticalAlignment="Center" />
+                                                        </StackPanel>
+                                                    </Border>
+                                                </StackPanel>
+
+                                                <!-- Status badge — right aligned -->
+                                                <Border HorizontalAlignment="Right"
+                                                        CornerRadius="6"
+                                                        Padding="10,4"
+                                                        Background="{Binding StatusColour}"
+                                                        VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding StatusLabel}"
+                                                               FontSize="11"
+                                                               FontWeight="Bold"
+                                                               Foreground="{Binding StatusTextColour}" />
+                                                </Border>
+                                            </Grid>
+
+                                            <!-- Row 2: Phone + Table + Deposit -->
+                                            <StackPanel Grid.Row="1"
+                                                        Orientation="Horizontal"
+                                                        Margin="0,8,0,0">
+
+                                                <!-- Phone -->
+                                                <StackPanel Orientation="Horizontal"
+                                                            Margin="0,0,20,0">
+                                                    <iconPacks:PackIconMaterial Kind="Phone"
+                                                                                Width="13"
+                                                                                Height="13"
+                                                                                VerticalAlignment="Center"
+                                                                                Foreground="{StaticResource TextMuted}"
+                                                                                Margin="0,0,6,0" />
+                                                    <TextBlock Text="{Binding CustomerPhone}"
+                                                               FontSize="13"
+                                                               Foreground="{StaticResource TextMuted}"
+                                                               VerticalAlignment="Center" />
+                                                </StackPanel>
+
+                                                <!-- Table -->
+                                                <StackPanel Orientation="Horizontal"
+                                                            Margin="0,0,20,0">
+                                                    <iconPacks:PackIconMaterial Kind="TableChair"
+                                                                                Width="13"
+                                                                                Height="13"
+                                                                                VerticalAlignment="Center"
+                                                                                Foreground="{StaticResource TextMuted}"
+                                                                                Margin="0,0,6,0" />
+                                                    <TextBlock Text="{Binding TableLabel}"
+                                                               FontSize="13"
+                                                               Foreground="{StaticResource TextMuted}"
+                                                               VerticalAlignment="Center" />
+                                                </StackPanel>
+
+                                                <!-- Deposit badge -->
+                                                <Border CornerRadius="6"
+                                                        Padding="10,3"
+                                                        VerticalAlignment="Center">
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Setter Property="Background"
+                                                                    Value="#F1F5F9" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding HasDeposit}"
+                                                                             Value="True">
+                                                                    <Setter Property="Background"
+                                                                            Value="#D1FAE5" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <iconPacks:PackIconMaterial Width="12"
+                                                                                    Height="12"
+                                                                                    VerticalAlignment="Center"
+                                                                                    Margin="0,0,5,0">
+                                                            <iconPacks:PackIconMaterial.Style>
+                                                                <Style TargetType="iconPacks:PackIconMaterial">
+                                                                    <Setter Property="Kind"
+                                                                            Value="CashRemove" />
+                                                                    <Setter Property="Foreground"
+                                                                            Value="{StaticResource TextMuted}" />
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding HasDeposit}"
+                                                                                     Value="True">
+                                                                            <Setter Property="Kind"
+                                                                                    Value="CashCheck" />
+                                                                            <Setter Property="Foreground"
+                                                                                    Value="#065F46" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </iconPacks:PackIconMaterial.Style>
+                                                        </iconPacks:PackIconMaterial>
+                                                        <TextBlock Text="{Binding DepositDisplay}"
+                                                                   FontSize="12"
+                                                                   FontWeight="SemiBold"
+                                                                   VerticalAlignment="Center">
+                                                            <TextBlock.Style>
+                                                                <Style TargetType="TextBlock">
+                                                                    <Setter Property="Foreground"
+                                                                            Value="{StaticResource TextMuted}" />
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding HasDeposit}"
+                                                                                     Value="True">
+                                                                            <Setter Property="Foreground"
+                                                                                    Value="#065F46" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                        </TextBlock>
+                                                    </StackPanel>
+                                                </Border>
+                                            </StackPanel>
+
+                                            <!-- Row 3: Notes (collapsed when empty) -->
+                                            <Border Grid.Row="2"
+                                                    Background="#FFFBEB"
+                                                    CornerRadius="6"
+                                                    Padding="10,5"
+                                                    Margin="0,8,0,0">
+                                                <Border.Style>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="Visibility"
+                                                                Value="Collapsed" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Notes}"
+                                                                         Value="">
+                                                                <Setter Property="Visibility"
+                                                                        Value="Collapsed" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Border.Style>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <iconPacks:PackIconMaterial Kind="NoteTextOutline"
+                                                                                Width="13"
+                                                                                Height="13"
+                                                                                VerticalAlignment="Center"
+                                                                                Foreground="#92400E"
+                                                                                Margin="0,0,6,0" />
+                                                    <TextBlock Text="{Binding Notes}"
+                                                               FontSize="12"
+                                                               Foreground="#92400E"
+                                                               VerticalAlignment="Center"
+                                                               TextWrapping="Wrap" />
+                                                </StackPanel>
+                                            </Border>
+                                        </Grid>
+
+                                        <!-- ── ACTIONS COLUMN ── -->
+                                        <StackPanel Grid.Column="3"
+                                                    Orientation="Horizontal"
+                                                    VerticalAlignment="Center"
+                                                    Margin="16,0,0,0">
+
+                                            <!-- Confirm button — Pending only -->
+                                            <Button Height="44"
+                                                    Padding="14,0"
+                                                    Margin="0,0,8,0"
+                                                    FontSize="13"
+                                                    FontWeight="Bold"
+                                                    Background="#DBEAFE"
+                                                    Foreground="#1E40AF"
+                                                    BorderThickness="0"
+                                                    Command="{Binding ConfirmCommand}"
+                                                    Visibility="{Binding CanConfirm,
+                                                                 Converter={StaticResource BoolToVisibilityConverter}}">
+                                                <Button.Resources>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="CornerRadius"
+                                                                Value="10" />
+                                                    </Style>
+                                                </Button.Resources>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <iconPacks:PackIconMaterial Kind="CheckCircleOutline"
+                                                                                Width="14"
+                                                                                Height="14"
+                                                                                VerticalAlignment="Center"
+                                                                                Margin="0,0,6,0" />
+                                                    <TextBlock Text="Confirm"
+                                                               VerticalAlignment="Center" />
+                                                </StackPanel>
+                                            </Button>
+
+                                            <!-- Seat Now button — Pending or Confirmed -->
+                                            <Button Height="44"
+                                                    Padding="14,0"
+                                                    Margin="0,0,8,0"
+                                                    FontSize="13"
+                                                    FontWeight="Bold"
+                                                    Background="{StaticResource SuccessGreen}"
+                                                    Foreground="White"
+                                                    BorderThickness="0"
+                                                    Command="{Binding SeatCommand}"
+                                                    Visibility="{Binding CanSeat,
+                                                                 Converter={StaticResource BoolToVisibilityConverter}}">
+                                                <Button.Resources>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="CornerRadius"
+                                                                Value="10" />
+                                                    </Style>
+                                                </Button.Resources>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <iconPacks:PackIconMaterial Kind="TableChair"
+                                                                                Width="14"
+                                                                                Height="14"
+                                                                                VerticalAlignment="Center"
+                                                                                Margin="0,0,6,0" />
+                                                    <TextBlock Text="Seat Now"
+                                                               VerticalAlignment="Center" />
+                                                </StackPanel>
+                                            </Button>
+
+                                            <!-- Edit button -->
+                                            <Button Width="44"
+                                                    Height="44"
+                                                    Margin="0,0,8,0"
+                                                    Background="#F8FAFC"
+                                                    BorderBrush="{StaticResource BorderGray}"
+                                                    BorderThickness="1"
+                                                    Command="{Binding EditCommand}"
+                                                    Visibility="{Binding CanEdit,
+                                                                 Converter={StaticResource BoolToVisibilityConverter}}"
+                                                    ToolTip="Edit booking">
+                                                <Button.Resources>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="CornerRadius"
+                                                                Value="10" />
+                                                    </Style>
+                                                </Button.Resources>
+                                                <iconPacks:PackIconMaterial Kind="Pencil"
+                                                                            Width="15"
+                                                                            Height="15"
+                                                                            Foreground="{StaticResource TextMuted}" />
+                                            </Button>
+
+                                            <!-- No Show button -->
+                                            <Button Width="44"
+                                                    Height="44"
+                                                    Margin="0,0,8,0"
+                                                    Background="#FEF3C7"
+                                                    BorderThickness="0"
+                                                    Command="{Binding NoShowCommand}"
+                                                    Visibility="{Binding CanMarkNoShow,
+                                                                 Converter={StaticResource BoolToVisibilityConverter}}"
+                                                    ToolTip="Mark as no-show">
+                                                <Button.Resources>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="CornerRadius"
+                                                                Value="10" />
+                                                    </Style>
+                                                </Button.Resources>
+                                                <iconPacks:PackIconMaterial Kind="AccountOff"
+                                                                            Width="15"
+                                                                            Height="15"
+                                                                            Foreground="#92400E" />
+                                            </Button>
+
+                                            <!-- Cancel button -->
+                                            <Button Width="44"
+                                                    Height="44"
+                                                    Background="#FEE2E2"
+                                                    BorderThickness="0"
+                                                    Command="{Binding CancelCommand}"
+                                                    Visibility="{Binding CanCancel,
+                                                                 Converter={StaticResource BoolToVisibilityConverter}}"
+                                                    ToolTip="Cancel booking">
+                                                <Button.Resources>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="CornerRadius"
+                                                                Value="10" />
+                                                    </Style>
+                                                </Button.Resources>
+                                                <iconPacks:PackIconMaterial Kind="CloseCircleOutline"
+                                                                            Width="15"
+                                                                            Height="15"
+                                                                            Foreground="#DC2626" />
+                                            </Button>
+
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+        </DockPanel>
+
+        <!-- ══════════════════════════════════════════════════════════════════
+             SEAT TABLE PICKER OVERLAY
+             Shows when a booking has no pre-assigned table or it's occupied.
+             ══════════════════════════════════════════════════════════════════ -->
+        <Border Background="#CC1E293B"
+                Visibility="{Binding IsSeatPickerOpen,
+                             Converter={StaticResource BoolToVisibilityConverter}}">
+            <Border Width="560"
+                    MaxHeight="480"
+                    Background="White"
+                    CornerRadius="20"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="40"
+                                      ShadowDepth="4"
+                                      Opacity="0.15" />
+                </Border.Effect>
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Header -->
+                    <Border Grid.Row="0"
+                            BorderBrush="{StaticResource BorderGray}"
+                            BorderThickness="0,0,0,1"
+                            Padding="28,20">
+                        <Grid>
+                            <StackPanel Orientation="Horizontal"
+                                        VerticalAlignment="Center">
+                                <iconPacks:PackIconMaterial Kind="TableChair"
+                                                            Foreground="{StaticResource PrimaryAccent}"
+                                                            Width="20"
+                                                            Height="20"
+                                                            VerticalAlignment="Center"
+                                                            Margin="0,0,12,0" />
+                                <StackPanel>
+                                    <TextBlock Text="Choose a Table"
+                                               FontSize="20"
+                                               FontWeight="Bold"
+                                               Foreground="{StaticResource TextDark}" />
+                                    <TextBlock Text="Select a free table to seat this booking"
+                                               FontSize="12"
+                                               Foreground="{StaticResource TextMuted}"
+                                               Margin="0,3,0,0" />
+                                </StackPanel>
+                            </StackPanel>
+                            <Button HorizontalAlignment="Right"
+                                    VerticalAlignment="Center"
+                                    Command="{Binding CloseSeatPickerCommand}"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Width="36"
+                                    Height="36">
+                                <iconPacks:PackIconMaterial Kind="Close"
+                                                            Width="14"
+                                                            Height="14"
+                                                            Foreground="{StaticResource TextMuted}" />
+                            </Button>
+                        </Grid>
+                    </Border>
+
+                    <!-- Legend -->
+                    <StackPanel Grid.Row="1"
+                                Orientation="Horizontal"
+                                Margin="28,14,28,6">
+                        <Border Width="12"
+                                Height="12"
+                                CornerRadius="3"
+                                Background="{StaticResource SuccessGreen}"
+                                Margin="0,0,6,0"
+                                VerticalAlignment="Center" />
+                        <TextBlock Text="Free"
+                                   FontSize="12"
+                                   Foreground="{StaticResource TextMuted}"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,20,0" />
+                        <Border Width="12"
+                                Height="12"
+                                CornerRadius="3"
+                                Background="#E2E8F0"
+                                Margin="0,0,6,0"
+                                VerticalAlignment="Center" />
+                        <TextBlock Text="Occupied"
+                                   FontSize="12"
+                                   Foreground="{StaticResource TextMuted}"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+
+                    <!-- Table grid -->
+                    <ScrollViewer Grid.Row="2"
+                                  VerticalScrollBarVisibility="Auto"
+                                  Padding="28,8,28,20">
+                        <ItemsControl ItemsSource="{Binding AvailableTables}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="5" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Height="80"
+                                            Margin="5"
+                                            IsEnabled="{Binding IsFree}"
+                                            Command="{Binding DataContext.SelectSeatTableCommand,
+                                                      RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}">
+                                        <Button.Style>
+                                            <Style TargetType="Button"
+                                                   BasedOn="{StaticResource MenuItemTile}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsFree}"
+                                                                 Value="True">
+                                                        <Setter Property="BorderBrush"
+                                                                Value="{StaticResource SuccessGreen}" />
+                                                        <Setter Property="BorderThickness"
+                                                                Value="2" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsOccupied}"
+                                                                 Value="True">
+                                                        <Setter Property="Opacity"
+                                                                Value="0.35" />
+                                                        <Setter Property="Background"
+                                                                Value="#F1F5F9" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding TableNumber}"
+                                                       FontSize="22"
+                                                       FontWeight="Black"
+                                                       TextAlignment="Center"
+                                                       Foreground="{StaticResource TextDark}" />
+                                            <TextBlock FontSize="10"
+                                                       TextAlignment="Center"
+                                                       FontWeight="SemiBold"
+                                                       Margin="0,3,0,0">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Text"
+                                                                Value="FREE" />
+                                                        <Setter Property="Foreground"
+                                                                Value="{StaticResource SuccessGreen}" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsOccupied}"
+                                                                         Value="True">
+                                                                <Setter Property="Text"
+                                                                        Value="OCCUPIED" />
+                                                                <Setter Property="Foreground"
+                                                                        Value="{StaticResource TextMuted}" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+
+                    <!-- Footer -->
+                    <Border Grid.Row="3"
+                            BorderBrush="{StaticResource BorderGray}"
+                            BorderThickness="0,1,0,0"
+                            Padding="28,16">
+                        <Button Style="{StaticResource ModernButton}"
+                                HorizontalAlignment="Right"
+                                Command="{Binding CloseSeatPickerCommand}">
+                            <TextBlock Text="Cancel"
+                                       FontWeight="SemiBold" />
+                        </Button>
+                    </Border>
+                </Grid>
+            </Border>
+        </Border>
+
+        <!-- ══════════════════════════════════════════════════════════════════
+             BOOKING EDITOR OVERLAY
+             ══════════════════════════════════════════════════════════════════ -->
+        <Border Background="#CC1E293B"
+                DataContext="{Binding Editor}"
+                Visibility="{Binding IsOpen,
+                             Converter={StaticResource BoolToVisibilityConverter}}">
+
+            <Border Width="860"
+                    MaxHeight="860"
+                    Background="White"
+                    CornerRadius="20"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="40"
+                                      ShadowDepth="4"
+                                      Opacity="0.15" />
+                </Border.Effect>
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <!-- Header -->
+                        <RowDefinition Height="*" />
+                        <!-- Content -->
+                        <RowDefinition Height="Auto" />
+                        <!-- Footer -->
+                    </Grid.RowDefinitions>
+
+                    <!-- ── Editor Header ── -->
+                    <Border Grid.Row="0"
+                            BorderBrush="{StaticResource BorderGray}"
+                            BorderThickness="0,0,0,1"
+                            Padding="32,20">
+                        <Grid>
+                            <StackPanel Orientation="Horizontal"
+                                        VerticalAlignment="Center">
+                                <iconPacks:PackIconMaterial Kind="CalendarPlus"
+                                                            Foreground="{StaticResource PrimaryAccent}"
+                                                            Width="20"
+                                                            Height="20"
+                                                            VerticalAlignment="Center"
+                                                            Margin="0,0,12,0" />
+                                <TextBlock Text="{Binding Title}"
+                                           FontSize="20"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource TextDark}"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+                            <Button HorizontalAlignment="Right"
+                                    VerticalAlignment="Center"
+                                    Command="{Binding CancelCommand}"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Width="36"
+                                    Height="36">
+                                <iconPacks:PackIconMaterial Kind="Close"
+                                                            Width="14"
+                                                            Height="14"
+                                                            Foreground="{StaticResource TextMuted}" />
+                            </Button>
+                        </Grid>
+                    </Border>
+
+                    <!-- ── Editor Content ── -->
+                    <ScrollViewer Grid.Row="1"
+                                  VerticalScrollBarVisibility="Auto">
+                        <Grid Margin="32,24">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <!-- Left: form fields + keyboard -->
+                                <ColumnDefinition Width="20" />
+                                <!-- Gap -->
+                                <ColumnDefinition Width="280" />
+                                <!-- Right: date, party, deposit, table -->
+                            </Grid.ColumnDefinitions>
+
+                            <!-- ════════════════════════════════════════
+                                 LEFT COLUMN — Text fields + keyboard
+                                 ════════════════════════════════════════ -->
+                            <StackPanel Grid.Column="0">
+
+                                <!-- Customer Name -->
+                                <TextBlock Text="Customer Name *"
+                                           FontSize="12"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource TextMuted}"
+                                           Margin="0,0,0,6" />
+                                <Border Height="56"
+                                        BorderThickness="2"
+                                        CornerRadius="12"
+                                        Margin="0,0,0,16">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="BorderBrush"
+                                                    Value="{StaticResource BorderGray}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsCustomerNameActive}"
+                                                             Value="True">
+                                                    <Setter Property="BorderBrush"
+                                                            Value="{StaticResource PrimaryAccent}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <Button Command="{Binding FocusCustomerNameCommand}"
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            HorizontalContentAlignment="Left"
+                                            Padding="16,0">
+                                        <TextBlock Text="{Binding CustomerName}"
+                                                   FontSize="16"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{StaticResource TextDark}"
+                                                   VerticalAlignment="Center" />
+                                    </Button>
+                                </Border>
+
+                                <!-- Phone -->
+                                <TextBlock Text="Phone Number *"
+                                           FontSize="12"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource TextMuted}"
+                                           Margin="0,0,0,6" />
+                                <Border Height="56"
+                                        BorderThickness="2"
+                                        CornerRadius="12"
+                                        Margin="0,0,0,16">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="BorderBrush"
+                                                    Value="{StaticResource BorderGray}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsCustomerPhoneActive}"
+                                                             Value="True">
+                                                    <Setter Property="BorderBrush"
+                                                            Value="{StaticResource PrimaryAccent}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <Button Command="{Binding FocusCustomerPhoneCommand}"
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            HorizontalContentAlignment="Left"
+                                            Padding="16,0">
+                                        <TextBlock Text="{Binding CustomerPhone}"
+                                                   FontSize="16"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{StaticResource TextDark}"
+                                                   VerticalAlignment="Center" />
+                                    </Button>
+                                </Border>
+
+                                <!-- Email -->
+                                <TextBlock Text="Email (optional)"
+                                           FontSize="12"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource TextMuted}"
+                                           Margin="0,0,0,6" />
+                                <Border Height="56"
+                                        BorderThickness="2"
+                                        CornerRadius="12"
+                                        Margin="0,0,0,16">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="BorderBrush"
+                                                    Value="{StaticResource BorderGray}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsCustomerEmailActive}"
+                                                             Value="True">
+                                                    <Setter Property="BorderBrush"
+                                                            Value="{StaticResource PrimaryAccent}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <Button Command="{Binding FocusCustomerEmailCommand}"
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            HorizontalContentAlignment="Left"
+                                            Padding="16,0">
+                                        <TextBlock Text="{Binding CustomerEmail}"
+                                                   FontSize="16"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{StaticResource TextDark}"
+                                                   VerticalAlignment="Center" />
+                                    </Button>
+                                </Border>
+
+                                <!-- Notes -->
+                                <TextBlock Text="Notes / Dietary Requirements"
+                                           FontSize="12"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource TextMuted}"
+                                           Margin="0,0,0,6" />
+                                <Border Height="56"
+                                        BorderThickness="2"
+                                        CornerRadius="12"
+                                        Margin="0,0,0,20">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="BorderBrush"
+                                                    Value="{StaticResource BorderGray}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsNotesActive}"
+                                                             Value="True">
+                                                    <Setter Property="BorderBrush"
+                                                            Value="{StaticResource PrimaryAccent}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <Button Command="{Binding FocusNotesCommand}"
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            HorizontalContentAlignment="Left"
+                                            Padding="16,0">
+                                        <TextBlock Text="{Binding Notes}"
+                                                   FontSize="14"
+                                                   Foreground="{StaticResource TextDark}"
+                                                   VerticalAlignment="Center"
+                                                   TextWrapping="Wrap" />
+                                    </Button>
+                                </Border>
+
+                                <!-- ── On-screen keyboard ── -->
+                                <Border Background="#F8FAFC"
+                                        CornerRadius="12"
+                                        Padding="10">
+                                    <StackPanel>
+                                        <StackPanel Orientation="Horizontal"
+                                                    HorizontalAlignment="Center"
+                                                    Margin="0,0,0,5">
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="Q" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="W" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="E" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="R" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="T" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="Y" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="U" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="I" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="O" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="P" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal"
+                                                    HorizontalAlignment="Center"
+                                                    Margin="0,0,0,5">
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="A" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="S" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="D" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="F" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="G" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="H" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="J" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="K" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="L" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal"
+                                                    HorizontalAlignment="Center"
+                                                    Margin="0,0,0,5">
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="Z" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="X" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="C" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="V" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="B" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="N" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="M" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter=" "
+                                                    Content="SPACE"
+                                                    Width="86" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding BackspaceCommand}"
+                                                    Width="52">
+                                                <iconPacks:PackIconMaterial Kind="BackspaceOutline"
+                                                                            Width="15"
+                                                                            Height="15" />
+                                            </Button>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal"
+                                                    HorizontalAlignment="Center">
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="1" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="2" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="3" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="4" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="5" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="6" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="7" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="8" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="9" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="0" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="+"
+                                                    Content="+" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Command="{Binding KeyCommand}"
+                                                    CommandParameter="-"
+                                                    Content="-" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+
+                            <!-- ════════════════════════════════════════
+                                 RIGHT COLUMN — Date, Party, Deposit, Table
+                                 ════════════════════════════════════════ -->
+                            <StackPanel Grid.Column="2">
+
+                                <!-- ── Date & Time ── -->
+                                <TextBlock Text="DATE &amp; TIME"
+                                           FontSize="11"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource TextMuted}"
+                                           Margin="0,0,0,12" />
+
+                                <!-- Full date display -->
+                                <Border Background="#EFF6FF"
+                                        CornerRadius="10"
+                                        Padding="14,10"
+                                        Margin="0,0,0,12">
+                                    <TextBlock Text="{Binding BookingDateDisplay}"
+                                               FontSize="13"
+                                               FontWeight="SemiBold"
+                                               Foreground="{StaticResource PrimaryAccent}"
+                                               TextWrapping="Wrap"
+                                               TextAlignment="Center" />
+                                </Border>
+
+                                <!-- Date steppers -->
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Day -->
+                                    <StackPanel Grid.Column="0"
+                                                Margin="0,0,4,0">
+                                        <TextBlock Text="Day"
+                                                   FontSize="10"
+                                                   Foreground="{StaticResource TextMuted}"
+                                                   TextAlignment="Center"
+                                                   Margin="0,0,0,4" />
+                                        <Button Style="{StaticResource ModernButton}"
+                                                Command="{Binding IncreaseDayCommand}"
+                                                Height="36"
+                                                FontSize="16">▲</Button>
+                                        <TextBlock Text="{Binding BookingDay}"
+                                                   FontSize="18"
+                                                   FontWeight="Bold"
+                                                   TextAlignment="Center"
+                                                   Foreground="{StaticResource TextDark}"
+                                                   Margin="0,4" />
+                                        <Button Style="{StaticResource ModernButton}"
+                                                Command="{Binding DecreaseDayCommand}"
+                                                Height="36"
+                                                FontSize="16">▼</Button>
+                                    </StackPanel>
+
+                                    <!-- Month -->
+                                    <StackPanel Grid.Column="1"
+                                                Margin="4,0">
+                                        <TextBlock Text="Month"
+                                                   FontSize="10"
+                                                   Foreground="{StaticResource TextMuted}"
+                                                   TextAlignment="Center"
+                                                   Margin="0,0,0,4" />
+                                        <Button Style="{StaticResource ModernButton}"
+                                                Command="{Binding IncreaseMonthCommand}"
+                                                Height="36"
+                                                FontSize="16">▲</Button>
+                                        <TextBlock Text="{Binding BookingMonth}"
+                                                   FontSize="18"
+                                                   FontWeight="Bold"
+                                                   TextAlignment="Center"
+                                                   Foreground="{StaticResource TextDark}"
+                                                   Margin="0,4" />
+                                        <Button Style="{StaticResource ModernButton}"
+                                                Command="{Binding DecreaseMonthCommand}"
+                                                Height="36"
+                                                FontSize="16">▼</Button>
+                                    </StackPanel>
+
+                                    <!-- Year -->
+                                    <StackPanel Grid.Column="2"
+                                                Margin="4,0,0,0">
+                                        <TextBlock Text="Year"
+                                                   FontSize="10"
+                                                   Foreground="{StaticResource TextMuted}"
+                                                   TextAlignment="Center"
+                                                   Margin="0,0,0,4" />
+                                        <Button Style="{StaticResource ModernButton}"
+                                                Command="{Binding IncreaseYearCommand}"
+                                                Height="36"
+                                                FontSize="16">▲</Button>
+                                        <TextBlock Text="{Binding BookingYear}"
+                                                   FontSize="18"
+                                                   FontWeight="Bold"
+                                                   TextAlignment="Center"
+                                                   Foreground="{StaticResource TextDark}"
+                                                   Margin="0,4" />
+                                        <Button Style="{StaticResource ModernButton}"
+                                                Command="{Binding DecreaseYearCommand}"
+                                                Height="36"
+                                                FontSize="16">▼</Button>
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- Time steppers -->
+                                <Grid Margin="0,0,0,20">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="20" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Hour -->
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Hour"
+                                                   FontSize="10"
+                                                   Foreground="{StaticResource TextMuted}"
+                                                   TextAlignment="Center"
+                                                   Margin="0,0,0,4" />
+                                        <Button Style="{StaticResource ModernButton}"
+                                                Command="{Binding IncreaseHourCommand}"
+                                                Height="36"
+                                                FontSize="16">▲</Button>
+                                        <TextBlock Text="{Binding BookingHour, StringFormat=D2}"
+                                                   FontSize="22"
+                                                   FontWeight="Black"
+                                                   TextAlignment="Center"
+                                                   Foreground="{StaticResource TextDark}"
+                                                   Margin="0,4" />
+                                        <Button Style="{StaticResource ModernButton}"
+                                                Command="{Binding DecreaseHourCommand}"
+                                                Height="36"
+                                                FontSize="16">▼</Button>
+                                    </StackPanel>
+
+                                    <TextBlock Grid.Column="1"
+                                               Text=":"
+                                               FontSize="24"
+                                               FontWeight="Black"
+                                               Foreground="{StaticResource TextDark}"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Margin="0,20,0,0" />
+
+                                    <!-- Minute -->
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Min"
+                                                   FontSize="10"
+                                                   Foreground="{StaticResource TextMuted}"
+                                                   TextAlignment="Center"
+                                                   Margin="0,0,0,4" />
+                                        <Button Style="{StaticResource ModernButton}"
+                                                Command="{Binding IncreaseMinuteCommand}"
+                                                Height="36"
+                                                FontSize="16">▲</Button>
+                                        <TextBlock Text="{Binding BookingMinute, StringFormat=D2}"
+                                                   FontSize="22"
+                                                   FontWeight="Black"
+                                                   TextAlignment="Center"
+                                                   Foreground="{StaticResource TextDark}"
+                                                   Margin="0,4" />
+                                        <Button Style="{StaticResource ModernButton}"
+                                                Command="{Binding DecreaseMinuteCommand}"
+                                                Height="36"
+                                                FontSize="16">▼</Button>
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- ── Party Size ── -->
+                                <TextBlock Text="PARTY SIZE"
+                                           FontSize="11"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource TextMuted}"
+                                           Margin="0,0,0,10" />
+
+                                <Grid Margin="0,0,0,20">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="44" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="44" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Button Grid.Column="0"
+                                            Height="52"
+                                            Width="44"
+                                            FontSize="22"
+                                            FontWeight="Bold"
+                                            Background="#F1F5F9"
+                                            BorderThickness="0"
+                                            Command="{Binding DecreasePartySizeCommand}">
+                                        <Button.Resources>
+                                            <Style TargetType="Border">
+                                                <Setter Property="CornerRadius"
+                                                        Value="10" />
+                                            </Style>
+                                        </Button.Resources>
+                                        <TextBlock Text="−" />
+                                    </Button>
+
+                                    <!-- Party size display — tapping focuses numpad -->
+                                    <Button Grid.Column="1"
+                                            Height="52"
+                                            Margin="8,0"
+                                            Background="#F8FAFC"
+                                            BorderBrush="{StaticResource BorderGray}"
+                                            BorderThickness="1"
+                                            Command="{Binding NumpadFocusPartySizeCommand}">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Background"
+                                                        Value="#F8FAFC" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding NumpadTargetsPartySize}"
+                                                                 Value="True">
+                                                        <Setter Property="BorderBrush"
+                                                                Value="{StaticResource PrimaryAccent}" />
+                                                        <Setter Property="BorderThickness"
+                                                                Value="2" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                        <Button.Resources>
+                                            <Style TargetType="Border">
+                                                <Setter Property="CornerRadius"
+                                                        Value="10" />
+                                            </Style>
+                                        </Button.Resources>
+                                        <TextBlock Text="{Binding PartySize}"
+                                                   FontSize="24"
+                                                   FontWeight="Black"
+                                                   Foreground="{StaticResource TextDark}"
+                                                   TextAlignment="Center" />
+                                    </Button>
+
+                                    <Button Grid.Column="2"
+                                            Height="52"
+                                            Width="44"
+                                            FontSize="22"
+                                            FontWeight="Bold"
+                                            Background="#F1F5F9"
+                                            BorderThickness="0"
+                                            Command="{Binding IncreasePartySizeCommand}">
+                                        <Button.Resources>
+                                            <Style TargetType="Border">
+                                                <Setter Property="CornerRadius"
+                                                        Value="10" />
+                                            </Style>
+                                        </Button.Resources>
+                                        <TextBlock Text="+" />
+                                    </Button>
+                                </Grid>
+
+                                <!-- ── Deposit ── -->
+                                <TextBlock Text="DEPOSIT"
+                                           FontSize="11"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource TextMuted}"
+                                           Margin="0,0,0,10" />
+
+                                <!-- Toggle -->
+                                <StackPanel Orientation="Horizontal"
+                                            Margin="0,0,0,12">
+                                    <CheckBox IsChecked="{Binding TakeDeposit}"
+                                              IsEnabled="{Binding IsDepositAlreadyPaid,
+                                                          Converter={StaticResource InverseBoolConverter}}"
+                                              VerticalAlignment="Center"
+                                              Width="22"
+                                              Height="22" />
+                                    <TextBlock FontSize="13"
+                                               Foreground="{StaticResource TextDark}"
+                                               VerticalAlignment="Center"
+                                               Margin="10,0,0,0">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Text"
+                                                        Value="Take deposit" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsDepositAlreadyPaid}"
+                                                                 Value="True">
+                                                        <Setter Property="Text"
+                                                                Value="Deposit already paid ✓" />
+                                                        <Setter Property="Foreground"
+                                                                Value="#065F46" />
+                                                        <Setter Property="FontWeight"
+                                                                Value="SemiBold" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </StackPanel>
+
+                                <!-- Deposit amount + method -->
+                                <StackPanel Visibility="{Binding IsDepositSectionVisible,
+                                                         Converter={StaticResource BoolToVisibilityConverter}}"
+                                            Margin="0,0,0,16">
+
+                                    <!-- Amount display — tapping focuses numpad on deposit -->
+                                    <TextBlock Text="{Binding CurrencySymbol,
+                                                      StringFormat='Amount ({0})'}"
+                                               FontSize="11"
+                                               Foreground="{StaticResource TextMuted}"
+                                               Margin="0,0,0,6" />
+                                    <Button Height="52"
+                                            Margin="0,0,0,10"
+                                            Command="{Binding NumpadFocusDepositCommand}"
+                                            IsEnabled="{Binding IsDepositAlreadyPaid,
+                                                        Converter={StaticResource InverseBoolConverter}}">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Background"
+                                                        Value="#F8FAFC" />
+                                                <Setter Property="BorderBrush"
+                                                        Value="{StaticResource BorderGray}" />
+                                                <Setter Property="BorderThickness"
+                                                        Value="1" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding NumpadTargetsDeposit}"
+                                                                 Value="True">
+                                                        <Setter Property="BorderBrush"
+                                                                Value="{StaticResource PrimaryAccent}" />
+                                                        <Setter Property="BorderThickness"
+                                                                Value="2" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                        <Button.Resources>
+                                            <Style TargetType="Border">
+                                                <Setter Property="CornerRadius"
+                                                        Value="10" />
+                                            </Style>
+                                        </Button.Resources>
+                                        <TextBlock Text="{Binding DepositAmountDisplay}"
+                                                   FontSize="22"
+                                                   FontWeight="Black"
+                                                   Foreground="{StaticResource TextDark}"
+                                                   TextAlignment="Center" />
+                                    </Button>
+
+                                    <!-- Method chips -->
+                                    <TextBlock Text="Method"
+                                               FontSize="11"
+                                               Foreground="{StaticResource TextMuted}"
+                                               Margin="0,0,0,6" />
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Height="40"
+                                                Padding="16,0"
+                                                Margin="0,0,8,0"
+                                                FontSize="13"
+                                                FontWeight="SemiBold"
+                                                BorderThickness="1"
+                                                IsEnabled="{Binding IsDepositAlreadyPaid,
+                                                            Converter={StaticResource InverseBoolConverter}}">
+                                            <Button.Style>
+                                                <Style TargetType="Button">
+                                                    <Setter Property="Background"
+                                                            Value="#F8FAFC" />
+                                                    <Setter Property="BorderBrush"
+                                                            Value="{StaticResource BorderGray}" />
+                                                    <Setter Property="Foreground"
+                                                            Value="{StaticResource TextDark}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding SelectedDepositMethod}"
+                                                                     Value="Cash">
+                                                            <Setter Property="Background"
+                                                                    Value="{StaticResource PrimaryAccent}" />
+                                                            <Setter Property="Foreground"
+                                                                    Value="White" />
+                                                            <Setter Property="BorderBrush"
+                                                                    Value="{StaticResource PrimaryAccent}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                            <Button.Resources>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="CornerRadius"
+                                                            Value="8" />
+                                                </Style>
+                                            </Button.Resources>
+                                            <Button.Command>
+                                                <Binding Path="DataContext.SaveCommand"
+                                                         RelativeSource="{RelativeSource AncestorType=Border}" />
+                                            </Button.Command>
+                                            <FrameworkElement.Tag>Cash</FrameworkElement.Tag>
+                                            <TextBlock Text="Cash" />
+                                        </Button>
+                                        <Button Height="40"
+                                                Padding="16,0"
+                                                FontSize="13"
+                                                FontWeight="SemiBold"
+                                                BorderThickness="1"
+                                                IsEnabled="{Binding IsDepositAlreadyPaid,
+                                                            Converter={StaticResource InverseBoolConverter}}">
+                                            <Button.Style>
+                                                <Style TargetType="Button">
+                                                    <Setter Property="Background"
+                                                            Value="#F8FAFC" />
+                                                    <Setter Property="BorderBrush"
+                                                            Value="{StaticResource BorderGray}" />
+                                                    <Setter Property="Foreground"
+                                                            Value="{StaticResource TextDark}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding SelectedDepositMethod}"
+                                                                     Value="Card">
+                                                            <Setter Property="Background"
+                                                                    Value="{StaticResource PrimaryAccent}" />
+                                                            <Setter Property="Foreground"
+                                                                    Value="White" />
+                                                            <Setter Property="BorderBrush"
+                                                                    Value="{StaticResource PrimaryAccent}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                            <Button.Resources>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="CornerRadius"
+                                                            Value="8" />
+                                                </Style>
+                                            </Button.Resources>
+                                            <TextBlock Text="Card" />
+                                        </Button>
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <!-- ── Numpad (Party Size & Deposit) ── -->
+                                <Border Background="#F8FAFC"
+                                        CornerRadius="12"
+                                        Padding="10"
+                                        Margin="0,0,0,20">
+                                    <StackPanel>
+                                        <UniformGrid Rows="3"
+                                                     Columns="3"
+                                                     Margin="0,0,0,5">
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Height="52"
+                                                    Command="{Binding NumpadKeyCommand}"
+                                                    CommandParameter="7" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Height="52"
+                                                    Command="{Binding NumpadKeyCommand}"
+                                                    CommandParameter="8" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Height="52"
+                                                    Command="{Binding NumpadKeyCommand}"
+                                                    CommandParameter="9" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Height="52"
+                                                    Command="{Binding NumpadKeyCommand}"
+                                                    CommandParameter="4" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Height="52"
+                                                    Command="{Binding NumpadKeyCommand}"
+                                                    CommandParameter="5" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Height="52"
+                                                    Command="{Binding NumpadKeyCommand}"
+                                                    CommandParameter="6" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Height="52"
+                                                    Command="{Binding NumpadKeyCommand}"
+                                                    CommandParameter="1" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Height="52"
+                                                    Command="{Binding NumpadKeyCommand}"
+                                                    CommandParameter="2" />
+                                            <Button Style="{StaticResource KeyboardKey}"
+                                                    Height="52"
+                                                    Command="{Binding NumpadKeyCommand}"
+                                                    CommandParameter="3" />
+                                        </UniformGrid>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Button Grid.Column="0"
+                                                    Style="{StaticResource KeyboardKey}"
+                                                    Height="52"
+                                                    Command="{Binding NumpadClearCommand}"
+                                                    Content="CLR" />
+                                            <Button Grid.Column="1"
+                                                    Style="{StaticResource KeyboardKey}"
+                                                    Height="52"
+                                                    Command="{Binding NumpadKeyCommand}"
+                                                    CommandParameter="0" />
+                                            <Button Grid.Column="2"
+                                                    Style="{StaticResource KeyboardKey}"
+                                                    Height="52"
+                                                    Command="{Binding NumpadBackspaceCommand}">
+                                                <iconPacks:PackIconMaterial Kind="BackspaceOutline"
+                                                                            Width="16"
+                                                                            Height="16" />
+                                            </Button>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- ── Table Picker ── -->
+                                <TextBlock Text="TABLE (optional)"
+                                           FontSize="11"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource TextMuted}"
+                                           Margin="0,0,0,10" />
+
+                                <Border Background="#F8FAFC"
+                                        CornerRadius="10"
+                                        Padding="12,10"
+                                        Margin="0,0,0,8"
+                                        BorderBrush="{StaticResource BorderGray}"
+                                        BorderThickness="1">
+                                    <TextBlock Text="{Binding TableDisplay}"
+                                               FontSize="14"
+                                               FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextDark}" />
+                                </Border>
+
+                                <ItemsControl ItemsSource="{Binding Tables}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <UniformGrid Columns="4" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Button Height="52"
+                                                    Margin="3"
+                                                    FontSize="16"
+                                                    FontWeight="Bold"
+                                                    BorderThickness="1"
+                                                    Command="{Binding DataContext.SelectTableCommand,
+                                                              RelativeSource={RelativeSource AncestorType=Border}}"
+                                                    CommandParameter="{Binding}">
+                                                <Button.Style>
+                                                    <Style TargetType="Button">
+                                                        <Setter Property="Background"
+                                                                Value="#F8FAFC" />
+                                                        <Setter Property="BorderBrush"
+                                                                Value="{StaticResource BorderGray}" />
+                                                        <Setter Property="Foreground"
+                                                                Value="{StaticResource TextDark}" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding DataContext.SelectedTable.Id,
+                                                                         RelativeSource={RelativeSource AncestorType=Border}}"
+                                                                         Value="{Binding Id}">
+                                                                <Setter Property="Background"
+                                                                        Value="{StaticResource PrimaryAccent}" />
+                                                                <Setter Property="Foreground"
+                                                                        Value="White" />
+                                                                <Setter Property="BorderBrush"
+                                                                        Value="{StaticResource PrimaryAccent}" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                                <Button.Resources>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="CornerRadius"
+                                                                Value="8" />
+                                                    </Style>
+                                                </Button.Resources>
+                                                <TextBlock Text="{Binding Number}"
+                                                           VerticalAlignment="Center"
+                                                           HorizontalAlignment="Center" />
+                                            </Button>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+
+                                <!-- Clear table button -->
+                                <Button Height="40"
+                                        Margin="0,8,0,0"
+                                        FontSize="12"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        Foreground="{StaticResource TextMuted}"
+                                        Command="{Binding ClearTableCommand}">
+                                    <TextBlock Text="✕  Clear table selection"
+                                               VerticalAlignment="Center" />
+                                </Button>
+
+                            </StackPanel>
+                        </Grid>
+                    </ScrollViewer>
+
+                    <!-- ── Editor Footer ── -->
+                    <Border Grid.Row="2"
+                            BorderBrush="{StaticResource BorderGray}"
+                            BorderThickness="0,1,0,0"
+                            Padding="32,20">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="12" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0"
+                                    Height="56"
+                                    FontSize="16"
+                                    FontWeight="Bold"
+                                    Background="#F1F5F9"
+                                    Foreground="{StaticResource TextDark}"
+                                    BorderThickness="0"
+                                    Command="{Binding CancelCommand}">
+                                <Button.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius"
+                                                Value="12" />
+                                    </Style>
+                                </Button.Resources>
+                                <TextBlock Text="Cancel" />
+                            </Button>
+                            <Button Grid.Column="2"
+                                    Height="56"
+                                    FontSize="16"
+                                    FontWeight="Bold"
+                                    Background="{StaticResource PrimaryAccent}"
+                                    Foreground="White"
+                                    BorderThickness="0"
+                                    Command="{Binding SaveCommand}">
+                                <Button.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius"
+                                                Value="12" />
+                                    </Style>
+                                </Button.Resources>
+                                <TextBlock Text="Save Booking" />
+                            </Button>
+                        </Grid>
+                    </Border>
+
+                </Grid>
+            </Border>
+        </Border>
+
+    </Grid>
+</UserControl>
