@@ -182,6 +182,55 @@ namespace RestaurantPOS.Services
             await _db.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Adds a free-hand item to an order.
+        /// Stored as an OrderItem with ProductId = 0 (no menu product link).
+        /// </summary>
+        public async Task<OrderItem> AddOpenItemAsync(int orderId, string name, decimal price)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Item name is required.");
+
+            if (price < 0)
+                throw new ArgumentException("Price cannot be negative.");
+
+            var order = await _db.Orders
+                .Include(o => o.Items)
+                .FirstAsync(o => o.Id == orderId);
+
+            var openItem = new OrderItem
+            {
+                OrderId = order.Id,
+                ProductId = null,
+                ProductName = name.Trim(),
+                UnitPrice = price,
+                Quantity = 1
+            };
+
+            _db.OrderItems.Add(openItem);
+            await _db.SaveChangesAsync();
+
+            return openItem;
+        }
+
+        /// <summary>
+        /// Removes a specific open item by its OrderItem.Id (not ProductId).
+        /// Used because open items have no ProductId to query by.
+        /// </summary>
+        public async Task RemoveOpenItemAsync(int orderId, int orderItemId)
+        {
+            var item = await _db.OrderItems
+                .FirstOrDefaultAsync(i =>
+                    i.OrderId == orderId &&
+                    i.Id == orderItemId &&
+                    i.ProductId == null);   // safety guard — only removes open items
+
+            if (item == null) return;
+
+            _db.OrderItems.Remove(item);
+            await _db.SaveChangesAsync();
+        }
+
         public async Task UpdateQuantityAsync(
     int orderId,
     int productId,
@@ -189,7 +238,8 @@ namespace RestaurantPOS.Services
         {
             var order = await LoadOrderAsync(orderId);
 
-            var item = order.Items.FirstOrDefault(i => i.ProductId == productId);
+            var item = order.Items
+                .FirstOrDefault(i => i.ProductId == productId && i.ProductId != null);
             if (item == null) return;
 
             if (quantity <= 0)
@@ -202,8 +252,8 @@ namespace RestaurantPOS.Services
 
 
         public async Task AddItemAsync(
-    int orderId,
-    int itemId)
+            int orderId,
+            int itemId)
         {
 
             var order = await _db.Orders
@@ -212,8 +262,10 @@ namespace RestaurantPOS.Services
 
             var existing = await _db.OrderItems
                 .FirstOrDefaultAsync(i =>
-                    i.OrderId == order.Id &&
-                    i.ProductId == itemId);
+                i.OrderId == order.Id &&
+                i.ProductId == itemId &&
+                i.ProductId != null);   // ✅ never merge with open items
+
 
             if (existing != null)
             {
@@ -240,6 +292,34 @@ namespace RestaurantPOS.Services
             await _db.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Updates cover counts AND optional label/price overrides for this order.
+        /// Pass null for label/price to keep using the Settings defaults.
+        /// </summary>
+        public async Task UpdateCoversWithLabelsAsync(
+            int orderId,
+            int adults,
+            int children,
+            string? coverALabel,
+            decimal? coverAPrice,
+            string? coverBLabel,
+            decimal? coverBPrice)
+        {
+            var order = await _db.Orders.FindAsync(orderId)
+                ?? throw new InvalidOperationException("Order not found.");
+
+            if (order.IsClosed)
+                throw new InvalidOperationException("Cannot modify closed order.");
+
+            order.AdultCovers = Math.Max(0, adults);
+            order.ChildCovers = Math.Max(0, children);
+            order.CoverALabel = string.IsNullOrWhiteSpace(coverALabel) ? null : coverALabel.Trim();
+            order.CoverAPrice = coverAPrice;
+            order.CoverBLabel = string.IsNullOrWhiteSpace(coverBLabel) ? null : coverBLabel.Trim();
+            order.CoverBPrice = coverBPrice;
+
+            await _db.SaveChangesAsync();
+        }
         public async Task<Order> GetByIdAsync(int orderId)
         {
             return await _db.Orders

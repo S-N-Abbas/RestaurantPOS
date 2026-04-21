@@ -22,14 +22,50 @@ namespace RestaurantPOS.ViewModels.Cover
         private OrderState _orderState;
         private readonly OrderService _orderService;
         private readonly IOrderContextService _orderContextService;
+        private readonly SettingsService _settingsService;
 
         public event Action? RequestClose;
 
-        public CoverSelectorViewModel(OrderState orderState, OrderService orderService, IOrderContextService orderContextService)
+        // ─── New fields alongside existing AdultCovers / ChildCovers ─────────────────
+
+        private string _coverALabel = string.Empty;
+        public string CoverALabel
+        {
+            get => _coverALabel;
+            set => SetProperty(ref _coverALabel, value);
+        }
+
+        private string _coverBLabel = string.Empty;
+        public string CoverBLabel
+        {
+            get => _coverBLabel;
+            set => SetProperty(ref _coverBLabel, value);
+        }
+
+        private string _coverAPrice = string.Empty;
+        public string CoverAPrice
+        {
+            get => _coverAPrice;
+            set => SetProperty(ref _coverAPrice, value);
+        }
+
+        private string _coverBPrice = string.Empty;
+        public string CoverBPrice
+        {
+            get => _coverBPrice;
+            set => SetProperty(ref _coverBPrice, value);
+        }
+
+        // Placeholders shown when fields are empty
+        public string CoverAPlaceholder => _settingsService.Settings.AdultCoverLabel;
+        public string CoverBPlaceholder => _settingsService.Settings.ChildCoverLabel;
+
+        public CoverSelectorViewModel(OrderState orderState, OrderService orderService, IOrderContextService orderContextService, SettingsService settingsService)
         {
             _orderState = orderState;
             _orderService = orderService;
             _orderContextService = orderContextService;
+            _settingsService = settingsService;
 
             _adultCovers = orderState.Order?.AdultCovers ?? 0;
             _childCovers = orderState.Order?.ChildCovers ?? 0;
@@ -73,6 +109,45 @@ namespace RestaurantPOS.ViewModels.Cover
             _orderState = newState;
             AdultCovers = _orderState.Order?.AdultCovers ?? 0;
             ChildCovers = _orderState.Order?.ChildCovers ?? 0;
+
+            // Load per-order label overrides — or leave empty to show placeholder
+            CoverALabel = _orderState.Order?.CoverALabel ?? string.Empty;
+            CoverBLabel = _orderState.Order?.CoverBLabel ?? string.Empty;
+            CoverAPrice = _orderState.Order?.CoverAPrice?.ToString("N2") ?? string.Empty;
+            CoverBPrice = _orderState.Order?.CoverBPrice?.ToString("N2") ?? string.Empty;
+        }
+
+        private async Task ConfirmAsync()
+        {
+            if (_orderState.Order == null)
+            {
+                var order = await _orderService.CreateOrderAsync(
+                    _orderState.ContextId,
+                    _orderContextService.CurrentOrderType);
+                _orderState.AttachOrder(order);
+            }
+
+            decimal? aPriceOverride = decimal.TryParse(CoverAPrice, out var ap) ? ap : null;
+            decimal? bPriceOverride = decimal.TryParse(CoverBPrice, out var bp) ? bp : null;
+
+            await _orderService.UpdateCoversWithLabelsAsync(
+                _orderState.Order!.Id,
+                AdultCovers,
+                ChildCovers,
+                string.IsNullOrWhiteSpace(CoverALabel) ? null : CoverALabel,
+                aPriceOverride,
+                string.IsNullOrWhiteSpace(CoverBLabel) ? null : CoverBLabel,
+                bPriceOverride);
+
+            // Update in-memory order object too
+            _orderState.Order.AdultCovers = AdultCovers;
+            _orderState.Order.ChildCovers = ChildCovers;
+            _orderState.Order.CoverALabel = string.IsNullOrWhiteSpace(CoverALabel) ? null : CoverALabel;
+            _orderState.Order.CoverBLabel = string.IsNullOrWhiteSpace(CoverBLabel) ? null : CoverBLabel;
+            _orderState.Order.CoverAPrice = aPriceOverride;
+            _orderState.Order.CoverBPrice = bPriceOverride;
+
+            RequestClose?.Invoke();
         }
 
 
@@ -137,31 +212,6 @@ namespace RestaurantPOS.ViewModels.Cover
                     break;
             }
         }
-
-
-
-        // Confirm
-        private async Task ConfirmAsync()
-        {
-            if (_orderState.Order == null)
-            {
-                var order = await _orderService.CreateOrderAsync(
-                            _orderState.ContextId,
-                            _orderContextService.CurrentOrderType);
-                _orderState.AttachOrder(order);
-            }
-
-            _orderState.Order.AdultCovers = AdultCovers;
-            _orderState.Order.ChildCovers = ChildCovers;
-
-            await _orderService.UpdateCoversAsync(
-                _orderState.Order.Id,
-                AdultCovers,
-                ChildCovers);
-
-            RequestClose?.Invoke();
-        }
-
 
         // Commands
         public ICommand IncreaseAdultsCommand { get; }

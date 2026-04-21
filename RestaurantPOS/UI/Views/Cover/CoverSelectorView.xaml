@@ -122,6 +122,93 @@
                             </StackPanel>
                         </Grid>
                     </Border>
+                    <!-- ── Custom Label Row A ── -->
+                    <TextBlock Text="Cover A Label (optional)"
+                               FontSize="11"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource TextMuted}"
+                               Margin="0,16,0,6" />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="12" />
+                            <ColumnDefinition Width="120" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Label field -->
+                        <Border Height="48"
+                                BorderThickness="1"
+                                CornerRadius="10"
+                                BorderBrush="{StaticResource BorderGray}"
+                                Background="White">
+                            <TextBox Text="{Binding CoverALabel, UpdateSourceTrigger=PropertyChanged}"
+                                     FontSize="14"
+                                     Padding="12,0"
+                                     BorderThickness="0"
+                                     Background="Transparent"
+                                     VerticalContentAlignment="Center"
+                                      />
+                        </Border>
+
+                        <!-- Price field -->
+                        <Border Grid.Column="2"
+                                Height="48"
+                                BorderThickness="1"
+                                CornerRadius="10"
+                                BorderBrush="{StaticResource BorderGray}"
+                                Background="White">
+                            <TextBox Text="{Binding CoverAPrice, UpdateSourceTrigger=PropertyChanged}"
+                                     FontSize="14"
+                                     Padding="12,0"
+                                     BorderThickness="0"
+                                     Background="Transparent"
+                                     VerticalContentAlignment="Center"
+                                      />
+                        </Border>
+                    </Grid>
+
+                    <!-- ── Custom Label Row B ── -->
+                    <TextBlock Text="Cover B Label (optional)"
+                               FontSize="11"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource TextMuted}"
+                               Margin="0,12,0,6" />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="12" />
+                            <ColumnDefinition Width="120" />
+                        </Grid.ColumnDefinitions>
+
+                        <Border Height="48"
+                                BorderThickness="1"
+                                CornerRadius="10"
+                                BorderBrush="{StaticResource BorderGray}"
+                                Background="White">
+                            <TextBox Text="{Binding CoverBLabel, UpdateSourceTrigger=PropertyChanged}"
+                                     FontSize="14"
+                                     Padding="12,0"
+                                     BorderThickness="0"
+                                     Background="Transparent"
+                                     VerticalContentAlignment="Center"
+                                      />
+                        </Border>
+
+                        <Border Grid.Column="2"
+                                Height="48"
+                                BorderThickness="1"
+                                CornerRadius="10"
+                                BorderBrush="{StaticResource BorderGray}"
+                                Background="White">
+                            <TextBox Text="{Binding CoverBPrice, UpdateSourceTrigger=PropertyChanged}"
+                                     FontSize="14"
+                                     Padding="12,0"
+                                     BorderThickness="0"
+                                     Background="Transparent"
+                                     VerticalContentAlignment="Center"
+                                    />
+                        </Border>
+                    </Grid>
                 </StackPanel>
 
                 <UniformGrid Grid.Row="2"

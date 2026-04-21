@@ -284,9 +284,15 @@
                 <Grid Margin="20">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
+                        <!-- Row 0: "Current Order" title -->
                         <RowDefinition Height="Auto" />
+                        <!-- Row 1: Covers row (DineIn only) -->
+                        <RowDefinition Height="Auto" />
+                        <!-- Row 2: Open Item button -->
                         <RowDefinition Height="*" />
+                        <!-- Row 3: Order items list -->
                         <RowDefinition Height="Auto" />
+                        <!-- Row 4: Totals + Pay button -->
                     </Grid.RowDefinitions>
 
                     <TextBlock Text="Current Order"
@@ -322,8 +328,34 @@
                                     Command="{Binding OpenCoverSelectorCommand}" />
                         </Grid>
                     </Border>
-
-                    <ListView Grid.Row="2"
+                    <!-- ✅ Open Item button — all staff -->
+                    <Button Grid.Row="2"
+                            Height="44"
+                            Margin="0,0,0,12"
+                            FontSize="13"
+                            FontWeight="Bold"
+                            Background="#F5F3FF"
+                            Foreground="#6D28D9"
+                            BorderBrush="#DDD6FE"
+                            BorderThickness="1"
+                            Command="{Binding OpenItemCommand}">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius"
+                                        Value="10" />
+                            </Style>
+                        </Button.Resources>
+                        <StackPanel Orientation="Horizontal">
+                            <iconPacks:PackIconMaterial Kind="PencilPlus"
+                                                        Width="14"
+                                                        Height="14"
+                                                        VerticalAlignment="Center"
+                                                        Margin="0,0,8,0" />
+                            <TextBlock Text="+ Open Item"
+                                       VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                    <ListView Grid.Row="3"
                               ItemsSource="{Binding OrderItems}"
                               BorderThickness="0"
                               ScrollViewer.VerticalScrollBarVisibility="Auto"
@@ -381,7 +413,7 @@
                         </ListView.ItemTemplate>
                     </ListView>
 
-                    <StackPanel Grid.Row="3"
+                    <StackPanel Grid.Row="4"
                                 Margin="0,15,0,0">
                         <Separator Background="{StaticResource BorderGray}"
                                    Margin="0,0,0,15" />
@@ -1512,6 +1544,324 @@
                     </Border>
 
                 </Grid>
+            </Border>
+        </Border>
+        <!-- ══════════════════════════════════════════════════════════════
+     OPEN ITEM EDITOR OVERLAY
+     ══════════════════════════════════════════════════════════════ -->
+        <Border Background="#CC1E293B"
+                DataContext="{Binding OpenItemEditor}"
+                Visibility="{Binding IsOpen,
+                     Converter={StaticResource BoolToVisibilityConverter}}">
+
+            <Border Width="800"
+                    Background="White"
+                    CornerRadius="20"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="40"
+                                      ShadowDepth="4"
+                                      Opacity="0.15" />
+                </Border.Effect>
+
+                <StackPanel Margin="36,32">
+
+                    <!-- Header -->
+                    <Grid Margin="0,0,0,24">
+                        <StackPanel Orientation="Horizontal"
+                                    VerticalAlignment="Center">
+                            <iconPacks:PackIconMaterial Kind="PencilPlus"
+                                                        Foreground="#6D28D9"
+                                                        Width="20"
+                                                        Height="20"
+                                                        VerticalAlignment="Center"
+                                                        Margin="0,0,12,0" />
+                            <TextBlock Text="Open Item"
+                                       FontSize="22"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource TextDark}"
+                                       VerticalAlignment="Center" />
+                        </StackPanel>
+                        <Button HorizontalAlignment="Right"
+                                Command="{Binding CancelCommand}"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Width="36"
+                                Height="36">
+                            <iconPacks:PackIconMaterial Kind="Close"
+                                                        Width="14"
+                                                        Height="14"
+                                                        Foreground="{StaticResource TextMuted}" />
+                        </Button>
+                    </Grid>
+
+                    <!-- Name field -->
+                    <TextBlock Text="Item Name"
+                               FontSize="12"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource TextMuted}"
+                               Margin="0,0,0,6" />
+                    <Border Height="56"
+                            BorderThickness="2"
+                            CornerRadius="12"
+                            Margin="0,0,0,16">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="BorderBrush"
+                                        Value="{StaticResource BorderGray}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsNameActive}"
+                                                 Value="True">
+                                        <Setter Property="BorderBrush"
+                                                Value="#6D28D9" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <Button Command="{Binding FocusNameCommand}"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                HorizontalContentAlignment="Left"
+                                Padding="16,0">
+                            <TextBlock Text="{Binding Name}"
+                                       FontSize="18"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextDark}"
+                                       VerticalAlignment="Center" />
+                        </Button>
+                    </Border>
+
+                    <!-- Price field -->
+                    <TextBlock FontSize="12"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource TextMuted}"
+                               Margin="0,0,0,6">
+                <Run Text="Price (" />
+                <Run Text="{Binding CurrencySymbol, Mode=OneWay}" />
+                <Run Text=")" />
+                    </TextBlock>
+                    <Border Height="56"
+                            BorderThickness="2"
+                            CornerRadius="12"
+                            Margin="0,0,0,20">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="BorderBrush"
+                                        Value="{StaticResource BorderGray}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsPriceActive}"
+                                                 Value="True">
+                                        <Setter Property="BorderBrush"
+                                                Value="#6D28D9" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <Button Command="{Binding FocusPriceCommand}"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                HorizontalContentAlignment="Left"
+                                Padding="16,0">
+                            <TextBlock Text="{Binding PriceDisplay}"
+                                       FontSize="18"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextDark}"
+                                       VerticalAlignment="Center" />
+                        </Button>
+                    </Border>
+
+                    <!-- On-screen keyboard -->
+                    <Border Background="#F8FAFC"
+                            CornerRadius="12"
+                            Padding="10"
+                            Margin="0,0,0,24">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal"
+                                        HorizontalAlignment="Center"
+                                        Margin="0,0,0,5">
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="Q" />
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="W" />
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="E" />
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="R" />
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="T" />
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="Y" />
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="U" />
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="I" />
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="O" />
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="P" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal"
+                                        HorizontalAlignment="Center"
+                                        Margin="0,0,0,5">
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="A" />
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="S" />
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="D" />
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="F" />
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="G" />
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="H" />
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="J" />
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="K" />
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="L" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal"
+                                        HorizontalAlignment="Center"
+                                        Margin="0,0,0,5">
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="Z" />
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="X" />
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="C" />
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="V" />
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="B" />
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="N" />
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="M" />
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter=" "
+                                        Content="SPACE"
+                                        Width="90" />
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding BackspaceCommand}"
+                                        Width="56">
+                                    <iconPacks:PackIconMaterial Kind="BackspaceOutline"
+                                                                Width="16"
+                                                                Height="16" />
+                                </Button>
+                            </StackPanel>
+                            <!-- Digits + decimal -->
+                            <StackPanel Orientation="Horizontal"
+                                        HorizontalAlignment="Center">
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="1" />
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="2" />
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="3" />
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="4" />
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="5" />
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="6" />
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="7" />
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="8" />
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="9" />
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="0" />
+                                <Button Style="{StaticResource KeyboardKey}"
+                                        Command="{Binding KeyCommand}"
+                                        CommandParameter="."
+                                        Content="." />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Confirm / Cancel -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="12" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0"
+                                Height="56"
+                                FontSize="16"
+                                FontWeight="Bold"
+                                Background="#F1F5F9"
+                                Foreground="{StaticResource TextDark}"
+                                BorderThickness="0"
+                                Command="{Binding CancelCommand}">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius"
+                                            Value="12" />
+                                </Style>
+                            </Button.Resources>
+                            <TextBlock Text="Cancel" />
+                        </Button>
+                        <Button Grid.Column="2"
+                                Height="56"
+                                FontSize="16"
+                                FontWeight="Bold"
+                                Background="#6D28D9"
+                                Foreground="White"
+                                BorderThickness="0"
+                                Command="{Binding ConfirmCommand}">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius"
+                                            Value="12" />
+                                </Style>
+                            </Button.Resources>
+                            <TextBlock Text="Add to Order" />
+                        </Button>
+                    </Grid>
+
+                </StackPanel>
             </Border>
         </Border>
     </Grid>

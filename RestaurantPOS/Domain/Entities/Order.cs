@@ -38,6 +38,11 @@ namespace RestaurantPOS.Domain.Entities
         public int AdultCovers { get; set; }
         public int ChildCovers { get; set; }
 
+        public string? CoverALabel { get; set; }   // replaces "Adults"
+        public decimal? CoverAPrice { get; set; }  // per-unit override
+        public string? CoverBLabel { get; set; }   // replaces "Children"
+        public decimal? CoverBPrice { get; set; }  // per-unit override
+
         [NotMapped]
         public decimal ItemsTotal => Items?.Sum(i => i.UnitPrice * i.Quantity) ?? 0m;
 

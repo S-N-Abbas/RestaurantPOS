@@ -22,10 +22,15 @@ namespace RestaurantPOS.Services
         }
         public FlowDocument Build(Order order)
         {
-            // Calculation Logic
-            var adultCoverTotal = _settingsService.Settings.AdultCoverPrice * order.AdultCovers;
-            var childCoverTotal = _settingsService.Settings.ChildCoverPrice * order.ChildCovers;
-            var grandTotal = adultCoverTotal + childCoverTotal + order.ItemsTotal;
+
+            // Use per-order label/price override, or fall back to settings
+            string aLabel = order.CoverALabel ?? "Adults";
+            string bLabel = order.CoverBLabel ?? "Children";
+            decimal aPrice = _settingsService.CalculateAdultCoverCharge(order);
+            decimal bPrice = _settingsService.CalculateChildCoverCharge(order);
+
+
+            var grandTotal = aPrice + bPrice + order.ItemsTotal;
 
             var cashPaid = order.Payments.Where(p => p.Method == "Cash").Sum(p => p.Amount);
             var cardPaid = order.Payments.Where(p => p.Method == "Card").Sum(p => p.Amount);
@@ -66,13 +71,21 @@ namespace RestaurantPOS.Services
             doc.Blocks.Add(Line());
 
             // 3. COVERS
+
             if (order.AdultCovers > 0 || order.ChildCovers > 0)
             {
                 doc.Blocks.Add(SectionHeader("COVERS"));
+
                 if (order.AdultCovers > 0)
-                    doc.Blocks.Add(TwoColumn($"Adults (x{order.AdultCovers})", $"{_settingsService.Settings.CurrencySymbol}{adultCoverTotal:F2}"));
+                    doc.Blocks.Add(TwoColumn(
+                        $"{aLabel} (x{order.AdultCovers})",
+                        $"{_settingsService.Settings.CurrencySymbol}{aPrice * order.AdultCovers:F2}"));
+
                 if (order.ChildCovers > 0)
-                    doc.Blocks.Add(TwoColumn($"Children (x{order.ChildCovers})", $"{_settingsService.Settings.CurrencySymbol}{childCoverTotal:F2}"));
+                    doc.Blocks.Add(TwoColumn(
+                        $"{bLabel} (x{order.ChildCovers})",
+                        $"{_settingsService.Settings.CurrencySymbol}{bPrice * order.ChildCovers:F2}"));
+
                 doc.Blocks.Add(Spacer(4));
             }
 
@@ -195,7 +208,8 @@ namespace RestaurantPOS.Services
 
                 doc.Blocks.Add(Spacer(6));
             }
-            catch(Exception ex) {
+            catch (Exception ex)
+            {
                 Debug.Write(ex.Message);
             }
         }
@@ -226,7 +240,7 @@ namespace RestaurantPOS.Services
             return table;
         }
 
-        
+
         // ✅ TYPOGRAPHY HELPERS ⭐⭐⭐⭐⭐
 
         private Paragraph Title(string text) =>
@@ -261,7 +275,7 @@ namespace RestaurantPOS.Services
                 Margin = new Thickness(0)
             };
 
-        
+
         private Paragraph TwoColumnBold(string left, string right) =>
             new Paragraph
             {

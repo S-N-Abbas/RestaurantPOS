@@ -37,6 +37,9 @@ namespace RestaurantPOS.ViewModels.Orders
 
         public InlineMenuEditorViewModel MenuEditor { get; }
 
+        public OpenItemEditorViewModel OpenItemEditor { get; }
+        public ICommand OpenItemCommand { get; }
+
         public CoverSelectorViewModel coverSelectorViewModel { get; set; }
 
         public ObservableCollection<CategoryViewModel> Categories { get; }
@@ -181,6 +184,13 @@ namespace RestaurantPOS.ViewModels.Orders
 
             MenuEditor = new InlineMenuEditorViewModel(menuAdmin, _settingsService);
 
+            OpenItemEditor = new OpenItemEditorViewModel(_settingsService);
+
+            OpenItemEditor.Confirmed += async (name, price) =>
+                await AddOpenItemAsync(name, price);
+
+            OpenItemCommand = new RelayCommand(() => OpenItemEditor.Open());
+
             ToggleEditMenuCommand = new RelayCommand(
                 () => IsEditMenuMode = !IsEditMenuMode,
                 () => CanEditMenu);
@@ -261,7 +271,8 @@ namespace RestaurantPOS.ViewModels.Orders
             coverSelectorViewModel = new CoverSelectorViewModel(
                 _orderState,
                 _orderService,
-                _orderContextService);
+                _orderContextService,
+                _settingsService);
 
             coverSelectorViewModel.RequestClose += CloseCoverSelector;
 
@@ -471,15 +482,26 @@ namespace RestaurantPOS.ViewModels.Orders
 
             if (_orderState.Order != null)
             {
-                await _orderService.UpdateQuantityAsync(
-                    _orderState.Order.Id,
-                    item.ItemId,
-                    0);
+                if (item.ItemId == 0)
+                {
+                    // ✅ Open item — delete by OrderItem.Id
+                    await _orderService.RemoveOpenItemAsync(
+                        _orderState.Order.Id,
+                        item.OrderItemId);
+                }
+                else
+                {
+                    // Regular menu item — set quantity to 0
+                    await _orderService.UpdateQuantityAsync(
+                        _orderState.Order.Id,
+                        item.ItemId,
+                        0);
+                }
             }
 
             UpdateOrderState();
 
-            if(_orderState.Order == null)
+            if (_orderState.Order == null)
                 throw new InvalidOperationException("Order should not be null here");
 
             var updatedOrder = await _orderService.GetByIdAsync(_orderState.Order.Id);
@@ -654,6 +676,35 @@ namespace RestaurantPOS.ViewModels.Orders
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }
+        }
+
+        private async Task AddOpenItemAsync(string name, decimal price)
+        {
+            if (_orderState.Order == null)
+            {
+                var order = await _orderService.CreateOrderAsync(
+                    TableNumber,
+                    _orderContextService.CurrentOrderType);
+                _orderState.AttachOrder(order);
+                _orderStore.NotifyOrderStateChanged(TableNumber);
+            }
+
+            // ✅ capture the returned item so we have its DB Id
+            var savedItem = await _orderService.AddOpenItemAsync(
+                _orderState.Order!.Id, name, price);
+
+            OrderItems.Add(new OrderItemViewModel(
+                itemId: 0,
+                orderItemId: savedItem.Id,    // ✅ pass DB row Id
+                name: name,
+                unitPrice: price,
+                settingsService: _settingsService,
+                removeCallback: RemoveItem));
+
+            UpdateOrderState();
+
+            var updatedOrder = await _orderService.GetByIdAsync(_orderState.Order.Id);
+            _orderState.UpdateFrom(updatedOrder);
         }
     }
 }

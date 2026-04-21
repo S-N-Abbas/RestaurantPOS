@@ -55,6 +55,12 @@ namespace RestaurantPOS.Infrastructure.Data
                 .Property(i => i.UnitPrice)
                 .HasColumnType("decimal(10,2)");
 
+            modelBuilder.Entity<OrderItem>()
+                .HasOne(i => i.Product)
+                .WithMany()
+                .HasForeignKey(i => i.ProductId)
+                .IsRequired(false);   // ✅ null = open item
+
             // ─── Bookings → Table (optional) ───────────────────────────────────────────
             modelBuilder.Entity<Booking>()
                 .HasOne(b => b.Table)

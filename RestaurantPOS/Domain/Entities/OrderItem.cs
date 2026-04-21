@@ -14,8 +14,8 @@ namespace RestaurantPOS.Domain.Entities
         public int OrderId { get; set; }
         public Order Order { get; set; } = null!;
 
-        public int ProductId { get; set; }
-        public MenuProduct Product { get; set; } = null!;
+        public int? ProductId { get; set; }      // ✅ nullable — null for open items
+        public MenuProduct? Product { get; set; } // ✅ nullable navigation property
 
         public string ProductName { get; set; } = null!;
 
@@ -25,6 +25,9 @@ namespace RestaurantPOS.Domain.Entities
 
         [NotMapped]
         public decimal LineTotal => UnitPrice * Quantity;
+        
+        [NotMapped]
+        public bool IsOpenItem => ProductId == null;
 
     }
 

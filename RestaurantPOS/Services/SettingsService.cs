@@ -71,11 +71,34 @@ namespace RestaurantPOS.Services
 
         public decimal CalculateCoverCharge(Order order)
         {
-            if (order == null)
-                return 0;
+            if (order == null) return 0;
 
-            return (order.AdultCovers * Settings.AdultCoverPrice)
-                 + (order.ChildCovers * Settings.ChildCoverPrice);
+            // Use per-order price override if set, otherwise fall back to settings
+            decimal adultPrice = order.CoverAPrice ?? Settings.AdultCoverPrice;
+            decimal childPrice = order.CoverBPrice ?? Settings.ChildCoverPrice;
+
+            return (order.AdultCovers * adultPrice)
+                 + (order.ChildCovers * childPrice);
+        }
+
+        public decimal CalculateAdultCoverCharge(Order order)
+        {
+            if (order == null) return 0;
+
+            // Use per-order price override if set, otherwise fall back to settings
+            decimal adultPrice = order.CoverAPrice ?? Settings.AdultCoverPrice;
+
+            return (order.AdultCovers * adultPrice);
+        }
+
+        public decimal CalculateChildCoverCharge(Order order)
+        {
+            if (order == null) return 0;
+
+            // Use per-order price override if set, otherwise fall back to settings
+            decimal childPrice = order.CoverBPrice ?? Settings.ChildCoverPrice;
+
+            return (order.ChildCovers * childPrice);
         }
 
         // ✅ PUBLIC SAVE

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Security.Policy;
 using System.Text;
@@ -37,5 +38,11 @@ namespace RestaurantPOS.Domain.Settings
         public decimal ChildCoverPrice { get; set; } = 0.00m;
         public bool PrintReceiptOnPayment { get; set; } = true;
         public string FooterMessage { get; set; } = "Thank you for dining with us!";
+
+        [NotMapped]
+        public string AdultCoverLabel { get; set; } = "Adults";
+        
+        [NotMapped]
+        public string ChildCoverLabel { get; set; } = "Children";
     }
 }

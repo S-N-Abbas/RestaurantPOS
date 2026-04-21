@@ -78,8 +78,7 @@ namespace RestaurantPOS.Services
                 return 0;
 
             return state.Order!.ItemsTotal
-                + state.Order.ChildCovers * _settingsService.Settings.ChildCoverPrice
-                + state.Order.AdultCovers * _settingsService.Settings.AdultCoverPrice;
+                + _settingsService.CalculateCoverCharge(state.Order);
         }
 
         /// <summary>

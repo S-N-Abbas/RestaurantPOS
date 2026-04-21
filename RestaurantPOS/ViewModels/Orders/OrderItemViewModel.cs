@@ -20,6 +20,9 @@ namespace RestaurantPOS.ViewModels.Orders
         public decimal UnitPrice { get; }
         public string CurrencySymbol => _settingsService.Settings.CurrencySymbol;
         private int _quantity = 1;
+
+        public int OrderItemId { get; }  // DB primary key of the OrderItem row
+
         public int Quantity
         {
             get => _quantity;
@@ -61,11 +64,12 @@ namespace RestaurantPOS.ViewModels.Orders
         }
 
         public OrderItemViewModel(
-    OrderItem orderItem, int tableNumber, SettingsService settingsService,
-    Action<OrderItemViewModel> removeCallback)
+            OrderItem orderItem, int tableNumber, SettingsService settingsService,
+            Action<OrderItemViewModel> removeCallback)
         {
             TableNumber = tableNumber;
-            ItemId = orderItem.ProductId;
+            OrderItemId = orderItem.Id;
+            ItemId = orderItem.ProductId ?? 0;
             Name = orderItem.ProductName;
             _settingsService = settingsService;
 
@@ -76,6 +80,38 @@ namespace RestaurantPOS.ViewModels.Orders
 
             UnitPrice = orderItem.UnitPrice;
             _quantity = orderItem.Quantity;
+
+            IncreaseCommand = new RelayCommand(() => Quantity++);
+            DecreaseCommand = new RelayCommand(() =>
+            {
+                Quantity--;
+                if (Quantity == 0)
+                    removeCallback(this);
+            });
+        }
+
+        // Add to OrderItemViewModel.cs
+
+        /// <summary>
+        /// Constructor for open/misc items that have no menu product.
+        /// ItemId = 0 indicates an open item.
+        /// </summary>
+        public OrderItemViewModel(
+            int itemId,
+            int orderItemId,
+            string name,
+            decimal unitPrice,
+            SettingsService settingsService,
+            Action<OrderItemViewModel> removeCallback)
+        {
+            ItemId = itemId;
+            OrderItemId = orderItemId;
+            Name = name;
+            UnitPrice = unitPrice;
+            _settingsService = settingsService;
+
+            _settingsService.SettingsChanged += ()
+                => OnPropertyChanged(nameof(CurrencySymbol));
 
             IncreaseCommand = new RelayCommand(() => Quantity++);
             DecreaseCommand = new RelayCommand(() =>

@@ -38,15 +38,20 @@ namespace RestaurantPOS.ViewModels.Payments
         public int AdultCount => _orderState.Order?.AdultCovers ?? 0;
         public int ChildCount => _orderState.Order?.ChildCovers ?? 0;
 
-        public decimal AdultCoverTotal => AdultCount * _settingsService.Settings.AdultCoverPrice;
-        public decimal ChildCoverTotal => ChildCount * _settingsService.Settings.ChildCoverPrice;
+        public decimal AdultCoverTotal => _orderState.Order == null
+            ? 0m
+            : _settingsService.CalculateAdultCoverCharge(_orderState.Order);
+        public decimal ChildCoverTotal => _orderState.Order == null
+            ? 0m
+            : _settingsService.CalculateChildCoverCharge(_orderState.Order);
+        public decimal CoverTotal => _orderState.Order == null
+            ? 0m
+            : _settingsService.CalculateCoverCharge(_orderState.Order);
 
         public string CurrencySymbol => _settingsService.Settings.CurrencySymbol;
 
         public decimal Total =>
-            (_orderState.Order?.ItemsTotal
-            + ChildCoverTotal
-            + AdultCoverTotal ?? 0);
+            (_orderState.Order?.ItemsTotal ?? 0m) + CoverTotal;
 
         public decimal AlreadyPaid => _orderState.Order?.PaidAmount ?? 0;
         public decimal PreviewPaid => AlreadyPaid;
