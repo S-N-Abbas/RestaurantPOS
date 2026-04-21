@@ -7,6 +7,7 @@ using RestaurantPOS.ViewModels.Base;
 using RestaurantPOS.ViewModels.Login;
 using RestaurantPOS.ViewModels.Orders;
 using RestaurantPOS.ViewModels.Tables;
+using RestaurantPOS.ViewModels.ZReport;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,7 +45,7 @@ namespace RestaurantPOS.ViewModels.Home
 
             TakeawayCommand = new RelayCommand(GoToTakeaway);
 
-            ReportsCommand = new RelayCommand(GoToReports, CanGoToReports);
+            ReportsCommand = new RelayCommand(GoToZReport, CanGoToReports);
 
             BackOfficeCommand = new RelayCommand(GoToBackOffice, CanGoToBackOffice);
         }
@@ -70,9 +71,9 @@ namespace RestaurantPOS.ViewModels.Home
             return _authorizationService.HasAccess(Domain.Entities.UserRole.Manager, Domain.Entities.UserRole.Admin);
         }
 
-        private void GoToReports()
+        private void GoToZReport()
         {
-            throw new NotImplementedException();
+            _navigationService.NavigateTo<ZReportViewModel>();
         }
 
         private bool CanGoToBackOffice()

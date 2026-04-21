@@ -16,11 +16,13 @@ namespace RestaurantPOS.Services
     {
         private readonly PosDbContext _db;
         private readonly SettingsService _settingsService;
+        private readonly UserSessionService _userSessionService;
 
-        public OrderService(PosDbContext db, SettingsService settingsService)
+        public OrderService(PosDbContext db, SettingsService settingsService, UserSessionService userSessionService)
         {
             _db = db;
             _settingsService = settingsService;
+            _userSessionService = userSessionService;
         }
 
         public async Task<List<Order>> GetOpenOrdersAsync()
@@ -123,7 +125,9 @@ namespace RestaurantPOS.Services
                 ContextId = contextId,
                 TableId = tableId,
                 OrderType = orderType,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.Now,
+                TillNo = _settingsService.Settings.TillNo,
+                CreatedBy = _userSessionService.CurrentUser?.Username ?? "Unknown"
             };
 
             _db.Orders.Add(order);
@@ -336,8 +340,7 @@ namespace RestaurantPOS.Services
                 return;
 
             var orderTotal = order.ItemsTotal
-                + order.ChildCovers * _settingsService.Settings.ChildCoverPrice
-                + order.AdultCovers * _settingsService.Settings.AdultCoverPrice;
+                + _settingsService.CalculateCoverCharge(order);
 
             if (order.PaidAmount < orderTotal)
                 throw new InvalidOperationException("Order not fully paid");
@@ -345,6 +348,7 @@ namespace RestaurantPOS.Services
             order.IsClosed = true;
             order.Status = OrderStatus.Paid;
             order.ClosedAt = DateTime.UtcNow;
+            order.ClosedBy = _userSessionService.CurrentUser?.Username ?? "Unknown";
 
             // ✅ Auto-complete any linked booking
             var linkedBooking = await _db.Bookings
@@ -374,6 +378,7 @@ namespace RestaurantPOS.Services
             order.IsClosed = true;
             order.Status = OrderStatus.Cancelled;
             order.ClosedAt = DateTime.UtcNow;
+            order.ClosedBy = _userSessionService.CurrentUser?.Username ?? "Unknown";
 
             await _db.SaveChangesAsync();
         }

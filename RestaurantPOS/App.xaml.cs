@@ -15,6 +15,7 @@ using RestaurantPOS.ViewModels.Orders;
 using RestaurantPOS.ViewModels.Payments;
 using RestaurantPOS.ViewModels.Shell;
 using RestaurantPOS.ViewModels.Tables;
+using RestaurantPOS.ViewModels.ZReport;
 using Serilog;
 using System.Configuration;
 using System.Data;
@@ -96,6 +97,9 @@ namespace RestaurantPOS
             services.AddScoped<IBookingService, BookingService>();
             services.AddTransient<BookingsViewModel>();
             services.AddTransient<BookingEditorViewModel>();
+            services.AddScoped<IZReportService, ZReportService>();
+            services.AddTransient<ZReportBuilder>();
+            services.AddTransient<ZReportViewModel>();
 
 
             // Shell

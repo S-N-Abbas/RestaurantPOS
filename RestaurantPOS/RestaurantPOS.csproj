@@ -29,7 +29,6 @@
 
   <ItemGroup>
     <Folder Include="Infrastructure\Repositories\" />
-    <Folder Include="Repositories\" />
     <Folder Include="UI\Controls\" />
     <Folder Include="UI\Themes\" />
     <Folder Include="UI\Views\Base\" />
