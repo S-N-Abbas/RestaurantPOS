@@ -505,24 +505,15 @@
 
             <ScrollViewer Margin="10,20,0,20"
                           HorizontalScrollBarVisibility="Disabled"
-                          VerticalScrollBarVisibility="Auto"
-                          VerticalAlignment="Top"
-                          HorizontalAlignment="Left">
-                <ItemsControl>
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <StackPanel Orientation="Horizontal" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
+                          VerticalScrollBarVisibility="Auto">
+                <WrapPanel Orientation="Horizontal">
 
-                    <!-- ✅ + Add Product tile — Admin/Manager only -->
                     <Button Style="{StaticResource ItemTile}"
                             Height="130"
                             Width="160"
                             Margin="4"
                             Command="{Binding AddProductCommand}"
-                            Visibility="{Binding CanEditMenu,
-                             Converter={StaticResource BoolToVisibilityConverter}}"
+                            Visibility="{Binding CanEditMenu, Converter={StaticResource BoolToVisibilityConverter}}"
                             Background="#F0FDF4"
                             BorderBrush="#BBF7D0"
                             BorderThickness="2">
@@ -540,7 +531,6 @@
                                        Foreground="#16A34A" />
                         </StackPanel>
                     </Button>
-
                     <!-- Existing products -->
                     <ItemsControl ItemsSource="{Binding Items}"
                                   Grid.Row="0">
@@ -599,7 +589,7 @@
                                                     <MultiBinding Converter="{StaticResource CurrencyFormatConverter}"
                                                                   Mode="OneWay">
                                                         <Binding Path="Price" />
-                                                        <Binding Path="CurrencySymbol"/>
+                                                        <Binding Path="CurrencySymbol" />
                                                     </MultiBinding>
                                                 </TextBlock.Text>
                                             </TextBlock>
@@ -636,7 +626,7 @@
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
-                </ItemsControl>
+                </WrapPanel>
             </ScrollViewer>
         </DockPanel>
 
@@ -1605,7 +1595,9 @@
                     <Border Height="56"
                             BorderThickness="2"
                             CornerRadius="12"
-                            Margin="0,0,0,16">
+                            Margin="0,0,0,16"
+                            Padding="12,0">
+
                         <Border.Style>
                             <Style TargetType="Border">
                                 <Setter Property="BorderBrush"
@@ -1619,17 +1611,14 @@
                                 </Style.Triggers>
                             </Style>
                         </Border.Style>
-                        <Button Command="{Binding FocusNameCommand}"
-                                Background="Transparent"
-                                BorderThickness="0"
-                                HorizontalContentAlignment="Left"
-                                Padding="16,0">
-                            <TextBlock Text="{Binding Name}"
-                                       FontSize="18"
-                                       FontWeight="SemiBold"
-                                       Foreground="{StaticResource TextDark}"
-                                       VerticalAlignment="Center" />
-                        </Button>
+
+                        <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
+                                 FontSize="18"
+                                 FontWeight="SemiBold"
+                                 BorderThickness="0"
+                                 Background="Transparent"
+                                 VerticalContentAlignment="Center"
+                                 HorizontalContentAlignment="Left" />
                     </Border>
 
                     <!-- Price field -->
@@ -1644,7 +1633,9 @@
                     <Border Height="56"
                             BorderThickness="2"
                             CornerRadius="12"
-                            Margin="0,0,0,20">
+                            Margin="0,0,0,20"
+                            Padding="12,0">
+
                         <Border.Style>
                             <Style TargetType="Border">
                                 <Setter Property="BorderBrush"
@@ -1658,17 +1649,13 @@
                                 </Style.Triggers>
                             </Style>
                         </Border.Style>
-                        <Button Command="{Binding FocusPriceCommand}"
-                                Background="Transparent"
-                                BorderThickness="0"
-                                HorizontalContentAlignment="Left"
-                                Padding="16,0">
-                            <TextBlock Text="{Binding PriceDisplay}"
-                                       FontSize="18"
-                                       FontWeight="SemiBold"
-                                       Foreground="{StaticResource TextDark}"
-                                       VerticalAlignment="Center" />
-                        </Button>
+
+                        <TextBox Text="{Binding PriceDisplay, UpdateSourceTrigger=PropertyChanged}"
+                                 FontSize="18"
+                                 FontWeight="SemiBold"
+                                 BorderThickness="0"
+                                 Background="Transparent"
+                                 VerticalContentAlignment="Center" />
                     </Border>
 
                     <!-- On-screen keyboard -->

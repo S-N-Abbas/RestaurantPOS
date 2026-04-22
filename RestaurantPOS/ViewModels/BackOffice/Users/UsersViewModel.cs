@@ -45,6 +45,21 @@ namespace RestaurantPOS.ViewModels.BackOffice.Users
 
         // ✅ Editor Fields
 
+        // ─── Keyboard active field tracking ──────────────────────────────────────────
+
+        public enum UserEditorField { Name, Pin, Search }
+
+        private UserEditorField _activeField = UserEditorField.Name;
+
+        public bool IsNameActive => _activeField == UserEditorField.Name;
+        public bool IsPinActive => _activeField == UserEditorField.Pin;
+
+        public bool IsSearchActive => _activeField == UserEditorField.Search;
+
+        // ─── PIN display (dots only — never show actual digits) ───────────────────────
+
+        public string PinDisplay => new string('●', EditorPin.Length);
+
         private string _editorName = string.Empty;
         public string EditorName
         {
@@ -92,10 +107,25 @@ namespace RestaurantPOS.ViewModels.BackOffice.Users
 
         // ✅ Commands
 
+        public ICommand FocusNameCommand { get; }
+        public ICommand FocusPinCommand { get; }
+
+        public ICommand FocusSearchCommand { get; }
+        public ICommand KeyCommand { get; }
+        public ICommand BackspaceCommand { get; }
+        public ICommand ClearFieldCommand { get; }
+
         public ICommand SaveUserCommand { get; }
         public ICommand DeleteUserCommand { get; }
         public ICommand ClearEditorCommand { get; }
         public ICommand NewUserCommand { get; }
+
+        // Role setter commands — replaces ComboBox
+        public ICommand SetRoleAdminCommand { get; }
+        public ICommand SetRoleManagerCommand { get; }
+        public ICommand SetRoleCashierCommand { get; }
+        // User selection from the list (replaces DataGrid SelectedItem binding)
+        public ICommand SelectUserCommand { get; }
 
         public UsersViewModel(IUserService userService, UserSessionService userSessionService)
         {
@@ -108,6 +138,20 @@ namespace RestaurantPOS.ViewModels.BackOffice.Users
             DeleteUserCommand = new RelayCommand(DeleteUser, CanDeleteUser);
             ClearEditorCommand = new RelayCommand(ClearEditor);
             NewUserCommand = new RelayCommand(NewUser);
+            FocusNameCommand = new RelayCommand(() => SetActiveField(UserEditorField.Name));
+            FocusPinCommand = new RelayCommand(() => SetActiveField(UserEditorField.Pin));
+            FocusSearchCommand = new RelayCommand(() => SetActiveField(UserEditorField.Search));
+            KeyCommand = new RelayCommand<string>(AppendKey);
+            BackspaceCommand = new RelayCommand(Backspace);
+            ClearFieldCommand = new RelayCommand(ClearActive);
+            SetRoleAdminCommand = new RelayCommand(() => EditorRole = UserRole.Admin);
+            SetRoleManagerCommand = new RelayCommand(() => EditorRole = UserRole.Manager);
+            SetRoleCashierCommand = new RelayCommand(() => EditorRole = UserRole.Cashier);
+
+            SelectUserCommand = new RelayCommand<User>(user =>
+            {
+                if (user != null) SelectedUser = user;
+            });
         }
 
         private void LoadUsers(string filter = "")
@@ -207,11 +251,11 @@ namespace RestaurantPOS.ViewModels.BackOffice.Users
         private void ClearEditor()
         {
             SelectedUser = null;
-
             EditorName = string.Empty;
             EditorRole = UserRole.Cashier;
             EditorPin = string.Empty;
             EditorIsActive = true;
+            OnPropertyChanged(nameof(PinDisplay));
         }
 
         // ✅ New User
@@ -219,6 +263,76 @@ namespace RestaurantPOS.ViewModels.BackOffice.Users
         private void NewUser()
         {
             ClearEditor();
+        }
+
+        // ✅ Keyboard Input Handling
+        private void SetActiveField(UserEditorField field)
+        {
+            _activeField = field;
+            OnPropertyChanged(nameof(IsNameActive));
+            OnPropertyChanged(nameof(IsPinActive));
+            OnPropertyChanged(nameof(IsSearchActive));
+        }
+
+        private void AppendKey(string? key)
+        {
+            if (key == null) return;
+
+            switch (_activeField)
+            {
+                case UserEditorField.Name:
+                    EditorName += key;
+                    break;
+
+                case UserEditorField.Pin:
+                    // PIN: digits only, max 4
+                    if (!char.IsDigit(key[0])) return;
+                    if (EditorPin.Length >= 4) return;
+                    EditorPin += key;
+                    OnPropertyChanged(nameof(PinDisplay));
+                    break;
+
+                case UserEditorField.Search:
+                    SearchText += key;
+                    break;
+            }
+        }
+
+        private void Backspace()
+        {
+            switch (_activeField)
+            {
+                case UserEditorField.Name when EditorName.Length > 0:
+                    EditorName = EditorName[..^1];
+                    break;
+
+                case UserEditorField.Pin when EditorPin.Length > 0:
+                    EditorPin = EditorPin[..^1];
+                    OnPropertyChanged(nameof(PinDisplay));
+                    break;
+                case UserEditorField.Search when SearchText.Length > 0:
+                    SearchText = SearchText[..^1];
+                    OnPropertyChanged(nameof(SearchText));
+                    break;
+            }
+        }
+
+        private void ClearActive()
+        {
+            switch (_activeField)
+            {
+                case UserEditorField.Name:
+                    EditorName = string.Empty;
+                    break;
+                case UserEditorField.Pin:
+                    EditorPin = string.Empty;
+                    OnPropertyChanged(nameof(PinDisplay));
+                    break;
+                case UserEditorField.Search:
+                    SearchText = string.Empty;
+                    OnPropertyChanged(nameof(SearchText));
+                    break;
+            }
         }
     }
 

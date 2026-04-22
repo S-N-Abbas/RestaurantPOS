@@ -26,10 +26,37 @@ namespace RestaurantPOS.UI.Views.BackOffice.Users
             InitializeComponent();
         }
 
-        private void PinBox_PasswordChanged(object sender, RoutedEventArgs e)
+        private void UserPinBox_PasswordChanged(object sender, RoutedEventArgs e)
         {
-            if (DataContext is UsersViewModel vm)
-                vm.EditorPin = PinBox.Password;
+            // Since PasswordBox isn't bindable for security, update VM manually
+            if (this.DataContext is UsersViewModel vm)
+            {
+                vm.EditorPin = ((PasswordBox)sender).Password;
+            }
+        }
+
+        private void UserPinBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (this.DataContext is UsersViewModel vm)
+            {
+                vm.FocusPinCommand.Execute(null);
+            }
+        }
+
+        private void TextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (this.DataContext is UsersViewModel vm)
+            {
+                vm.FocusNameCommand.Execute(null);
+            }
+        }
+
+        private void SearchBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (this.DataContext is UsersViewModel vm)
+            {
+                vm.FocusSearchCommand.Execute(null);
+            }
         }
     }
 }

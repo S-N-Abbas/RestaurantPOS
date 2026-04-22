@@ -5,168 +5,190 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mc:Ignorable="d"
-             d:DesignHeight="700"
-             d:DesignWidth="1100">
+             d:DesignHeight="850"
+             d:DesignWidth="1400">
 
     <Grid Background="{StaticResource BackgroundGray}">
-        <Grid Margin="30">
+        <Grid Margin="24">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3*" />
-                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="3*" />
             </Grid.ColumnDefinitions>
 
-            <Border Background="{StaticResource SurfaceWhite}"
-                    CornerRadius="16"
-                    Margin="0,0,20,0">
+            <!-- ══════════════════════════════════
+                 LEFT — User list
+                 ══════════════════════════════════ -->
+            <Border Grid.Column="0"
+                    Background="{StaticResource SurfaceWhite}"
+                    CornerRadius="16">
                 <Border.Effect>
                     <DropShadowEffect BlurRadius="15"
                                       ShadowDepth="0"
                                       Opacity="0.05" />
                 </Border.Effect>
 
-                <DockPanel Margin="25">
+                <DockPanel Margin="24">
+
+                    <!-- Header row -->
                     <DockPanel DockPanel.Dock="Top"
                                LastChildFill="False"
                                Margin="0,0,0,20">
-                        <StackPanel DockPanel.Dock="Left">
+                        <StackPanel DockPanel.Dock="Left"
+                                    VerticalAlignment="Center">
                             <TextBlock Text="Staff Management"
-                                       FontSize="24"
+                                       FontSize="22"
                                        FontWeight="Black"
                                        Foreground="{StaticResource TextDark}" />
-                            <TextBlock Text="Manage system access and roles"
+                            <TextBlock Text="Tap a user to edit, or add a new one"
                                        Foreground="{StaticResource TextMuted}"
-                                       FontSize="13" />
+                                       FontSize="12"
+                                       Margin="0,2,0,0" />
                         </StackPanel>
 
                         <Button DockPanel.Dock="Right"
                                 VerticalAlignment="Center"
-                                Content="+ New User"
-                                Command="{Binding NewUserCommand}"
+                                Height="48"
+                                Padding="20,0"
+                                FontSize="14"
+                                FontWeight="Bold"
                                 Background="{StaticResource PrimaryAccent}"
                                 Foreground="White"
-                                Padding="20,10"
-                                FontWeight="Bold">
+                                Command="{Binding NewUserCommand}">
                             <Button.Resources>
                                 <Style TargetType="Border">
                                     <Setter Property="CornerRadius"
-                                            Value="8" />
+                                            Value="10" />
                                 </Style>
                             </Button.Resources>
+                            <StackPanel Orientation="Horizontal">
+                                <iconPacks:PackIconMaterial Kind="Plus"
+                                                            Width="14"
+                                                            Height="14"
+                                                            VerticalAlignment="Center"
+                                                            Margin="0,0,8,0" />
+                                <TextBlock Text="New User"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
                         </Button>
                     </DockPanel>
 
+                    <!-- Search bar -->
                     <Border DockPanel.Dock="Top"
                             Background="#F8FAFC"
-                            CornerRadius="8"
-                            Padding="10,5"
-                            Margin="0,0,0,15"
+                            CornerRadius="10"
+                            Padding="12,0"
+                            Height="48"
+                            Margin="0,0,0,16"
                             BorderBrush="{StaticResource BorderGray}"
                             BorderThickness="1">
-                        <Grid>
+                        <Grid VerticalAlignment="Center">
                             <iconPacks:PackIconMaterial Kind="Magnify"
                                                         Foreground="{StaticResource TextMuted}"
-                                                        VerticalAlignment="Center" />
-                            <TextBox Margin="25,0,0,0"
+                                                        VerticalAlignment="Center"
+                                                        Width="16"
+                                                        Height="16" />
+                            <TextBox Margin="28,0,0,0"
                                      Background="Transparent"
                                      BorderThickness="0"
-                                     VerticalAlignment="Center"
-                                     Tag="Search users..."
+                                     VerticalContentAlignment="Center"
+                                     FontSize="14"
+                                     GotFocus="SearchBox_GotFocus"
                                      Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
                         </Grid>
                     </Border>
 
-                    <DataGrid ItemsSource="{Binding Users}"
-                              SelectedItem="{Binding SelectedUser}"
-                              AutoGenerateColumns="False"
-                              CanUserAddRows="False"
-                              HeadersVisibility="Column"
-                              GridLinesVisibility="None"
-                              SelectionMode="Single"
-                              RowHeight="50"
-                              Background="Transparent"
-                              BorderThickness="0">
-                        <DataGrid.Resources>
-                            <Style TargetType="DataGridColumnHeader">
-                                <Setter Property="Background"
-                                        Value="Transparent" />
-                                <Setter Property="Foreground"
-                                        Value="{StaticResource TextMuted}" />
-                                <Setter Property="FontWeight"
-                                        Value="SemiBold" />
-                                <Setter Property="Padding"
-                                        Value="10,0" />
-                                <Setter Property="BorderThickness"
-                                        Value="0,0,0,1" />
-                                <Setter Property="BorderBrush"
-                                        Value="{StaticResource BorderGray}" />
-                            </Style>
-                        </DataGrid.Resources>
+                    <!-- User list — touch-friendly rows -->
+                    <ItemsControl ItemsSource="{Binding Users}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Height="64"
+                                        Margin="0,0,0,4"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        Command="{Binding DataContext.SelectUserCommand,
+                                                  RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border x:Name="Bg"
+                                                    Background="Transparent"
+                                                    CornerRadius="10"
+                                                    Padding="12,0">
+                                                <Grid>
+                                                    <!-- Avatar -->
+                                                    <StackPanel Orientation="Horizontal"
+                                                                VerticalAlignment="Center">
+                                                        <Border Width="40"
+                                                                Height="40"
+                                                                CornerRadius="20"
+                                                                Background="#EFF6FF"
+                                                                Margin="0,0,14,0">
+                                                            <iconPacks:PackIconMaterial Kind="Account"
+                                                                                        Foreground="{StaticResource PrimaryAccent}"
+                                                                                        Width="18"
+                                                                                        Height="18"
+                                                                                        HorizontalAlignment="Center"
+                                                                                        VerticalAlignment="Center" />
+                                                        </Border>
 
-                        <DataGrid.Columns>
-                            <DataGridTemplateColumn Header="User"
-                                                    Width="*">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <StackPanel Orientation="Horizontal"
-                                                    VerticalAlignment="Center">
-                                            <Border Width="32"
-                                                    Height="32"
-                                                    CornerRadius="16"
-                                                    Background="#EFF6FF"
-                                                    Margin="0,0,10,0">
-                                                <iconPacks:PackIconMaterial Kind="Account"
-                                                                            Foreground="{StaticResource PrimaryAccent}"
-                                                                            Width="14"
-                                                                            Height="14"
-                                                                            HorizontalAlignment="Center"
-                                                                            VerticalAlignment="Center" />
+                                                        <StackPanel VerticalAlignment="Center">
+                                                            <TextBlock Text="{Binding Username}"
+                                                                       FontSize="15"
+                                                                       FontWeight="Bold"
+                                                                       Foreground="{StaticResource TextDark}" />
+                                                            <TextBlock Text="{Binding Role}"
+                                                                       FontSize="12"
+                                                                       Foreground="{StaticResource TextMuted}"
+                                                                       Margin="0,2,0,0" />
+                                                        </StackPanel>
+                                                    </StackPanel>
+
+                                                    <!-- Status badge -->
+                                                    <Border HorizontalAlignment="Right"
+                                                            VerticalAlignment="Center"
+                                                            CornerRadius="6"
+                                                            Padding="10,4"
+                                                            Background="{Binding IsActive,
+                                                                         Converter={StaticResource StatusToBrushConverter}}">
+                                                        <TextBlock Text="{Binding IsActive,
+                                                                   Converter={StaticResource StatusToTextConverter}}"
+                                                                   FontSize="11"
+                                                                   FontWeight="Bold"
+                                                                   Foreground="White" />
+                                                    </Border>
+                                                </Grid>
                                             </Border>
-                                            <TextBlock Text="{Binding Username}"
-                                                       VerticalAlignment="Center"
-                                                       FontWeight="Bold"
-                                                       Foreground="{StaticResource TextDark}" />
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver"
+                                                         Value="True">
+                                                    <Setter TargetName="Bg"
+                                                            Property="Background"
+                                                            Value="#F8FAFC" />
+                                                </Trigger>
+                                                <Trigger Property="IsPressed"
+                                                         Value="True">
+                                                    <Setter TargetName="Bg"
+                                                            Property="Background"
+                                                            Value="#EFF6FF" />
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
 
-                            <DataGridTemplateColumn Header="Access Role"
-                                                    Width="150">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding Role}"
-                                                   VerticalAlignment="Center"
-                                                   Foreground="{StaticResource TextDark}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-
-                            <DataGridTemplateColumn Header="Status"
-                                                    Width="100">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Border CornerRadius="10"
-                                                Padding="5"
-                                                HorizontalAlignment="Center"
-                                                VerticalAlignment="Center"
-                                                Background="{Binding IsActive, Converter={StaticResource StatusToBrushConverter}}">
-                                            <TextBlock Text="{Binding IsActive, Converter={StaticResource StatusToTextConverter}}"
-                                                       FontSize="10"
-                                                       FontWeight="Bold"
-                                                       Foreground="White" />
-                                        </Border>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                        </DataGrid.Columns>
-                    </DataGrid>
                 </DockPanel>
             </Border>
 
-            <Border Grid.Column="1"
+            <!-- ══════════════════════════════════
+                 RIGHT — Editor panel
+                 ══════════════════════════════════ -->
+            <Border Grid.Column="2"
                     Background="{StaticResource SurfaceWhite}"
-                    CornerRadius="16"
-                    Padding="30">
+                    CornerRadius="16">
                 <Border.Effect>
                     <DropShadowEffect BlurRadius="15"
                                       ShadowDepth="0"
@@ -176,96 +198,571 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
+                        <!-- Header -->
                         <RowDefinition Height="*" />
+                        <!-- Fields + keyboard -->
                         <RowDefinition Height="Auto" />
+                        <!-- Action buttons -->
                     </Grid.RowDefinitions>
 
-                    <TextBlock Text="Edit User Profile"
-                               FontSize="20"
-                               FontWeight="Black"
-                               Margin="0,0,0,25" />
+                    <!-- Editor header -->
+                    <Border Grid.Row="0"
+                            BorderBrush="{StaticResource BorderGray}"
+                            BorderThickness="0,0,0,1"
+                            Padding="24,18">
+                        <Grid>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="Edit User Profile"
+                                           FontSize="18"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource TextDark}" />
+                                <TextBlock Text="Tap a field then use the keyboard below"
+                                           FontSize="11"
+                                           Foreground="{StaticResource TextMuted}"
+                                           Margin="0,3,0,0" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
 
+                    <!-- Scrollable content -->
                     <ScrollViewer Grid.Row="1"
-                                  VerticalScrollBarVisibility="Auto">
+                                  VerticalScrollBarVisibility="Auto"
+                                  Padding="24,20,24,8">
                         <StackPanel>
+
                             <TextBlock Text="DISPLAY NAME"
                                        FontSize="11"
                                        FontWeight="Bold"
                                        Foreground="{StaticResource TextMuted}"
-                                       Margin="0,0,0,8" />
-                            <TextBox Text="{Binding EditorName}"
-                                     Height="40"
-                                     Margin="0,0,0,20" />
+                                       Margin="0,0,0,6" />
+
+                            <TextBox Text="{Binding EditorName, UpdateSourceTrigger=PropertyChanged}"
+                                     Height="52"
+                                     FontSize="16"
+                                     FontWeight="SemiBold"
+                                     Padding="12,0"
+                                     VerticalContentAlignment="Center"
+                                     Margin="0,0,0,16"
+                                     GotFocus="TextBox_GotFocus">
+                                <TextBox.Style>
+                                    <Style TargetType="TextBox"
+                                           BasedOn="{StaticResource {x:Type TextBox}}">
+                                        <Setter Property="Background"
+                                                Value="Transparent" />
+                                        <Setter Property="BorderThickness"
+                                                Value="2" />
+                                        <Setter Property="BorderBrush"
+                                                Value="{StaticResource BorderGray}" />
+                                        <Style.Resources>
+                                            <Style TargetType="Border">
+                                                <Setter Property="CornerRadius"
+                                                        Value="12" />
+                                            </Style>
+                                        </Style.Resources>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsFocused"
+                                                     Value="True">
+                                                <Setter Property="BorderBrush"
+                                                        Value="{StaticResource PrimaryAccent}" />
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBox.Style>
+                            </TextBox>
+
+                            <!-- ── System Role ── -->
 
                             <TextBlock Text="SYSTEM ROLE"
                                        FontSize="11"
                                        FontWeight="Bold"
                                        Foreground="{StaticResource TextMuted}"
                                        Margin="0,0,0,8" />
-                            <ComboBox ItemsSource="{Binding Roles}"
-                                      SelectedItem="{Binding EditorRole, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                      Height="40"
-                                      Margin="0,0,0,20" />
 
-                            <TextBlock Text="SECURITY PIN"
+                            <!-- Role chips — large tap targets -->
+
+                            <StackPanel Orientation="Horizontal"
+                                        Margin="0,0,0,20">
+
+                                <Button Height="44"
+                                        Padding="16,0"
+                                        Margin="0,0,8,0"
+                                        FontSize="13"
+                                        FontWeight="SemiBold"
+                                        BorderThickness="1">
+
+                                    <Button.Style>
+
+                                        <Style TargetType="Button">
+
+                                            <Setter Property="Background"
+                                                    Value="#F8FAFC" />
+
+                                            <Setter Property="BorderBrush"
+                                                    Value="{StaticResource BorderGray}" />
+
+                                            <Setter Property="Foreground"
+                                                    Value="{StaticResource TextDark}" />
+
+                                            <Style.Triggers>
+
+                                                <DataTrigger Binding="{Binding EditorRole}"
+                                                             Value="Admin">
+
+                                                    <Setter Property="Background"
+                                                            Value="{StaticResource PrimaryAccent}" />
+
+                                                    <Setter Property="Foreground"
+                                                            Value="White" />
+
+                                                    <Setter Property="BorderBrush"
+                                                            Value="{StaticResource PrimaryAccent}" />
+
+                                                </DataTrigger>
+
+                                            </Style.Triggers>
+
+                                        </Style>
+
+                                    </Button.Style>
+
+                                    <Button.Resources>
+
+                                        <Style TargetType="Border">
+
+                                            <Setter Property="CornerRadius"
+                                                    Value="10" />
+
+                                        </Style>
+
+                                    </Button.Resources>
+
+                                    <Button.Command>
+
+                                        <Binding Path="SetRoleAdminCommand" />
+
+                                    </Button.Command>
+
+                                    <TextBlock Text="Admin" />
+
+                                </Button>
+
+                                <Button Height="44"
+                                        Padding="16,0"
+                                        Margin="0,0,8,0"
+                                        FontSize="13"
+                                        FontWeight="SemiBold"
+                                        BorderThickness="1">
+
+                                    <Button.Style>
+
+                                        <Style TargetType="Button">
+
+                                            <Setter Property="Background"
+                                                    Value="#F8FAFC" />
+
+                                            <Setter Property="BorderBrush"
+                                                    Value="{StaticResource BorderGray}" />
+
+                                            <Setter Property="Foreground"
+                                                    Value="{StaticResource TextDark}" />
+
+                                            <Style.Triggers>
+
+                                                <DataTrigger Binding="{Binding EditorRole}"
+                                                             Value="Manager">
+
+                                                    <Setter Property="Background"
+                                                            Value="{StaticResource PrimaryAccent}" />
+
+                                                    <Setter Property="Foreground"
+                                                            Value="White" />
+
+                                                    <Setter Property="BorderBrush"
+                                                            Value="{StaticResource PrimaryAccent}" />
+
+                                                </DataTrigger>
+
+                                            </Style.Triggers>
+
+                                        </Style>
+
+                                    </Button.Style>
+
+                                    <Button.Resources>
+
+                                        <Style TargetType="Border">
+
+                                            <Setter Property="CornerRadius"
+                                                    Value="10" />
+
+                                        </Style>
+
+                                    </Button.Resources>
+
+                                    <Button.Command>
+
+                                        <Binding Path="SetRoleManagerCommand" />
+
+                                    </Button.Command>
+
+                                    <TextBlock Text="Manager" />
+
+                                </Button>
+
+                                <Button Height="44"
+                                        Padding="16,0"
+                                        FontSize="13"
+                                        FontWeight="SemiBold"
+                                        BorderThickness="1">
+
+                                    <Button.Style>
+
+                                        <Style TargetType="Button">
+
+                                            <Setter Property="Background"
+                                                    Value="#F8FAFC" />
+
+                                            <Setter Property="BorderBrush"
+                                                    Value="{StaticResource BorderGray}" />
+
+                                            <Setter Property="Foreground"
+                                                    Value="{StaticResource TextDark}" />
+
+                                            <Style.Triggers>
+
+                                                <DataTrigger Binding="{Binding EditorRole}"
+                                                             Value="Cashier">
+
+                                                    <Setter Property="Background"
+                                                            Value="{StaticResource PrimaryAccent}" />
+
+                                                    <Setter Property="Foreground"
+                                                            Value="White" />
+
+                                                    <Setter Property="BorderBrush"
+                                                            Value="{StaticResource PrimaryAccent}" />
+
+                                                </DataTrigger>
+
+                                            </Style.Triggers>
+
+                                        </Style>
+
+                                    </Button.Style>
+
+                                    <Button.Resources>
+
+                                        <Style TargetType="Border">
+
+                                            <Setter Property="CornerRadius"
+                                                    Value="10" />
+
+                                        </Style>
+
+                                    </Button.Resources>
+
+                                    <Button.Command>
+
+                                        <Binding Path="SetRoleCashierCommand" />
+
+                                    </Button.Command>
+
+                                    <TextBlock Text="Cashier" />
+
+                                </Button>
+
+                            </StackPanel>
+
+                            <TextBlock Text="SECURITY PIN (4 DIGITS)"
                                        FontSize="11"
                                        FontWeight="Bold"
                                        Foreground="{StaticResource TextMuted}"
-                                       Margin="0,0,0,8" />
-                            <PasswordBox x:Name="PinBox"
-                                         Height="40"
-                                         Margin="0,0,0,10"
-                                         PasswordChanged="PinBox_PasswordChanged" />
+                                       Margin="0,0,0,6" />
+
+                            <PasswordBox x:Name="UserPinBox"
+                                         Height="52"
+                                         FontSize="24"
+                                         FontWeight="Black"
+                                         Padding="12,0"
+                                         VerticalContentAlignment="Center"
+                                         HorizontalContentAlignment="Center"
+                                         Foreground="{StaticResource PrimaryAccent}"
+                                         Margin="0,0,0,6"
+                                         GotFocus="UserPinBox_GotFocus"
+                                         PasswordChanged="UserPinBox_PasswordChanged">
+                                <PasswordBox.Style>
+                                    <Style TargetType="PasswordBox">
+                                        <Setter Property="BorderThickness"
+                                                Value="2" />
+                                        <Setter Property="BorderBrush"
+                                                Value="{StaticResource BorderGray}" />
+                                        <Style.Resources>
+                                            <Style TargetType="Border">
+                                                <Setter Property="CornerRadius"
+                                                        Value="12" />
+                                            </Style>
+                                        </Style.Resources>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsFocused"
+                                                     Value="True">
+                                                <Setter Property="BorderBrush"
+                                                        Value="{StaticResource PrimaryAccent}" />
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </PasswordBox.Style>
+                            </PasswordBox>
+
                             <TextBlock Text="Leave empty to keep current PIN"
                                        FontSize="11"
                                        Foreground="{StaticResource TextMuted}"
-                                       Margin="0,0,0,20"
-                                       FontStyle="Italic" />
+                                       FontStyle="Italic"
+                                       Margin="0,0,0,20" />
 
-                            <CheckBox Content="Enable account access"
-                                      IsChecked="{Binding EditorIsActive}"
-                                      FontWeight="SemiBold" />
+                            <StackPanel Orientation="Horizontal"
+                                        Margin="0,0,0,20">
+                                <CheckBox IsChecked="{Binding EditorIsActive}"
+                                          VerticalAlignment="Center">
+                                    <CheckBox.LayoutTransform>
+                                        <ScaleTransform ScaleX="1.5"
+                                                        ScaleY="1.5" />
+                                    </CheckBox.LayoutTransform>
+                                </CheckBox>
+                                <TextBlock Text="Enable account access"
+                                           FontSize="14"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextDark}"
+                                           VerticalAlignment="Center"
+                                           Margin="10,0,0,0" />
+                            </StackPanel>
+
+                            <!-- ══════════════════════════════════
+                                 ON-SCREEN KEYBOARD
+                                 QWERTY rows + numpad row for PIN
+                                 ══════════════════════════════════ -->
+                            <Border Background="#F8FAFC"
+                                    CornerRadius="12"
+                                    Padding="10">
+                                <StackPanel>
+
+                                    <!-- Row 1: Q–P -->
+                                    <StackPanel Orientation="Horizontal"
+                                                HorizontalAlignment="Center"
+                                                Margin="0,0,0,5">
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter="Q" />
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter="W" />
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter="E" />
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter="R" />
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter="T" />
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter="Y" />
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter="U" />
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter="I" />
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter="O" />
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter="P" />
+                                    </StackPanel>
+
+                                    <!-- Row 2: A–L -->
+                                    <StackPanel Orientation="Horizontal"
+                                                HorizontalAlignment="Center"
+                                                Margin="0,0,0,5">
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter="A" />
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter="S" />
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter="D" />
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter="F" />
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter="G" />
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter="H" />
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter="J" />
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter="K" />
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter="L" />
+                                    </StackPanel>
+
+                                    <!-- Row 3: Z–M + Space + Backspace -->
+                                    <StackPanel Orientation="Horizontal"
+                                                HorizontalAlignment="Center"
+                                                Margin="0,0,0,5">
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter="Z" />
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter="X" />
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter="C" />
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter="V" />
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter="B" />
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter="N" />
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter="M" />
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter=" "
+                                                Content="SPACE"
+                                                Width="88" />
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding BackspaceCommand}"
+                                                Width="56">
+                                            <iconPacks:PackIconMaterial Kind="BackspaceOutline"
+                                                                        Width="15"
+                                                                        Height="15" />
+                                        </Button>
+                                    </StackPanel>
+
+                                    <!-- Row 4: Digits — used for both name and PIN -->
+                                    <StackPanel Orientation="Horizontal"
+                                                HorizontalAlignment="Center">
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter="1" />
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter="2" />
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter="3" />
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter="4" />
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter="5" />
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter="6" />
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter="7" />
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter="8" />
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter="9" />
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding KeyCommand}"
+                                                CommandParameter="0" />
+                                        <!-- Clear active field -->
+                                        <Button Style="{StaticResource KeyboardKey}"
+                                                Command="{Binding ClearFieldCommand}"
+                                                Content="CLR"
+                                                Width="52" />
+                                    </StackPanel>
+
+                                </StackPanel>
+                            </Border>
+
                         </StackPanel>
                     </ScrollViewer>
 
-                    <Grid Grid.Row="2"
-                          Margin="0,20,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
+                    <!-- ── Action buttons ── -->
+                    <Border Grid.Row="2"
+                            BorderBrush="{StaticResource BorderGray}"
+                            BorderThickness="0,1,0,0"
+                            Padding="24,16">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="12" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
 
-                        <Button Content="Save User"
-                                Command="{Binding SaveUserCommand}"
-                                Background="{StaticResource SuccessGreen}"
-                                Foreground="White"
-                                Height="45"
-                                Margin="0,0,5,0"
-                                FontWeight="Bold">
-                            <Button.Resources>
-                                <Style TargetType="Border">
-                                    <Setter Property="CornerRadius"
-                                            Value="10" />
-                                </Style>
-                            </Button.Resources>
-                        </Button>
+                            <Button Grid.Column="0"
+                                    Height="52"
+                                    FontSize="15"
+                                    FontWeight="Bold"
+                                    Background="{StaticResource SuccessGreen}"
+                                    Foreground="White"
+                                    BorderThickness="0"
+                                    Command="{Binding SaveUserCommand}">
+                                <Button.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius"
+                                                Value="12" />
+                                    </Style>
+                                </Button.Resources>
+                                <StackPanel Orientation="Horizontal">
+                                    <iconPacks:PackIconMaterial Kind="ContentSave"
+                                                                Width="16"
+                                                                Height="16"
+                                                                VerticalAlignment="Center"
+                                                                Margin="0,0,8,0" />
+                                    <TextBlock Text="Save User"
+                                               VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
 
-                        <Button Grid.Column="1"
-                                Content="Delete"
-                                Command="{Binding DeleteUserCommand}"
-                                Background="{StaticResource DangerRed}"
-                                Foreground="White"
-                                Height="45"
-                                Margin="5,0,0,0"
-                                FontWeight="Bold">
-                            <Button.Resources>
-                                <Style TargetType="Border">
-                                    <Setter Property="CornerRadius"
-                                            Value="10" />
-                                </Style>
-                            </Button.Resources>
-                        </Button>
-                    </Grid>
+                            <Button Grid.Column="2"
+                                    Height="52"
+                                    FontSize="15"
+                                    FontWeight="Bold"
+                                    Background="{StaticResource DangerRed}"
+                                    Foreground="White"
+                                    BorderThickness="0"
+                                    Command="{Binding DeleteUserCommand}">
+                                <Button.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius"
+                                                Value="12" />
+                                    </Style>
+                                </Button.Resources>
+                                <StackPanel Orientation="Horizontal">
+                                    <iconPacks:PackIconMaterial Kind="TrashCanOutline"
+                                                                Width="16"
+                                                                Height="16"
+                                                                VerticalAlignment="Center"
+                                                                Margin="0,0,8,0" />
+                                    <TextBlock Text="Delete"
+                                               VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                        </Grid>
+                    </Border>
+
                 </Grid>
             </Border>
         </Grid>

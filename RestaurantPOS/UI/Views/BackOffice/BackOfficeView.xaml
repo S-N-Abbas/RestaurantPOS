@@ -4,41 +4,98 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:RestaurantPOS.UI.Views.BackOffice"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="800">
-    <Grid Margin="20">
-        <UniformGrid Rows="2">
-            <UniformGrid Columns="3">
+    <Grid Background="{StaticResource BackgroundGray}">
+        <StackPanel VerticalAlignment="Center"
+                    HorizontalAlignment="Center">
 
-                <Button Content="USERS"
-                        Style="{StaticResource PosTileButton}"
-                        Command="{Binding UsersCommand}" />
+            <TextBlock Text="Management &amp; Config"
+                       FontSize="32"
+                       FontWeight="Black"
+                       Foreground="{StaticResource TextDark}"
+                       HorizontalAlignment="Center"
+                       Margin="0,0,0,8" />
+            <TextBlock Text="Configure your system settings and resources"
+                       FontSize="16"
+                       Foreground="{StaticResource TextMuted}"
+                       HorizontalAlignment="Center"
+                       Margin="0,0,0,40" />
 
-                <Button Content="CATEGORIES"
-                        Style="{StaticResource PosTileButton}"
-                        Command="{Binding CategoriesCommand}" />
+            <UniformGrid Columns="3"
+                         Width="750">
 
-                <Button Content="PRODUCTS"
-                        Style="{StaticResource PosTileButton}"
-                        Command="{Binding ProductsCommand}" />
+                <Button Style="{StaticResource ItemTile}"
+                        Height="180"
+                        Margin="10"
+                        Command="{Binding UsersCommand}">
+                    <StackPanel VerticalAlignment="Center">
+                        <iconPacks:PackIconMaterial Kind="AccountGroup"
+                                                    Width="40"
+                                                    Height="40"
+                                                    Foreground="#6366F1"
+                                                    HorizontalAlignment="Center"
+                                                    Margin="0,0,0,15" />
+                        <TextBlock Text="USERS"
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource TextDark}"
+                                   TextAlignment="Center" />
+                        <TextBlock Text="Staff &amp; Permissions"
+                                   FontSize="12"
+                                   Foreground="{StaticResource TextMuted}"
+                                   TextAlignment="Center" />
+                    </StackPanel>
+                </Button>
+
+                <Button Style="{StaticResource ItemTile}"
+                        Height="180"
+                        Margin="10"
+                        Command="{Binding TablesCommand}">
+                    <StackPanel VerticalAlignment="Center">
+                        <iconPacks:PackIconMaterial Kind="TableChair"
+                                                    Width="40"
+                                                    Height="40"
+                                                    Foreground="#0D9488"
+                                                    HorizontalAlignment="Center"
+                                                    Margin="0,0,0,15" />
+                        <TextBlock Text="TABLES"
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource TextDark}"
+                                   TextAlignment="Center" />
+                        <TextBlock Text="Floor Plan Layout"
+                                   FontSize="12"
+                                   Foreground="{StaticResource TextMuted}"
+                                   TextAlignment="Center" />
+                    </StackPanel>
+                </Button>
+
+                <Button Style="{StaticResource ItemTile}"
+                        Height="180"
+                        Margin="10"
+                        Command="{Binding SettingsCommand}">
+                    <StackPanel VerticalAlignment="Center">
+                        <iconPacks:PackIconMaterial Kind="Cog"
+                                                    Width="40"
+                                                    Height="40"
+                                                    Foreground="#64748B"
+                                                    HorizontalAlignment="Center"
+                                                    Margin="0,0,0,15" />
+                        <TextBlock Text="SETTINGS"
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource TextDark}"
+                                   TextAlignment="Center" />
+                        <TextBlock Text="System Configuration"
+                                   FontSize="12"
+                                   Foreground="{StaticResource TextMuted}"
+                                   TextAlignment="Center" />
+                    </StackPanel>
+                </Button>
 
             </UniformGrid>
-            <UniformGrid Columns="3">
-
-                <Button Content="TABLES"
-                        Style="{StaticResource PosTileButton}"
-                        Command="{Binding TablesCommand}" />
-
-                <Button Content="COVERS"
-                        Style="{StaticResource PosTileButton}"
-                        Command="{Binding CoversCommand}" />
-
-                <Button Content="SETTINGS"
-                        Style="{StaticResource PosTileButton}"
-                        Command="{Binding SettingsCommand}" />
-
-            </UniformGrid>
-        </UniformGrid>
-        
+        </StackPanel>
     </Grid>
 </UserControl>

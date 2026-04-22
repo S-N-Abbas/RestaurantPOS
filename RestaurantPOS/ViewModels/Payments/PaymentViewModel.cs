@@ -30,8 +30,8 @@ namespace RestaurantPOS.ViewModels.Payments
         public OrderState _orderState { get; }
         public OrderStore _orderStore { get; }
 
-        // UK currency labels
-        public string TableLabel => $"Table {_orderState.ContextId}";
+        
+        public string TableLabel => _orderState.ContextId > 0 ? $"Table {_orderState.ContextId}" : $"{_orderState.Order?.OrderType.ToString()}";
 
         // Payment amounts
 

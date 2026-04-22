@@ -48,9 +48,9 @@ namespace RestaurantPOS.Services
 
             // 1. BRANDING & HEADER
             AddLogo(doc);
-            doc.Blocks.Add(Title("NAWAB PALACE"));
-            doc.Blocks.Add(Center("136 Rochdale Rd, Bury"));
-            doc.Blocks.Add(Center("Tel: 0161 217 0541"));
+            doc.Blocks.Add(Title(_settingsService.Settings.BusinessName));
+            doc.Blocks.Add(Center(_settingsService.Settings.AddressLine1));
+            doc.Blocks.Add(Center("Tel: " + _settingsService.Settings.PhoneNo));
             doc.Blocks.Add(Spacer(8));
             doc.Blocks.Add(Line());
 
@@ -60,13 +60,16 @@ namespace RestaurantPOS.Services
             metaTable.Columns.Add(new TableColumn { Width = new GridLength(1, GridUnitType.Star) });
             metaTable.Columns.Add(new TableColumn { Width = new GridLength(1, GridUnitType.Star) });
             var metaRow = new TableRow();
-            metaRow.Cells.Add(Cell($"Table: {order.ContextId}", fontWeight: FontWeights.Bold));
+            if(order.Table != null)
+                metaRow.Cells.Add(Cell($"Table: {order.Table.Number}", fontWeight: FontWeights.Bold));
+            else
+                metaRow.Cells.Add(Cell($"{order.OrderType.ToString()}", fontWeight: FontWeights.Bold));
             metaRow.Cells.Add(Cell($"ID: #{order.Id}", TextAlignment.Right));
             metaTable.RowGroups.Add(new TableRowGroup());
             metaTable.RowGroups[0].Rows.Add(metaRow);
             doc.Blocks.Add(metaTable);
 
-            doc.Blocks.Add(TwoColumn($"Server: {_userSessionService?.CurrentUser?.Username}", $"Till: 1"));
+            doc.Blocks.Add(TwoColumn($"Server: {order.CreatedBy}", $"Till: {order.TillNo}"));
             doc.Blocks.Add(Center($"{DateTime.Now:dd/MM/yyyy HH:mm}"));
             doc.Blocks.Add(Line());
 
@@ -115,7 +118,8 @@ namespace RestaurantPOS.Services
             // 6. FOOTER
             doc.Blocks.Add(Spacer(10));
             doc.Blocks.Add(CenterBold("THANK YOU FOR YOUR VISIT!"));
-            doc.Blocks.Add(Center("VAT No: 123 4567 89")); // Common in UK
+            if(_settingsService.Settings.VatNo != null)
+                doc.Blocks.Add(Center($"VAT No: {_settingsService.Settings.VatNo}")); // Common in UK
             doc.Blocks.Add(Spacer(6));
             doc.Blocks.Add(Center("Developed By"));
             doc.Blocks.Add(CenterBold("EPS Tech Mirpur"));
