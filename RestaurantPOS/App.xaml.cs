@@ -85,7 +85,7 @@ namespace RestaurantPOS
             // Other Services
             services.AddScoped<IMenuDataService, MenuDataService>();
             services.AddSingleton<IOrderContextService, OrderContextService>();
-            services.AddScoped<ITableService, TableService>();
+            services.AddTransient<ITableService, TableService>();
             services.AddSingleton<IUserService, UserService>();
             services.AddScoped<OrderService>();
             services.AddSingleton<OrderStore>();
