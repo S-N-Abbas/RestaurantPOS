@@ -16,7 +16,9 @@ namespace RestaurantPOS.Services
         void NavigateTo<TViewModel>() where TViewModel : ViewModelBase;
         void NavigateTo<TViewModel>(object parameter) where TViewModel : ViewModelBase;
 
-        void GoBack(); // Add this
-        bool CanGoBack { get; } // Add this
+        void GoBack();
+        bool CanGoBack { get; }
+
+        void ClearHistory();
     }
 }

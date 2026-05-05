@@ -235,6 +235,23 @@ namespace RestaurantPOS.Services
             await _db.SaveChangesAsync();
         }
 
+        public async Task UpdateOpenItemQuantityAsync(int orderId, int orderItemId, int quantity)
+        {
+            var item = await _db.OrderItems
+                .FirstOrDefaultAsync(i =>
+                    i.OrderId == orderId &&
+                    i.Id == orderItemId &&
+                    i.ProductId == null);   // safety guard — only removes open items
+
+            if (item == null) return;
+
+            if(quantity <= 0)
+                _db.OrderItems.Remove(item);
+            else
+                item.Quantity = quantity;
+            await _db.SaveChangesAsync();
+        }
+
         public async Task UpdateQuantityAsync(
     int orderId,
     int productId,

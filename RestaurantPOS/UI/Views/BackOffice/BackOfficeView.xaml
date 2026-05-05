@@ -23,7 +23,7 @@
                        HorizontalAlignment="Center"
                        Margin="0,0,0,40" />
 
-            <UniformGrid Columns="3"
+            <UniformGrid Columns="2"
                          Width="750">
 
                 <Button Style="{StaticResource ItemTile}"
@@ -43,29 +43,6 @@
                                    Foreground="{StaticResource TextDark}"
                                    TextAlignment="Center" />
                         <TextBlock Text="Staff &amp; Permissions"
-                                   FontSize="12"
-                                   Foreground="{StaticResource TextMuted}"
-                                   TextAlignment="Center" />
-                    </StackPanel>
-                </Button>
-
-                <Button Style="{StaticResource ItemTile}"
-                        Height="180"
-                        Margin="10"
-                        Command="{Binding TablesCommand}">
-                    <StackPanel VerticalAlignment="Center">
-                        <iconPacks:PackIconMaterial Kind="TableChair"
-                                                    Width="40"
-                                                    Height="40"
-                                                    Foreground="#0D9488"
-                                                    HorizontalAlignment="Center"
-                                                    Margin="0,0,0,15" />
-                        <TextBlock Text="TABLES"
-                                   FontSize="18"
-                                   FontWeight="Bold"
-                                   Foreground="{StaticResource TextDark}"
-                                   TextAlignment="Center" />
-                        <TextBlock Text="Floor Plan Layout"
                                    FontSize="12"
                                    Foreground="{StaticResource TextMuted}"
                                    TextAlignment="Center" />

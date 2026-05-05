@@ -1008,75 +1008,86 @@
                                FontWeight="Bold"
                                Foreground="{StaticResource TextMuted}"
                                Margin="0,0,0,6" />
-                    <Border Height="56"
-                            BorderThickness="2"
-                            CornerRadius="12"
-                            Margin="0,0,0,16">
-                        <Border.Style>
-                            <Style TargetType="Border">
+
+                    <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
+                             Height="56"
+                             FontSize="18"
+                             FontWeight="SemiBold"
+                             Padding="16,0"
+                             VerticalContentAlignment="Center"
+                             Foreground="{StaticResource TextDark}"
+                             Margin="0,0,0,16"
+                             GotFocus="ProductName_GotFocus">
+                        <TextBox.Style>
+                            <Style TargetType="TextBox"
+                                   BasedOn="{StaticResource {x:Type TextBox}}">
+                                <Setter Property="Background"
+                                        Value="Transparent" />
+                                <Setter Property="BorderThickness"
+                                        Value="2" />
                                 <Setter Property="BorderBrush"
                                         Value="{StaticResource BorderGray}" />
+                                <Style.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius"
+                                                Value="12" />
+                                    </Style>
+                                </Style.Resources>
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsNameActive}"
-                                                 Value="True">
+                                    <Trigger Property="IsFocused"
+                                             Value="True">
                                         <Setter Property="BorderBrush"
                                                 Value="{StaticResource PrimaryAccent}" />
-                                    </DataTrigger>
+                                    </Trigger>
                                 </Style.Triggers>
                             </Style>
-                        </Border.Style>
-                        <Button Command="{Binding FocusNameCommand}"
-                                Background="Transparent"
-                                BorderThickness="0"
-                                HorizontalContentAlignment="Left"
-                                Padding="16,0">
-                            <TextBlock Text="{Binding Name}"
-                                       FontSize="18"
-                                       FontWeight="SemiBold"
-                                       Foreground="{StaticResource TextDark}"
-                                       VerticalAlignment="Center" />
-                        </Button>
-                    </Border>
+                        </TextBox.Style>
+                    </TextBox>
 
-                    <!-- ── Price field — Product only ── -->
-                    <StackPanel Visibility="{Binding IsProductMode,
-                                     Converter={StaticResource BoolToVisibilityConverter}}"
+                    <StackPanel Visibility="{Binding IsProductMode, Converter={StaticResource BoolToVisibilityConverter}}"
                                 Margin="0,0,0,16">
                         <TextBlock FontSize="12"
                                    FontWeight="Bold"
                                    Foreground="{StaticResource TextMuted}"
                                    Margin="0,0,0,6">
-                            <Run Text="Price " />
-                            <Run Text="{Binding CurrencySymbol, Mode=OneWay}" />
+        <Run Text="Price " />
+        <Run Text="{Binding CurrencySymbol, Mode=OneWay}" />
                         </TextBlock>
-                        <Border Height="56"
-                                BorderThickness="2"
-                                CornerRadius="12">
-                            <Border.Style>
-                                <Style TargetType="Border">
+
+                        <!-- Price Box -->
+                        <TextBox Text="{Binding Price, UpdateSourceTrigger=PropertyChanged}"
+                                 Height="56"
+                                 FontSize="18"
+                                 FontWeight="SemiBold"
+                                 Padding="16,0"
+                                 VerticalContentAlignment="Center"
+                                 Foreground="{StaticResource TextDark}"
+                                 GotFocus="ProductPrice_GotFocus">
+                            <TextBox.Style>
+                                <Style TargetType="TextBox"
+                                       BasedOn="{StaticResource {x:Type TextBox}}">
+                                    <Setter Property="Background"
+                                            Value="Transparent" />
+                                    <Setter Property="BorderThickness"
+                                            Value="2" />
                                     <Setter Property="BorderBrush"
                                             Value="{StaticResource BorderGray}" />
+                                    <Style.Resources>
+                                        <Style TargetType="Border">
+                                            <Setter Property="CornerRadius"
+                                                    Value="12" />
+                                        </Style>
+                                    </Style.Resources>
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsPriceActive}"
-                                                     Value="True">
+                                        <Trigger Property="IsFocused"
+                                                 Value="True">
                                             <Setter Property="BorderBrush"
                                                     Value="{StaticResource PrimaryAccent}" />
-                                        </DataTrigger>
+                                        </Trigger>
                                     </Style.Triggers>
                                 </Style>
-                            </Border.Style>
-                            <Button Command="{Binding FocusPriceCommand}"
-                                    Background="Transparent"
-                                    BorderThickness="0"
-                                    HorizontalContentAlignment="Left"
-                                    Padding="16,0">
-                                <TextBlock Text="{Binding Price}"
-                                           FontSize="18"
-                                           FontWeight="SemiBold"
-                                           Foreground="{StaticResource TextDark}"
-                                           VerticalAlignment="Center" />
-                            </Button>
-                        </Border>
+                            </TextBox.Style>
+                        </TextBox>
                     </StackPanel>
 
                     <!-- ── Category picker — Product only ── -->
@@ -1618,7 +1629,8 @@
                                  BorderThickness="0"
                                  Background="Transparent"
                                  VerticalContentAlignment="Center"
-                                 HorizontalContentAlignment="Left" />
+                                 HorizontalContentAlignment="Left"
+                                 GotFocus="NameBox_GotFocus"/>
                     </Border>
 
                     <!-- Price field -->
@@ -1655,7 +1667,8 @@
                                  FontWeight="SemiBold"
                                  BorderThickness="0"
                                  Background="Transparent"
-                                 VerticalContentAlignment="Center" />
+                                 VerticalContentAlignment="Center" 
+                                 GotFocus="PriceBox_GotFocus"/>
                     </Border>
 
                     <!-- On-screen keyboard -->

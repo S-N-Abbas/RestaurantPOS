@@ -59,5 +59,10 @@ namespace RestaurantPOS.Services
                 CurrentViewModel = previous;
             }
         }
+
+        public void ClearHistory()
+        {
+            _history.Clear();
+        }
     }
 }

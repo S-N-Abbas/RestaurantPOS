@@ -434,10 +434,19 @@ namespace RestaurantPOS.ViewModels.Orders
             if (_orderState.Order == null)
                 return;
 
-            await _orderService.UpdateQuantityAsync(
-                _orderState.Order.Id,
-                item.ItemId,
-                item.Quantity);
+            // open item
+            if(item.ItemId == 0)
+            {
+                await _orderService.UpdateOpenItemQuantityAsync(_orderState.Order.Id, item.OrderItemId, item.Quantity);
+            }
+            else
+            {
+                await _orderService.UpdateQuantityAsync(
+                    _orderState.Order.Id,
+                    item.ItemId,
+                    item.Quantity);
+            }
+
 
             var updatedOrder = await _orderService.GetByIdAsync(_orderState.Order.Id);
             _orderState.UpdateFrom(updatedOrder);

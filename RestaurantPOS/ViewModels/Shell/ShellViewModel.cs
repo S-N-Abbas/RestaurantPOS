@@ -81,6 +81,9 @@ namespace RestaurantPOS.ViewModels.Shell
             _userSessionService = userSessionService;
             _settingsService = settingsService;
 
+            RestaurantName = _settingsService.Settings.BusinessName;
+            TerminalInfo = _settingsService.Settings.TillNo;
+
             // Subscribe to changes
             _userSessionService.UserChanged += UpdateUserProperties;
             _settingsService.SettingsChanged += SettingsChanged;
@@ -118,6 +121,7 @@ namespace RestaurantPOS.ViewModels.Shell
         {
             _userSessionService.Logout();
             _navigationService.NavigateTo<LoginViewModel>();
+            _navigationService.ClearHistory(); // Clear history to prevent going back to authenticated views
         }
 
         private void OnClose()
