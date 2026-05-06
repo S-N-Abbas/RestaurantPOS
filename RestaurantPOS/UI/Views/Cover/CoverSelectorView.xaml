@@ -1,17 +1,19 @@
 ﻿<UserControl x:Class="RestaurantPOS.UI.Views.Cover.CoverSelectorView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:RestaurantPOS.UI.Views.Cover"
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
-             mc:Ignorable="d" 
-             d:DesignHeight="900" d:DesignWidth="1200">
+             mc:Ignorable="d"
+             d:DesignHeight="1080"
+             d:DesignWidth="1200">
+
     <Border Background="#CC1E293B">
-        <Border Width="400"
+        <Border Width="600"
                 Background="White"
                 CornerRadius="20"
-                Padding="24"
+                Padding="28"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center">
             <Border.Effect>
@@ -20,201 +22,353 @@
                                   Opacity="0.2" />
             </Border.Effect>
 
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+            <StackPanel>
 
-                <StackPanel Margin="0,0,0,24">
-                    <TextBlock Text="Guest Covers"
-                               FontSize="24"
-                               FontWeight="Black"
-                               Foreground="#1E293B" />
-                    <TextBlock Text="Set the number of people at the table"
-                               FontSize="13"
-                               Foreground="#64748B" />
-                </StackPanel>
+                <!-- ── Header ── -->
+                <Grid Margin="0,0,0,20">
+                    <StackPanel>
+                        <TextBlock Text="Guest Covers"
+                                   FontSize="22"
+                                   FontWeight="Black"
+                                   Foreground="#1E293B" />
+                        <TextBlock Text="Set guest numbers and optional cover labels"
+                                   FontSize="12"
+                                   Foreground="#64748B"
+                                   Margin="0,3,0,0" />
+                    </StackPanel>
+                </Grid>
 
-                <StackPanel Grid.Row="1"
-                            Margin="0,0,0,20">
-                    <Border Background="#F8FAFC"
-                            CornerRadius="12"
-                            Padding="12"
-                            Margin="0,0,0,8"
-                            BorderBrush="#E2E8F0"
-                            BorderThickness="1">
-                        <Grid>
-                            <StackPanel Orientation="Horizontal">
-                                <iconPacks:PackIconMaterial Kind="Account"
-                                                            VerticalAlignment="Center"
-                                                            Foreground="#2563EB"
-                                                            Width="18" />
-                                <TextBlock Text="Adults"
-                                           VerticalAlignment="Center"
-                                           Margin="10,0,0,0"
-                                           FontSize="16"
-                                           FontWeight="SemiBold"
-                                           Foreground="#1E293B" />
-                            </StackPanel>
-
-                            <StackPanel Orientation="Horizontal"
-                                        HorizontalAlignment="Right">
-                                <Button Style="{StaticResource CircleActionButton}"
-                                        Content="−"
-                                        Command="{Binding DecreaseAdultsCommand}" />
-                                <TextBox Text="{Binding AdultCovers}"
-                                         Width="50"
-                                         BorderThickness="0"
-                                         Background="Transparent"
-                                         FontSize="20"
-                                         FontWeight="Bold"
-                                         Foreground="#2563EB"
-                                         GotFocus="AdultsBox_GotFocus"
-                                         HorizontalContentAlignment="Center"
-                                         VerticalAlignment="Center" />
-                                <Button Style="{StaticResource CircleActionButton}"
-                                        Content="+"
-                                        Command="{Binding IncreaseAdultsCommand}" />
-                            </StackPanel>
-                        </Grid>
-                    </Border>
-
-                    <Border Background="#F8FAFC"
-                            CornerRadius="12"
-                            Padding="12"
-                            BorderBrush="#E2E8F0"
-                            BorderThickness="1">
-                        <Grid>
-                            <StackPanel Orientation="Horizontal">
-                                <iconPacks:PackIconMaterial Kind="HumanChild"
-                                                            VerticalAlignment="Center"
-                                                            Foreground="#2563EB"
-                                                            Width="18" />
-                                <TextBlock Text="Children"
-                                           VerticalAlignment="Center"
-                                           Margin="10,0,0,0"
-                                           FontSize="16"
-                                           FontWeight="SemiBold"
-                                           Foreground="#1E293B" />
-                            </StackPanel>
-
-                            <StackPanel Orientation="Horizontal"
-                                        HorizontalAlignment="Right">
-                                <Button Style="{StaticResource CircleActionButton}"
-                                        Content="−"
-                                        Command="{Binding DecreaseChildrenCommand}" />
-                                <TextBox Text="{Binding ChildCovers}"
-                                         Width="50"
-                                         BorderThickness="0"
-                                         Background="Transparent"
-                                         FontSize="20"
-                                         FontWeight="Bold"
-                                         Foreground="#2563EB"
-                                         GotFocus="ChildrenBox_GotFocus"
-                                         HorizontalContentAlignment="Center"
-                                         VerticalAlignment="Center" />
-                                <Button Style="{StaticResource CircleActionButton}"
-                                        Content="+"
-                                        Command="{Binding IncreaseChildrenCommand}" />
-                            </StackPanel>
-                        </Grid>
-                    </Border>
-                    <!-- ── Custom Label Row A ── -->
-                    <TextBlock Text="Cover A Label (optional)"
-                               FontSize="11"
-                               FontWeight="Bold"
-                               Foreground="{StaticResource TextMuted}"
-                               Margin="0,16,0,6" />
+                <!-- ── Adults row ── -->
+                <Border Background="#F8FAFC"
+                        CornerRadius="12"
+                        Padding="8"
+                        Margin="0,0,0,8"
+                        BorderBrush="#E2E8F0"
+                        BorderThickness="1">
                     <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="12" />
-                            <ColumnDefinition Width="120" />
-                        </Grid.ColumnDefinitions>
-
-                        <!-- Label field -->
-                        <Border Height="48"
-                                BorderThickness="1"
-                                CornerRadius="10"
-                                BorderBrush="{StaticResource BorderGray}"
-                                Background="White">
-                            <TextBox Text="{Binding CoverALabel, UpdateSourceTrigger=PropertyChanged}"
-                                     FontSize="14"
-                                     Padding="12,0"
+                        <StackPanel Orientation="Horizontal"
+                                    VerticalAlignment="Center">
+                            <iconPacks:PackIconMaterial Kind="Account"
+                                                        VerticalAlignment="Center"
+                                                        Foreground="#2563EB"
+                                                        Width="18" />
+                            <TextBlock Text="Adults"
+                                       VerticalAlignment="Center"
+                                       Margin="10,0,0,0"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Foreground="#1E293B" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Right">
+                            <Button Style="{StaticResource CircleActionButton}"
+                                    Content="−"
+                                    Command="{Binding DecreaseAdultsCommand}" />
+                            <TextBox Text="{Binding AdultCovers}"
+                                     Width="50"
                                      BorderThickness="0"
                                      Background="Transparent"
-                                     VerticalContentAlignment="Center"
-                                      />
-                        </Border>
-
-                        <!-- Price field -->
-                        <Border Grid.Column="2"
-                                Height="48"
-                                BorderThickness="1"
-                                CornerRadius="10"
-                                BorderBrush="{StaticResource BorderGray}"
-                                Background="White">
-                            <TextBox Text="{Binding CoverAPrice, UpdateSourceTrigger=PropertyChanged}"
-                                     FontSize="14"
-                                     Padding="12,0"
-                                     BorderThickness="0"
-                                     Background="Transparent"
-                                     VerticalContentAlignment="Center"
-                                      />
-                        </Border>
+                                     FontSize="20"
+                                     FontWeight="Bold"
+                                     Foreground="#2563EB"
+                                     GotFocus="AdultsBox_GotFocus"
+                                     HorizontalContentAlignment="Center"
+                                     VerticalAlignment="Center" />
+                            <Button Style="{StaticResource CircleActionButton}"
+                                    Content="+"
+                                    Command="{Binding IncreaseAdultsCommand}" />
+                        </StackPanel>
                     </Grid>
+                </Border>
 
-                    <!-- ── Custom Label Row B ── -->
-                    <TextBlock Text="Cover B Label (optional)"
-                               FontSize="11"
-                               FontWeight="Bold"
-                               Foreground="{StaticResource TextMuted}"
-                               Margin="0,12,0,6" />
+                <!-- ── Children row ── -->
+                <Border Background="#F8FAFC"
+                        CornerRadius="12"
+                        Padding="8"
+                        Margin="0,0,0,16"
+                        BorderBrush="#E2E8F0"
+                        BorderThickness="1">
                     <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="12" />
-                            <ColumnDefinition Width="120" />
-                        </Grid.ColumnDefinitions>
-
-                        <Border Height="48"
-                                BorderThickness="1"
-                                CornerRadius="10"
-                                BorderBrush="{StaticResource BorderGray}"
-                                Background="White">
-                            <TextBox Text="{Binding CoverBLabel, UpdateSourceTrigger=PropertyChanged}"
-                                     FontSize="14"
-                                     Padding="12,0"
+                        <StackPanel Orientation="Horizontal"
+                                    VerticalAlignment="Center">
+                            <iconPacks:PackIconMaterial Kind="HumanChild"
+                                                        VerticalAlignment="Center"
+                                                        Foreground="#2563EB"
+                                                        Width="18" />
+                            <TextBlock Text="Children"
+                                       VerticalAlignment="Center"
+                                       Margin="10,0,0,0"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Foreground="#1E293B" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Right">
+                            <Button Style="{StaticResource CircleActionButton}"
+                                    Content="−"
+                                    Command="{Binding DecreaseChildrenCommand}" />
+                            <TextBox Text="{Binding ChildCovers}"
+                                     Width="50"
                                      BorderThickness="0"
                                      Background="Transparent"
-                                     VerticalContentAlignment="Center"
-                                      />
-                        </Border>
-
-                        <Border Grid.Column="2"
-                                Height="48"
-                                BorderThickness="1"
-                                CornerRadius="10"
-                                BorderBrush="{StaticResource BorderGray}"
-                                Background="White">
-                            <TextBox Text="{Binding CoverBPrice, UpdateSourceTrigger=PropertyChanged}"
-                                     FontSize="14"
-                                     Padding="12,0"
-                                     BorderThickness="0"
-                                     Background="Transparent"
-                                     VerticalContentAlignment="Center"
-                                    />
-                        </Border>
+                                     FontSize="20"
+                                     FontWeight="Bold"
+                                     Foreground="#2563EB"
+                                     GotFocus="ChildrenBox_GotFocus"
+                                     HorizontalContentAlignment="Center"
+                                     VerticalAlignment="Center" />
+                            <Button Style="{StaticResource CircleActionButton}"
+                                    Content="+"
+                                    Command="{Binding IncreaseChildrenCommand}" />
+                        </StackPanel>
                     </Grid>
-                </StackPanel>
+                </Border>
 
-                <UniformGrid Grid.Row="2"
-                             Columns="3"
+                <!-- ── Cover A label + price ── -->
+                <TextBlock Text="COVER A LABEL (optional)"
+                           FontSize="10"
+                           FontWeight="Bold"
+                           Foreground="#94A3B8"
+                           Margin="0,0,0,6" />
+                <Grid Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="10" />
+                        <ColumnDefinition Width="110" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Label field — Now Hardware Keyboard Compatible -->
+                    <TextBox Text="{Binding CoverALabel, UpdateSourceTrigger=PropertyChanged}"
+                             Grid.Column="0"
+                             Height="48"
+                             FontSize="14"
+                             Padding="12,0"
+                             VerticalContentAlignment="Center"
+                             GotFocus="CoverA_GotFocus">
+                        <TextBox.Style>
+                            <Style TargetType="TextBox"
+                                   BasedOn="{StaticResource {x:Type TextBox}}">
+                                <Setter Property="Background"
+                                        Value="White" />
+                                <Setter Property="BorderThickness"
+                                        Value="2" />
+                                <Setter Property="BorderBrush"
+                                        Value="#E2E8F0" />
+                                <Style.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius"
+                                                Value="10" />
+                                    </Style>
+                                </Style.Resources>
+                                <Style.Triggers>
+                                    <!-- Highlight border when focused via Tab or Click -->
+                                    <Trigger Property="IsFocused"
+                                             Value="True">
+                                        <Setter Property="BorderBrush"
+                                                Value="#2563EB" />
+                                    </Trigger>
+                                    <!-- Watermark Logic: Shows "e.g. Adults" when empty and NOT focused -->
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding CoverALabel}"
+                                                       Value="" />
+                                            <Condition Binding="{Binding IsFocused, RelativeSource={RelativeSource Self}}"
+                                                       Value="False" />
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="Foreground"
+                                                Value="#94A3B8" />
+                                        <!-- Note: Real placeholders usually require a Template change, 
+                             for now this ensures the text is visible/editable -->
+                                    </MultiDataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
+
+                    <!-- Price field (Already a TextBox, but added focus highlight) -->
+                    <TextBox Text="{Binding CoverAPrice, UpdateSourceTrigger=PropertyChanged}"
+                             Grid.Column="2"
+                             Height="48"
+                             FontSize="14"
+                             Padding="12,0"
+                             VerticalContentAlignment="Center"
+                             BorderThickness="1"
+                             BorderBrush="#E2E8F0"
+                             GotFocus="AdultsPriceBox_GotFocus">
+                        <TextBox.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius"
+                                        Value="10" />
+                            </Style>
+                        </TextBox.Resources>
+                    </TextBox>
+                </Grid>
+
+                <!-- ── Cover B label + price ── -->
+                <TextBlock Text="COVER B LABEL (optional)"
+                           FontSize="10"
+                           FontWeight="Bold"
+                           Foreground="#94A3B8"
+                           Margin="0,0,0,6" />
+                <Grid Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="10" />
+                        <ColumnDefinition Width="110" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBox Text="{Binding CoverBLabel, UpdateSourceTrigger=PropertyChanged}"
+                             Grid.Column="0"
+                             Height="48"
+                             FontSize="14"
+                             Padding="12,0"
+                             VerticalContentAlignment="Center"
+                             GotFocus="CoverB_GotFocus">
+                        <TextBox.Style>
+                            <Style TargetType="TextBox"
+                                   BasedOn="{StaticResource {x:Type TextBox}}">
+                                <Setter Property="Background"
+                                        Value="White" />
+                                <Setter Property="BorderThickness"
+                                        Value="2" />
+                                <Setter Property="BorderBrush"
+                                        Value="#E2E8F0" />
+                                <Style.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius"
+                                                Value="10" />
+                                    </Style>
+                                </Style.Resources>
+                                <Style.Triggers>
+                                    <Trigger Property="IsFocused"
+                                             Value="True">
+                                        <Setter Property="BorderBrush"
+                                                Value="#2563EB" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
+
+                    <TextBox Text="{Binding CoverBPrice, UpdateSourceTrigger=PropertyChanged}"
+                             Grid.Column="2"
+                             Height="48"
+                             FontSize="14"
+                             Padding="12,0"
+                             VerticalContentAlignment="Center"
+                             BorderThickness="1"
+                             BorderBrush="#E2E8F0"
+                             GotFocus="ChildrenPriceBox_GotFocus">
+                        <TextBox.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius"
+                                        Value="10" />
+                            </Style>
+                        </TextBox.Resources>
+                    </TextBox>
+                </Grid>
+
+                <!-- ── Keyboard mode toggle pill ── -->
+                <Border Background="#F1F5F9"
+                        CornerRadius="10"
+                        Padding="4"
+                        Margin="0,0,0,12"
+                        HorizontalAlignment="Center">
+                    <StackPanel Orientation="Horizontal">
+
+                        <!-- 123 button -->
+                        <Button Height="36"
+                                Padding="20,0"
+                                FontSize="13"
+                                FontWeight="Bold"
+                                BorderThickness="0"
+                                Command="{Binding ToggleKeyboardCommand}">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Background"
+                                            Value="Transparent" />
+                                    <Setter Property="Foreground"
+                                            Value="#64748B" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsNumpadMode}"
+                                                     Value="True">
+                                            <Setter Property="Background"
+                                                    Value="White" />
+                                            <Setter Property="Foreground"
+                                                    Value="#2563EB" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius"
+                                            Value="8" />
+                                </Style>
+                            </Button.Resources>
+                            <StackPanel Orientation="Horizontal">
+                                <iconPacks:PackIconMaterial Kind="Numeric"
+                                                            Width="14"
+                                                            Height="14"
+                                                            VerticalAlignment="Center"
+                                                            Margin="0,0,6,0" />
+                                <TextBlock Text="123"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+
+                        <!-- ABC button -->
+                        <Button Height="36"
+                                Padding="20,0"
+                                FontSize="13"
+                                FontWeight="Bold"
+                                BorderThickness="0"
+                                Command="{Binding ToggleKeyboardCommand}">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Background"
+                                            Value="Transparent" />
+                                    <Setter Property="Foreground"
+                                            Value="#64748B" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsQwertyMode}"
+                                                     Value="True">
+                                            <Setter Property="Background"
+                                                    Value="White" />
+                                            <Setter Property="Foreground"
+                                                    Value="#2563EB" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius"
+                                            Value="8" />
+                                </Style>
+                            </Button.Resources>
+                            <StackPanel Orientation="Horizontal">
+                                <iconPacks:PackIconMaterial Kind="Alphabetical"
+                                                            Width="14"
+                                                            Height="14"
+                                                            VerticalAlignment="Center"
+                                                            Margin="0,0,6,0" />
+                                <TextBlock Text="ABC"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+
+                    </StackPanel>
+                </Border>
+
+                <!-- ══════════════════════════════════════════════════
+                     NUMPAD — shown when IsNumpadMode = true
+                     ══════════════════════════════════════════════════ -->
+                <UniformGrid Columns="3"
                              Rows="4"
-                             Height="280">
+                             Height="240"
+                             Visibility="{Binding IsNumpadMode,
+                                          Converter={StaticResource BoolToVisibilityConverter}}">
                     <Button Content="1"
                             Style="{StaticResource KeypadButton}"
                             Command="{Binding AppendDigitCommand}"
@@ -227,7 +381,6 @@
                             Style="{StaticResource KeypadButton}"
                             Command="{Binding AppendDigitCommand}"
                             CommandParameter="3" />
-
                     <Button Content="4"
                             Style="{StaticResource KeypadButton}"
                             Command="{Binding AppendDigitCommand}"
@@ -240,7 +393,6 @@
                             Style="{StaticResource KeypadButton}"
                             Command="{Binding AppendDigitCommand}"
                             CommandParameter="6" />
-
                     <Button Content="7"
                             Style="{StaticResource KeypadButton}"
                             Command="{Binding AppendDigitCommand}"
@@ -253,7 +405,6 @@
                             Style="{StaticResource KeypadButton}"
                             Command="{Binding AppendDigitCommand}"
                             CommandParameter="9" />
-
                     <Button Style="{StaticResource KeypadActionButton}"
                             Command="{Binding ClearCommand}">
                         <iconPacks:PackIconMaterial Kind="Refresh"
@@ -270,10 +421,170 @@
                     </Button>
                 </UniformGrid>
 
-                <Button Grid.Row="3"
-                        Content="CONFIRM GUESTS"
+                <!-- ══════════════════════════════════════════════════
+                     QWERTY KEYBOARD — shown when IsQwertyMode = true
+                     ══════════════════════════════════════════════════ -->
+                <Border Background="#F8FAFC"
+                        CornerRadius="12"
+                        Padding="8"
+                        Visibility="{Binding IsQwertyMode,
+                                     Converter={StaticResource BoolToVisibilityConverter}}">
+                    <StackPanel>
+
+                        <!-- Row 1: Q–P -->
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Center"
+                                    Margin="0,0,0,4">
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter="Q" />
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter="W" />
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter="E" />
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter="R" />
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter="T" />
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter="Y" />
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter="U" />
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter="I" />
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter="O" />
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter="P" />
+                        </StackPanel>
+
+                        <!-- Row 2: A–L -->
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Center"
+                                    Margin="0,0,0,4">
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter="A" />
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter="S" />
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter="D" />
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter="F" />
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter="G" />
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter="H" />
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter="J" />
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter="K" />
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter="L" />
+                        </StackPanel>
+
+                        <!-- Row 3: Z–M + Space + Backspace -->
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Center"
+                                    Margin="0,0,0,4">
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter="Z" />
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter="X" />
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter="C" />
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter="V" />
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter="B" />
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter="N" />
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter="M" />
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter=" "
+                                    Content="SPC"
+                                    Width="52" />
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelBackspaceCommand}"
+                                    Width="52">
+                                <iconPacks:PackIconMaterial Kind="BackspaceOutline"
+                                                            Width="14"
+                                                            Height="14" />
+                            </Button>
+                        </StackPanel>
+
+                        <!-- Row 4: digits + CLR -->
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Center">
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter="1" />
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter="2" />
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter="3" />
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter="4" />
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter="5" />
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter="6" />
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter="7" />
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter="8" />
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter="9" />
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelKeyCommand}"
+                                    CommandParameter="0" />
+                            <Button Style="{StaticResource KeyboardKey}"
+                                    Command="{Binding LabelClearCommand}"
+                                    Content="CLR"
+                                    Width="52" />
+                        </StackPanel>
+
+                    </StackPanel>
+                </Border>
+
+                <!-- ── Confirm button ── -->
+                <Button Content="CONFIRM GUESTS"
                         Height="56"
-                        Margin="0,20,0,0"
+                        Margin="0,16,0,0"
                         FontSize="16"
                         FontWeight="Bold"
                         Background="#16A34A"
@@ -287,7 +598,8 @@
                         </Style>
                     </Button.Resources>
                 </Button>
-            </Grid>
+
+            </StackPanel>
         </Border>
     </Border>
 </UserControl>

@@ -13,7 +13,11 @@ namespace RestaurantPOS.ViewModels.Cover
     public enum CoverField
     {
         Adults,
-        Children
+        Children,
+        CoverALabel,
+        CoverBLabel,
+        AdultsPrice,
+        ChildrenPrice
     }
 
 
@@ -27,6 +31,39 @@ namespace RestaurantPOS.ViewModels.Cover
         public event Action? RequestClose;
 
         // ─── New fields alongside existing AdultCovers / ChildCovers ─────────────────
+        public enum CoverKeyboardMode { Numpad, Qwerty }
+
+        private CoverKeyboardMode _keyboardMode = CoverKeyboardMode.Numpad;
+        public CoverKeyboardMode KeyboardMode
+        {
+            get => _keyboardMode;
+            set
+            {
+                if (SetProperty(ref _keyboardMode, value))
+                {
+                    OnPropertyChanged(nameof(IsNumpadMode));
+                    OnPropertyChanged(nameof(IsQwertyMode));
+                    OnPropertyChanged(nameof(KeyboardToggleLabel));
+                }
+            }
+        }
+
+        public bool IsNumpadMode => KeyboardMode == CoverKeyboardMode.Numpad;
+        public bool IsQwertyMode => KeyboardMode == CoverKeyboardMode.Qwerty;
+
+        public string KeyboardToggleLabel
+            => KeyboardMode == CoverKeyboardMode.Numpad ? "ABC" : "123";
+
+
+        public ICommand ToggleKeyboardCommand { get; }
+
+        // ─── Label keyboard commands ──────────────────────────────────────────────────
+
+        public ICommand FocusCoverALabelCommand { get; }
+        public ICommand FocusCoverBLabelCommand { get; }
+        public ICommand LabelKeyCommand { get; }
+        public ICommand LabelBackspaceCommand { get; }
+        public ICommand LabelClearCommand { get; }
 
         private string _coverALabel = string.Empty;
         public string CoverALabel
@@ -81,6 +118,28 @@ namespace RestaurantPOS.ViewModels.Cover
             {
                 if (ChildCovers > 0) ChildCovers--;
             });
+
+
+            ToggleKeyboardCommand = new RelayCommand(() =>
+    KeyboardMode = KeyboardMode == CoverKeyboardMode.Numpad
+        ? CoverKeyboardMode.Qwerty
+        : CoverKeyboardMode.Numpad);
+
+            FocusCoverALabelCommand = new RelayCommand(() =>
+            {
+                SetActiveField(CoverField.CoverALabel);
+                KeyboardMode = CoverKeyboardMode.Qwerty;  // auto-switch to QWERTY
+            });
+
+            FocusCoverBLabelCommand = new RelayCommand(() =>
+            {
+                SetActiveField(CoverField.CoverBLabel);
+                KeyboardMode = CoverKeyboardMode.Qwerty;
+            });
+
+            LabelKeyCommand = new RelayCommand<string>(AppendLabelKey);
+            LabelBackspaceCommand = new RelayCommand(LabelBackspace);
+            LabelClearCommand = new RelayCommand(LabelClear);
 
             AppendDigitCommand = new RelayCommand<string>(AppendDigit);
             BackspaceCommand = new RelayCommand(Backspace);
@@ -157,9 +216,52 @@ namespace RestaurantPOS.ViewModels.Cover
         public void SetActiveField(CoverField field)
         {
             _activeField = field;
+
+            // Auto-switch keyboard mode based on field type
+            if (field == CoverField.Adults || field == CoverField.Children || field == CoverField.AdultsPrice || field == CoverField.ChildrenPrice)
+                KeyboardMode = CoverKeyboardMode.Numpad;
+            else
+                KeyboardMode = CoverKeyboardMode.Qwerty;
         }
 
         // ✅ Keypad Logic
+        private void AppendLabelKey(string? key)
+        {
+            if (key == null) return;
+
+            switch (_activeField)
+            {
+                case CoverField.CoverALabel:
+                    CoverALabel += key;
+                    break;
+                case CoverField.CoverBLabel:
+                    CoverBLabel += key;
+                    break;
+            }
+        }
+
+        private void LabelBackspace()
+        {
+            switch (_activeField)
+            {
+                case CoverField.CoverALabel when CoverALabel.Length > 0:
+                    CoverALabel = CoverALabel[..^1];
+                    break;
+                case CoverField.CoverBLabel when CoverBLabel.Length > 0:
+                    CoverBLabel = CoverBLabel[..^1];
+                    break;
+            }
+        }
+
+        private void LabelClear()
+        {
+            switch (_activeField)
+            {
+                case CoverField.CoverALabel: CoverALabel = string.Empty; break;
+                case CoverField.CoverBLabel: CoverBLabel = string.Empty; break;
+            }
+        }
+
         private void AppendDigit(string digit)
         {
             if (!int.TryParse(digit, out int d))
@@ -173,6 +275,13 @@ namespace RestaurantPOS.ViewModels.Cover
 
                 case CoverField.Children:
                     ChildCovers = Append(ChildCovers, d);
+                    break;
+                case CoverField.AdultsPrice:
+                    CoverAPrice += d.ToString();
+                    break;
+
+                case CoverField.ChildrenPrice:
+                    CoverBPrice += d.ToString();
                     break;
             }
         }
@@ -196,6 +305,13 @@ namespace RestaurantPOS.ViewModels.Cover
                 case CoverField.Children:
                     ChildCovers /= 10;
                     break;
+
+                case CoverField.AdultsPrice when CoverAPrice.Length > 0:
+                    CoverAPrice = CoverAPrice[..^1];
+                    break;
+                case CoverField.ChildrenPrice when CoverBPrice.Length > 0:
+                    CoverBPrice = CoverBPrice[..^1];
+                    break;
             }
         }
 
@@ -209,6 +325,12 @@ namespace RestaurantPOS.ViewModels.Cover
 
                 case CoverField.Children:
                     ChildCovers = 0;
+                    break;
+                case CoverField.AdultsPrice:
+                    CoverAPrice = String.Empty;
+                    break;
+                case CoverField.ChildrenPrice:
+                    CoverBPrice = String.Empty;
                     break;
             }
         }

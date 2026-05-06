@@ -38,5 +38,32 @@ namespace RestaurantPOS.UI.Views.Cover
                 vm.SetActiveField(CoverField.Children);
         }
 
+        private void AdultsPriceBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is CoverSelectorViewModel vm)
+                vm.SetActiveField(CoverField.AdultsPrice);
+        }
+
+        private void ChildrenPriceBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is CoverSelectorViewModel vm)
+                vm.SetActiveField(CoverField.ChildrenPrice);
+        }
+
+        private void CoverA_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is CoverSelectorViewModel vm)
+            {
+                vm.SetActiveField(CoverField.CoverALabel);
+            }
+        }
+
+        private void CoverB_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is CoverSelectorViewModel vm)
+            {
+                vm.SetActiveField(CoverField.CoverBLabel);
+            }
+        }
     }
 }
