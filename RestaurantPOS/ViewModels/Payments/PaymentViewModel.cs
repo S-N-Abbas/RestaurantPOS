@@ -172,9 +172,11 @@ namespace RestaurantPOS.ViewModels.Payments
 
                 _orderStore.CloseOrder(_orderState.Order.ContextId);
 
-                PrintReceipt();
-
-                _navigationService.NavigateTo<TablesViewModel>();
+                if (_settingsService.Settings.PrintReceiptOnPayment)
+                {
+                    PrintReceipt();
+                    _navigationService.NavigateTo<TablesViewModel>();
+                }
             }
         }
 

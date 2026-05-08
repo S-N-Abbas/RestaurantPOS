@@ -1,0 +1,913 @@
+﻿<UserControl x:Class="RestaurantPOS.UI.Views.Orders.History.OrderHistoryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             mc:Ignorable="d"
+             d:DesignHeight="768"
+             d:DesignWidth="1280">
+
+    <Grid Background="{StaticResource BackgroundGray}">
+        <DockPanel>
+
+            <!-- ══════════════════════════════════════════════════
+                 TOP HEADER
+                 ══════════════════════════════════════════════════ -->
+            <Border DockPanel.Dock="Top"
+                    Height="80"
+                    Background="White"
+                    BorderBrush="{StaticResource BorderGray}"
+                    BorderThickness="0,0,0,1"
+                    Padding="28,0">
+                <Grid VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal"
+                                VerticalAlignment="Center">
+                        <iconPacks:PackIconMaterial Kind="History"
+                                                    Foreground="{StaticResource PrimaryAccent}"
+                                                    Width="24"
+                                                    Height="24"
+                                                    VerticalAlignment="Center"
+                                                    Margin="0,0,14,0" />
+                        <TextBlock Text="ORDER HISTORY"
+                                   FontSize="22"
+                                   FontWeight="Black"
+                                   Foreground="{StaticResource TextDark}"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+
+                    <!-- Reprint button — only when an order is selected -->
+                    <Button HorizontalAlignment="Right"
+                            Height="44"
+                            Padding="20,0"
+                            FontSize="14"
+                            FontWeight="Bold"
+                            Background="{StaticResource PrimaryAccent}"
+                            Foreground="White"
+                            BorderThickness="0"
+                            Command="{Binding ReprintCommand}"
+                            Visibility="{Binding HasSelection,
+                                         Converter={StaticResource BoolToVisibilityConverter}}">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius"
+                                        Value="10" />
+                            </Style>
+                        </Button.Resources>
+                        <StackPanel Orientation="Horizontal">
+                            <iconPacks:PackIconMaterial Kind="Printer"
+                                                        Width="14"
+                                                        Height="14"
+                                                        VerticalAlignment="Center"
+                                                        Margin="0,0,8,0" />
+                            <TextBlock Text="Reprint Receipt"
+                                       VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!-- ══════════════════════════════════════════════════
+                 LEFT PANEL — Filters + Order List
+                 ══════════════════════════════════════════════════ -->
+            <Border DockPanel.Dock="Left"
+                    Width="400"
+                    Background="White"
+                    BorderBrush="{StaticResource BorderGray}"
+                    BorderThickness="0,0,1,0">
+                <DockPanel>
+
+                    <!-- ── Filter section ── -->
+                    <StackPanel DockPanel.Dock="Top"
+                                Margin="20,16,20,0">
+
+                        <!-- Quick date shortcuts -->
+                        <UniformGrid Rows="1"
+                                     Columns="4"
+                                     Margin="0,0,0,12">
+                            <Button Height="36"
+                                    Margin="0,0,4,0"
+                                    FontSize="11"
+                                    FontWeight="SemiBold"
+                                    Background="#F1F5F9"
+                                    BorderThickness="0"
+                                    Command="{Binding SetTodayCommand}">
+                                <Button.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius"
+                                                Value="8" />
+                                    </Style>
+                                </Button.Resources>
+                                <TextBlock Text="Today" />
+                            </Button>
+                            <Button Height="36"
+                                    Margin="0,0,4,0"
+                                    FontSize="11"
+                                    FontWeight="SemiBold"
+                                    Background="#F1F5F9"
+                                    BorderThickness="0"
+                                    Command="{Binding SetYesterdayCommand}">
+                                <Button.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius"
+                                                Value="8" />
+                                    </Style>
+                                </Button.Resources>
+                                <TextBlock Text="Yesterday" />
+                            </Button>
+                            <Button Height="36"
+                                    Margin="0,0,4,0"
+                                    FontSize="11"
+                                    FontWeight="SemiBold"
+                                    Background="#F1F5F9"
+                                    BorderThickness="0"
+                                    Command="{Binding SetThisWeekCommand}">
+                                <Button.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius"
+                                                Value="8" />
+                                    </Style>
+                                </Button.Resources>
+                                <TextBlock Text="This Week" />
+                            </Button>
+                            <Button Height="36"
+                                    FontSize="11"
+                                    FontWeight="SemiBold"
+                                    Background="#F1F5F9"
+                                    BorderThickness="0"
+                                    Command="{Binding SetThisMonthCommand}">
+                                <Button.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius"
+                                                Value="8" />
+                                    </Style>
+                                </Button.Resources>
+                                <TextBlock Text="This Month" />
+                            </Button>
+                        </UniformGrid>
+
+                        <!-- Date pickers -->
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="FROM"
+                                           FontSize="10"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource TextMuted}"
+                                           Margin="0,0,0,4" />
+                                <DatePicker SelectedDate="{Binding From}"
+                                            Height="40"
+                                            FontSize="13" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="TO"
+                                           FontSize="10"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource TextMuted}"
+                                           Margin="0,0,0,4" />
+                                <DatePicker SelectedDate="{Binding To}"
+                                            Height="40"
+                                            FontSize="13" />
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Type + Status filters -->
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="TYPE"
+                                           FontSize="10"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource TextMuted}"
+                                           Margin="0,0,0,4" />
+                                <ComboBox ItemsSource="{Binding OrderTypeFilters}"
+                                          SelectedItem="{Binding SelectedTypeFilter}"
+                                          Height="40"
+                                          FontSize="13" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="STATUS"
+                                           FontSize="10"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource TextMuted}"
+                                           Margin="0,0,0,4" />
+                                <ComboBox ItemsSource="{Binding StatusFilters}"
+                                          SelectedItem="{Binding SelectedStatusFilter}"
+                                          Height="40"
+                                          FontSize="13" />
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Search button -->
+                        <Button Height="44"
+                                Margin="0,0,0,12"
+                                FontSize="14"
+                                FontWeight="Bold"
+                                Background="{StaticResource PrimaryAccent}"
+                                Foreground="White"
+                                BorderThickness="0"
+                                Command="{Binding SearchCommand}">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius"
+                                            Value="10" />
+                                </Style>
+                            </Button.Resources>
+                            <StackPanel Orientation="Horizontal">
+                                <iconPacks:PackIconMaterial Kind="Magnify"
+                                                            Width="14"
+                                                            Height="14"
+                                                            VerticalAlignment="Center"
+                                                            Margin="0,0,8,0" />
+                                <TextBlock Text="Search Orders"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+
+                        <!-- Summary tiles -->
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="6" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="6" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="6" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Orders -->
+                            <Border Grid.Column="0"
+                                    Background="#F8FAFC"
+                                    CornerRadius="10"
+                                    Padding="10,8"
+                                    BorderBrush="{StaticResource BorderGray}"
+                                    BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="Orders"
+                                               FontSize="10"
+                                               Foreground="{StaticResource TextMuted}" />
+                                    <TextBlock Text="{Binding SummaryOrders}"
+                                               FontSize="18"
+                                               FontWeight="Black"
+                                               Foreground="{StaticResource TextDark}" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Total -->
+                            <Border Grid.Column="2"
+                                    Background="#EFF6FF"
+                                    CornerRadius="10"
+                                    Padding="10,8">
+                                <StackPanel>
+                                    <TextBlock Text="Total"
+                                               FontSize="10"
+                                               Foreground="{StaticResource TextMuted}" />
+                                    <TextBlock Text="{Binding SummaryIncome}"
+                                               FontSize="14"
+                                               FontWeight="Black"
+                                               Foreground="{StaticResource PrimaryAccent}" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Cash -->
+                            <Border Grid.Column="4"
+                                    Background="#F0FDF4"
+                                    CornerRadius="10"
+                                    Padding="10,8">
+                                <StackPanel>
+                                    <TextBlock Text="Cash"
+                                               FontSize="10"
+                                               Foreground="{StaticResource TextMuted}" />
+                                    <TextBlock Text="{Binding SummaryCash}"
+                                               FontSize="14"
+                                               FontWeight="Black"
+                                               Foreground="#065F46" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Card -->
+                            <Border Grid.Column="6"
+                                    Background="#EFF6FF"
+                                    CornerRadius="10"
+                                    Padding="10,8">
+                                <StackPanel>
+                                    <TextBlock Text="Card"
+                                               FontSize="10"
+                                               Foreground="{StaticResource TextMuted}" />
+                                    <TextBlock Text="{Binding SummaryCard}"
+                                               FontSize="14"
+                                               FontWeight="Black"
+                                               Foreground="#1E40AF" />
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- ── Order list ── -->
+                    <Grid>
+
+                        <!-- Loading -->
+                        <StackPanel VerticalAlignment="Center"
+                                    HorizontalAlignment="Center"
+                                    Visibility="{Binding IsLoading,
+                                                 Converter={StaticResource BoolToVisibilityConverter}}">
+                            <iconPacks:PackIconMaterial Kind="Loading"
+                                                        Width="32"
+                                                        Height="32"
+                                                        Foreground="{StaticResource TextMuted}"
+                                                        HorizontalAlignment="Center" />
+                            <TextBlock Text="Loading..."
+                                       FontSize="13"
+                                       Foreground="{StaticResource TextMuted}"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,8,0,0" />
+                        </StackPanel>
+
+                        <!-- Empty state -->
+                        <StackPanel VerticalAlignment="Center"
+                                    HorizontalAlignment="Center"
+                                    Visibility="{Binding IsEmpty,
+                                                 Converter={StaticResource BoolToVisibilityConverter}}">
+                            <iconPacks:PackIconMaterial Kind="ReceiptTextOutline"
+                                                        Width="48"
+                                                        Height="48"
+                                                        Foreground="{StaticResource TextMuted}"
+                                                        HorizontalAlignment="Center"
+                                                        Opacity="0.35" />
+                            <TextBlock Text="No orders found"
+                                       FontSize="15"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextMuted}"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,12,0,0" />
+                            <TextBlock Text="Try adjusting the date range or filters"
+                                       FontSize="12"
+                                       Foreground="{StaticResource TextMuted}"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,4,0,0" />
+                        </StackPanel>
+
+                        <!-- Scrollable order cards -->
+                        <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                      Padding="12,0,12,12">
+                            <ItemsControl ItemsSource="{Binding Orders}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+
+                                        <Button Margin="0,0,0,6"
+                                                Background="Transparent"
+                                                BorderThickness="0"
+                                                Command="{Binding DataContext.SelectOrderCommand,
+                                                          RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}">
+                                            <Button.Template>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border x:Name="CardBg"
+                                                            Background="White"
+                                                            CornerRadius="12"
+                                                            BorderThickness="1.5"
+                                                            Padding="14,12">
+                                                        <Border.Style>
+                                                            <Style TargetType="Border">
+                                                                <Setter Property="BorderBrush"
+                                                                        Value="{StaticResource BorderGray}" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding DataContext.SelectedOrder.Id,
+                                                                                  RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                                 Value="{Binding Id}">
+                                                                        <Setter Property="BorderBrush"
+                                                                                Value="{StaticResource PrimaryAccent}" />
+                                                                        <Setter Property="Background"
+                                                                                Value="#F0F7FF" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Border.Style>
+
+                                                        <Grid>
+                                                            <Grid.RowDefinitions>
+                                                                <RowDefinition Height="Auto" />
+                                                                <RowDefinition Height="Auto" />
+                                                            </Grid.RowDefinitions>
+
+                                                            <!-- Row 1: ID + type icon + total + status -->
+                                                            <Grid Grid.Row="0">
+                                                                <StackPanel Orientation="Horizontal"
+                                                                            VerticalAlignment="Center">
+
+                                                                    <!-- Type icon -->
+                                                                    <Border Width="32"
+                                                                            Height="32"
+                                                                            CornerRadius="8"
+                                                                            Background="#EFF6FF"
+                                                                            Margin="0,0,10,0">
+                                                                        <iconPacks:PackIconMaterial Kind="{Binding TypeIcon}"
+                                                                                                    Width="15"
+                                                                                                    Height="15"
+                                                                                                    Foreground="{StaticResource PrimaryAccent}"
+                                                                                                    HorizontalAlignment="Center"
+                                                                                                    VerticalAlignment="Center" />
+                                                                    </Border>
+
+                                                                    <StackPanel VerticalAlignment="Center">
+                                                                        <TextBlock Text="{Binding OrderLabel}"
+                                                                                   FontSize="15"
+                                                                                   FontWeight="Bold"
+                                                                                   Foreground="{StaticResource TextDark}" />
+                                                                        <TextBlock Text="{Binding ContextLabel}"
+                                                                                   FontSize="11"
+                                                                                   Foreground="{StaticResource TextMuted}"
+                                                                                   Margin="0,1,0,0" />
+                                                                    </StackPanel>
+                                                                </StackPanel>
+
+                                                                <!-- Right: total + status -->
+                                                                <StackPanel HorizontalAlignment="Right"
+                                                                            VerticalAlignment="Center">
+                                                                    <TextBlock Text="{Binding GrandTotalDisplay}"
+                                                                               FontSize="16"
+                                                                               FontWeight="Black"
+                                                                               Foreground="{StaticResource TextDark}"
+                                                                               TextAlignment="Right" />
+                                                                    <Border CornerRadius="5"
+                                                                            Padding="8,3"
+                                                                            HorizontalAlignment="Right"
+                                                                            Margin="0,3,0,0"
+                                                                            Background="{Binding StatusColour}">
+                                                                        <TextBlock Text="{Binding StatusLabel}"
+                                                                                   FontSize="10"
+                                                                                   FontWeight="Bold"
+                                                                                   Foreground="{Binding StatusTextColour}" />
+                                                                    </Border>
+                                                                </StackPanel>
+                                                            </Grid>
+
+                                                            <!-- Row 2: date/time + staff -->
+                                                            <Grid Grid.Row="1"
+                                                                  Margin="0,8,0,0">
+                                                                <StackPanel Orientation="Horizontal">
+                                                                    <iconPacks:PackIconMaterial Kind="Clock"
+                                                                                                Width="12"
+                                                                                                Height="12"
+                                                                                                VerticalAlignment="Center"
+                                                                                                Foreground="{StaticResource TextMuted}"
+                                                                                                Margin="0,0,5,0" />
+                                                                    <TextBlock Text="{Binding FullDateTimeDisplay}"
+                                                                               FontSize="12"
+                                                                               Foreground="{StaticResource TextMuted}"
+                                                                               VerticalAlignment="Center" />
+                                                                </StackPanel>
+
+                                                                <StackPanel Orientation="Horizontal"
+                                                                            HorizontalAlignment="Right">
+                                                                    <iconPacks:PackIconMaterial Kind="Account"
+                                                                                                Width="12"
+                                                                                                Height="12"
+                                                                                                VerticalAlignment="Center"
+                                                                                                Foreground="{StaticResource TextMuted}"
+                                                                                                Margin="0,0,5,0" />
+                                                                    <TextBlock Text="{Binding ClosedBy}"
+                                                                               FontSize="12"
+                                                                               Foreground="{StaticResource TextMuted}"
+                                                                               VerticalAlignment="Center" />
+                                                                </StackPanel>
+                                                            </Grid>
+                                                        </Grid>
+                                                    </Border>
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsMouseOver"
+                                                                 Value="True">
+                                                            <Setter TargetName="CardBg"
+                                                                    Property="Background"
+                                                                    Value="#F8FAFC" />
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Button.Template>
+                                        </Button>
+
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
+                </DockPanel>
+            </Border>
+
+            <!-- ══════════════════════════════════════════════════
+                 RIGHT PANEL — Order Detail
+                 ══════════════════════════════════════════════════ -->
+            <Grid>
+
+                <!-- Empty state — no order selected -->
+                <StackPanel VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            Visibility="{Binding HasSelection,
+                                         Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                    <iconPacks:PackIconMaterial Kind="CursorDefaultClick"
+                                                Width="56"
+                                                Height="56"
+                                                Foreground="{StaticResource TextMuted}"
+                                                HorizontalAlignment="Center"
+                                                Opacity="0.3" />
+                    <TextBlock Text="Select an order to view details"
+                               FontSize="16"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource TextMuted}"
+                               HorizontalAlignment="Center"
+                               Margin="0,16,0,0" />
+                </StackPanel>
+
+                <!-- Order detail panel -->
+                <Border Margin="20"
+                        Background="White"
+                        CornerRadius="16"
+                        DataContext="{Binding SelectedOrder}"
+                        Visibility="{Binding DataContext.HasSelection,
+                                     RelativeSource={RelativeSource AncestorType=UserControl},
+                                     Converter={StaticResource BoolToVisibilityConverter}}">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="15"
+                                          ShadowDepth="0"
+                                          Opacity="0.05" />
+                    </Border.Effect>
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <!-- Detail header -->
+                            <RowDefinition Height="*" />
+                            <!-- Scrollable body -->
+                            <RowDefinition Height="Auto" />
+                            <!-- Totals footer -->
+                        </Grid.RowDefinitions>
+
+                        <!-- ── Detail header ── -->
+                        <Border Grid.Row="0"
+                                BorderBrush="{StaticResource BorderGray}"
+                                BorderThickness="0,0,0,1"
+                                Padding="24,18">
+                            <Grid>
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding OrderLabel}"
+                                                   FontSize="22"
+                                                   FontWeight="Black"
+                                                   Foreground="{StaticResource TextDark}" />
+                                        <Border CornerRadius="8"
+                                                Padding="12,4"
+                                                Margin="12,0,0,0"
+                                                VerticalAlignment="Center"
+                                                Background="{Binding StatusColour}">
+                                            <TextBlock Text="{Binding StatusLabel}"
+                                                       FontSize="12"
+                                                       FontWeight="Bold"
+                                                       Foreground="{Binding StatusTextColour}" />
+                                        </Border>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal"
+                                                Margin="0,6,0,0">
+                                        <iconPacks:PackIconMaterial Kind="{Binding TypeIcon}"
+                                                                    Width="14"
+                                                                    Height="14"
+                                                                    VerticalAlignment="Center"
+                                                                    Foreground="{StaticResource TextMuted}"
+                                                                    Margin="0,0,6,0" />
+                                        <TextBlock Text="{Binding TypeLabel}"
+                                                   FontSize="13"
+                                                   Foreground="{StaticResource TextMuted}"
+                                                   VerticalAlignment="Center"
+                                                   Margin="0,0,16,0" />
+                                        <iconPacks:PackIconMaterial Kind="TableChair"
+                                                                    Width="14"
+                                                                    Height="14"
+                                                                    VerticalAlignment="Center"
+                                                                    Foreground="{StaticResource TextMuted}"
+                                                                    Margin="0,0,6,0" />
+                                        <TextBlock Text="{Binding ContextLabel}"
+                                                   FontSize="13"
+                                                   Foreground="{StaticResource TextMuted}"
+                                                   VerticalAlignment="Center"
+                                                   Margin="0,0,16,0" />
+                                        <iconPacks:PackIconMaterial Kind="Clock"
+                                                                    Width="14"
+                                                                    Height="14"
+                                                                    VerticalAlignment="Center"
+                                                                    Foreground="{StaticResource TextMuted}"
+                                                                    Margin="0,0,6,0" />
+                                        <TextBlock Text="{Binding FullDateTimeDisplay}"
+                                                   FontSize="13"
+                                                   Foreground="{StaticResource TextMuted}"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <!-- Staff info top-right -->
+                                <StackPanel HorizontalAlignment="Right"
+                                            VerticalAlignment="Center">
+                                    <StackPanel Orientation="Horizontal"
+                                                HorizontalAlignment="Right">
+                                        <TextBlock Text="Opened by  "
+                                                   FontSize="12"
+                                                   Foreground="{StaticResource TextMuted}" />
+                                        <TextBlock Text="{Binding CreatedBy}"
+                                                   FontSize="12"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{StaticResource TextDark}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal"
+                                                HorizontalAlignment="Right"
+                                                Margin="0,3,0,0">
+                                        <TextBlock Text="Closed by  "
+                                                   FontSize="12"
+                                                   Foreground="{StaticResource TextMuted}" />
+                                        <TextBlock Text="{Binding ClosedBy}"
+                                                   FontSize="12"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{StaticResource TextDark}" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <!-- ── Scrollable body ── -->
+                        <ScrollViewer Grid.Row="1"
+                                      VerticalScrollBarVisibility="Auto"
+                                      Padding="24,16">
+                            <StackPanel>
+
+                                <!-- Items section -->
+                                <TextBlock Text="ITEMS"
+                                           FontSize="11"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource TextMuted}"
+                                           Margin="0,0,0,10" />
+
+                                <ItemsControl ItemsSource="{Binding Items}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border BorderBrush="{StaticResource BorderGray}"
+                                                    BorderThickness="0,0,0,1"
+                                                    Padding="0,10">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="50" />
+                                                        <ColumnDefinition Width="80" />
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <!-- Name -->
+                                                    <StackPanel Grid.Column="0"
+                                                                VerticalAlignment="Center">
+                                                        <TextBlock Text="{Binding ProductName}"
+                                                                   FontSize="14"
+                                                                   FontWeight="SemiBold"
+                                                                   Foreground="{StaticResource TextDark}" />
+                                                        <!-- Open item indicator -->
+                                                        <Border CornerRadius="4"
+                                                                Padding="6,2"
+                                                                Margin="0,3,0,0"
+                                                                HorizontalAlignment="Left"
+                                                                Background="#F5F3FF"
+                                                                Visibility="{Binding IsOpenItem,
+                                                                             Converter={StaticResource BoolToVisibilityConverter}}">
+                                                            <TextBlock Text="Open Item"
+                                                                       FontSize="10"
+                                                                       FontWeight="Bold"
+                                                                       Foreground="#6D28D9" />
+                                                        </Border>
+                                                    </StackPanel>
+
+                                                    <!-- Qty -->
+                                                    <TextBlock Grid.Column="1"
+                                                               Text="{Binding Quantity,
+                                                                      StringFormat='x{0}'}"
+                                                               FontSize="14"
+                                                               Foreground="{StaticResource TextMuted}"
+                                                               VerticalAlignment="Center"
+                                                               TextAlignment="Center" />
+
+                                                    <!-- Line total -->
+                                                    <TextBlock Grid.Column="2"
+                                                               Text="{Binding LineTotal,
+                                                                      StringFormat='£{0:N2}'}"
+                                                               FontSize="14"
+                                                               FontWeight="SemiBold"
+                                                               Foreground="{StaticResource TextDark}"
+                                                               VerticalAlignment="Center"
+                                                               TextAlignment="Right" />
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+
+                                <!-- Covers section — only when HasCovers -->
+                                <StackPanel Margin="0,20,0,0"
+                                            Visibility="{Binding HasCovers,
+                                                         Converter={StaticResource BoolToVisibilityConverter}}">
+                                    <TextBlock Text="COVERS"
+                                               FontSize="11"
+                                               FontWeight="Bold"
+                                               Foreground="{StaticResource TextMuted}"
+                                               Margin="0,0,0,10" />
+
+                                    <!-- Cover A row -->
+                                    <Grid Margin="0,0,0,6"
+                                          Visibility="{Binding AdultCovers,
+                                                       Converter={StaticResource GreaterThanZeroToVisibilityConverter}}">
+                                        <TextBlock VerticalAlignment="Center">
+                                            <Run Text="{Binding CoverALabel, Mode=OneWay}" />
+                                            <Run Text=" (x" /><Run Text="{Binding AdultCovers, Mode=OneWay}" /><Run Text=")" />
+                                        </TextBlock>
+                                        <TextBlock HorizontalAlignment="Right"
+                                                   FontSize="14"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{StaticResource TextDark}">
+                                            <Run Text="£" />
+                                            <Run Text="{Binding CoverATotal,
+                                                        StringFormat={}{0:N2}, Mode=OneWay}" />
+                                        </TextBlock>
+                                    </Grid>
+
+                                    <!-- Cover B row -->
+                                    <Grid Visibility="{Binding ChildCovers,
+                                                       Converter={StaticResource GreaterThanZeroToVisibilityConverter}}">
+                                        <TextBlock VerticalAlignment="Center">
+                                            <Run Text="{Binding CoverBLabel, Mode=OneWay}" />
+                                            <Run Text=" (x" /><Run Text="{Binding ChildCovers, Mode=OneWay}" /><Run Text=")" />
+                                        </TextBlock>
+                                        <TextBlock HorizontalAlignment="Right"
+                                                   FontSize="14"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{StaticResource TextDark}">
+                                            <Run Text="£" />
+                                            <Run Text="{Binding CoverBTotal,
+                                                        StringFormat={}{0:N2}, Mode=OneWay}" />
+                                        </TextBlock>
+                                    </Grid>
+                                </StackPanel>
+
+                                <!-- Payments section -->
+                                <StackPanel Margin="0,20,0,0">
+                                    <TextBlock Text="PAYMENTS"
+                                               FontSize="11"
+                                               FontWeight="Bold"
+                                               Foreground="{StaticResource TextMuted}"
+                                               Margin="0,0,0,10" />
+
+                                    <!-- Cash -->
+                                    <Grid Margin="0,0,0,6"
+                                          Visibility="{Binding CashPaid,
+                                                       Converter={StaticResource GreaterThanZeroToVisibilityConverter}}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Border Width="8"
+                                                    Height="8"
+                                                    CornerRadius="4"
+                                                    Background="{StaticResource SuccessGreen}"
+                                                    Margin="0,0,8,0"
+                                                    VerticalAlignment="Center" />
+                                            <TextBlock Text="Cash"
+                                                       FontSize="14"
+                                                       Foreground="{StaticResource TextMuted}"
+                                                       VerticalAlignment="Center" />
+                                        </StackPanel>
+                                        <TextBlock HorizontalAlignment="Right"
+                                                   FontSize="14"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{StaticResource TextDark}">
+                                            <Run Text="{Binding CurrencySymbol, Mode=OneWay}" />
+                                            <Run Text="{Binding CashPaid,
+                                                        StringFormat={}{0:N2}, Mode=OneWay}" />
+                                        </TextBlock>
+                                    </Grid>
+
+                                    <!-- Card -->
+                                    <Grid Margin="0,0,0,6"
+                                          Visibility="{Binding CardPaid,
+                                                       Converter={StaticResource GreaterThanZeroToVisibilityConverter}}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Border Width="8"
+                                                    Height="8"
+                                                    CornerRadius="4"
+                                                    Background="{StaticResource PrimaryAccent}"
+                                                    Margin="0,0,8,0"
+                                                    VerticalAlignment="Center" />
+                                            <TextBlock Text="Card"
+                                                       FontSize="14"
+                                                       Foreground="{StaticResource TextMuted}"
+                                                       VerticalAlignment="Center" />
+                                        </StackPanel>
+                                        <TextBlock HorizontalAlignment="Right"
+                                                   FontSize="14"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{StaticResource TextDark}">
+                                            <Run Text="{Binding CurrencySymbol, Mode=OneWay}" />
+                                            <Run Text="{Binding CardPaid,
+                                                        StringFormat={}{0:N2}, Mode=OneWay}" />
+                                        </TextBlock>
+                                    </Grid>
+
+                                    <!-- Deposit -->
+                                    <Grid Visibility="{Binding DepositPaid,
+                                                       Converter={StaticResource GreaterThanZeroToVisibilityConverter}}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Border Width="8"
+                                                    Height="8"
+                                                    CornerRadius="4"
+                                                    Background="#FCD34D"
+                                                    Margin="0,0,8,0"
+                                                    VerticalAlignment="Center" />
+                                            <TextBlock Text="Deposit"
+                                                       FontSize="14"
+                                                       Foreground="{StaticResource TextMuted}"
+                                                       VerticalAlignment="Center" />
+                                        </StackPanel>
+                                        <TextBlock HorizontalAlignment="Right"
+                                                   FontSize="14"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{StaticResource TextDark}">
+                                            <Run Text="{Binding CurrencySymbol, Mode=OneWay}" />
+                                            <Run Text="{Binding DepositPaid,
+                                                        StringFormat={}{0:N2}, Mode=OneWay}" />
+                                        </TextBlock>
+                                    </Grid>
+                                </StackPanel>
+
+                            </StackPanel>
+                        </ScrollViewer>
+
+                        <!-- ── Totals footer ── -->
+                        <Border Grid.Row="2"
+                                BorderBrush="{StaticResource BorderGray}"
+                                BorderThickness="0,1,0,0"
+                                Padding="24,16">
+                            <StackPanel>
+
+                                <!-- Items subtotal -->
+                                <Grid Margin="0,0,0,6">
+                                    <TextBlock Text="Items Subtotal"
+                                               FontSize="13"
+                                               Foreground="{StaticResource TextMuted}" />
+                                    <TextBlock HorizontalAlignment="Right"
+                                               FontSize="13"
+                                               Foreground="{StaticResource TextDark}">
+                                        <Run Text="{Binding CurrencySymbol, Mode=OneWay}" />
+                                        <Run Text="{Binding ItemsTotal,
+                                                    StringFormat={}{0:N2}, Mode=OneWay}" />
+                                    </TextBlock>
+                                </Grid>
+
+                                <!-- Covers subtotal — only when HasCovers -->
+                                <Grid Margin="0,0,0,6"
+                                      Visibility="{Binding HasCovers,
+                                                   Converter={StaticResource BoolToVisibilityConverter}}">
+                                    <TextBlock Text="Covers"
+                                               FontSize="13"
+                                               Foreground="{StaticResource TextMuted}" />
+                                    <TextBlock HorizontalAlignment="Right"
+                                               FontSize="13"
+                                               Foreground="{StaticResource TextDark}">
+                                        <Run Text="{Binding CurrencySymbol, Mode=OneWay}" />
+                                        <Run Text="{Binding CoverTotal,
+                                                    StringFormat={}{0:N2}, Mode=OneWay}" />
+                                    </TextBlock>
+                                </Grid>
+
+                                <Separator Background="{StaticResource BorderGray}"
+                                           Margin="0,6,0,10" />
+
+                                <!-- Grand total -->
+                                <Grid>
+                                    <TextBlock Text="TOTAL"
+                                               FontSize="16"
+                                               FontWeight="Bold"
+                                               Foreground="{StaticResource TextDark}" />
+                                    <TextBlock HorizontalAlignment="Right"
+                                               FontSize="22"
+                                               FontWeight="Black"
+                                               Foreground="{StaticResource TextDark}"
+                                               Text="{Binding GrandTotalDisplay}" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                    </Grid>
+                </Border>
+            </Grid>
+        </DockPanel>
+    </Grid>
+</UserControl>

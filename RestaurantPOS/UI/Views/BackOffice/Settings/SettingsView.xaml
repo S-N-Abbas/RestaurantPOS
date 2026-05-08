@@ -45,6 +45,9 @@
                         <RadioButton x:Name="BtnOperational"
                                      Content="Operational"
                                      Style="{StaticResource MenuButtonStyle}" />
+                        <RadioButton x:Name="BtnPrinting"
+                                     Content="Printing"
+                                     Style="{StaticResource MenuButtonStyle}" />
                     </StackPanel>
                 </Border>
 
@@ -137,13 +140,113 @@
                                            Margin="0,0,0,5" />
                                 <TextBox Text="{Binding EditableSettings.TillNo}" />
 
+                                <!-- ── Covers ── -->
+                                <TextBlock Text="ADULT COVER LABEL"
+                                           Style="{StaticResource FieldLabel}" />
+                                <TextBox Text="{Binding EditableSettings.AdultCoverLabel, UpdateSourceTrigger=PropertyChanged}" />
+
                                 <TextBlock Text="ADULT COVER PRICE"
                                            Style="{StaticResource FieldLabel}" />
                                 <TextBox Text="{Binding EditableSettings.AdultCoverPrice}" />
 
+                                <TextBlock Text="CHILD COVER LABEL"
+                                           Style="{StaticResource FieldLabel}" />
+                                <TextBox Text="{Binding EditableSettings.ChildCoverLabel, UpdateSourceTrigger=PropertyChanged}" />
+
                                 <TextBlock Text="CHILD COVER PRICE"
                                            Style="{StaticResource FieldLabel}" />
                                 <TextBox Text="{Binding EditableSettings.ChildCoverPrice}" />
+                            </StackPanel>
+                        </ScrollViewer>
+
+                        <!-- ══════════════════════════════════════
+                             PRINTING PANEL
+                        ══════════════════════════════════════ -->
+                        <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                      Visibility="{Binding IsChecked, ElementName=BtnPrinting, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <StackPanel MaxWidth="500"
+                                        HorizontalAlignment="Left">
+                                <TextBlock Text="Printing"
+                                           FontSize="20"
+                                           FontWeight="Bold"
+                                           Margin="0,0,0,10" />
+
+                                <!-- Print receipt toggle -->
+                                <CheckBox Content="Automatically print receipt on payment"
+                                          IsChecked="{Binding EditableSettings.PrintReceiptOnPayment, Mode=TwoWay}"
+                                          FontWeight="SemiBold"
+                                          Foreground="{StaticResource TextDark}"
+                                          Margin="0,0,0,20" />
+
+                                <!-- Default printer -->
+                                <TextBlock Style="{StaticResource FieldLabel}">
+                                    DEFAULT RECEIPT PRINTER
+                                    <Run Foreground="{StaticResource TextMuted}"
+                                         FontStyle="Italic"
+                                         FontWeight="Normal">  — leave blank to show dialog each time</Run>
+                                </TextBlock>
+
+                                <Grid Margin="0,0,0,20">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <ComboBox Grid.Column="0"
+                                              ItemsSource="{Binding AvailablePrinters}"
+                                              SelectedItem="{Binding EditableSettings.DefaultPrinter, Mode=TwoWay}"
+                                              Margin="0,0,8,0">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock>
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Text" Value="{Binding}" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding}" Value="">
+                                                                    <Setter Property="Text" Value="— Show print dialog each time —" />
+                                                                    <Setter Property="Foreground" Value="{StaticResource TextMuted}" />
+                                                                    <Setter Property="FontStyle" Value="Italic" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+
+                                    <Button Grid.Column="1"
+                                            Command="{Binding RefreshPrintersCommand}"
+                                            Height="30"
+                                            Padding="12,0"
+                                            Background="Transparent"
+                                            BorderBrush="{StaticResource BorderGray}"
+                                            BorderThickness="1"
+                                            ToolTip="Refresh printer list">
+                                        <Button.Resources>
+                                            <Style TargetType="Border">
+                                                <Setter Property="CornerRadius" Value="6" />
+                                            </Style>
+                                        </Button.Resources>
+                                        <TextBlock Text="↻ Refresh"
+                                                   Foreground="{StaticResource TextMuted}"
+                                                   FontSize="12" />
+                                    </Button>
+                                </Grid>
+
+                                <!-- Footer message -->
+                                <TextBlock Text="RECEIPT FOOTER MESSAGE"
+                                           Style="{StaticResource FieldLabel}" />
+                                <TextBox Text="{Binding EditableSettings.FooterMessage, UpdateSourceTrigger=PropertyChanged}"
+                                         MaxLength="120"
+                                         TextWrapping="Wrap"
+                                         AcceptsReturn="False" />
+                                <TextBlock Text="Printed at the bottom of every receipt."
+                                           Foreground="{StaticResource TextMuted}"
+                                           FontSize="11"
+                                           FontStyle="Italic"
+                                           Margin="0,4,0,0" />
                             </StackPanel>
                         </ScrollViewer>
                     </Grid>

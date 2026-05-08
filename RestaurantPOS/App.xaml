@@ -26,7 +26,9 @@
              xmlns:vmBookings="clr-namespace:RestaurantPOS.ViewModels.Bookings"
              xmlns:bookingsViews="clr-namespace:RestaurantPOS.UI.Views.Bookings"
              xmlns:vmReports="clr-namespace:RestaurantPOS.ViewModels.ZReport"
-             xmlns:reportViews="clr-namespace:RestaurantPOS.UI.Views.ZReport">
+             xmlns:reportViews="clr-namespace:RestaurantPOS.UI.Views.ZReport"
+             xmlns:vmHistory="clr-namespace:RestaurantPOS.ViewModels.Orders.History"
+             xmlns:historyViews="clr-namespace:RestaurantPOS.UI.Views.Orders.History">
     <Application.Resources>
 
         <!-- Buttons Style -->
@@ -52,6 +54,7 @@
             <converters:StatusToTextConverter x:Key="StatusToTextConverter" />
             <converters:CurrencyFormatConverter x:Key="CurrencyFormatConverter" />
             <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" />
+            <converters:GreaterThanZeroToVisibilityConverter x:Key="GreaterThanZeroToVisibilityConverter" />
 
             <!-- DATA TEMPLATES -->
             <DataTemplate DataType="{x:Type vmShell:ShellViewModel}">
@@ -99,6 +102,9 @@
             </DataTemplate>
             <DataTemplate DataType="{x:Type vmReports:ZReportViewModel}">
                 <reportViews:ZReportView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vmHistory:OrderHistoryViewModel}">
+                <historyViews:OrderHistoryView />
             </DataTemplate>
         </ResourceDictionary>
     </Application.Resources>

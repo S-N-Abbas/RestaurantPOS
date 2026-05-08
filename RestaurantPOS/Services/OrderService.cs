@@ -433,5 +433,35 @@ namespace RestaurantPOS.Services
 
             await _db.SaveChangesAsync();
         }
+
+        /// <summary>
+        /// Returns closed orders within a date range with optional filters.
+        /// Ordered most recent first.
+        /// </summary>
+        public async Task<IReadOnlyList<Order>> GetOrderHistoryAsync(
+            DateTime from,
+            DateTime to,
+            OrderType? orderType = null,
+            OrderStatus? status = null)
+        {
+            var query = _db.Orders
+                .Include(o => o.Items)
+                .Include(o => o.Payments)
+                .Where(o =>
+                    o.IsClosed &&
+                    o.ClosedAt >= from &&
+                    o.ClosedAt <= to);
+
+            if (orderType.HasValue)
+                query = query.Where(o => o.OrderType == orderType.Value);
+
+            if (status.HasValue)
+                query = query.Where(o => o.Status == status.Value);
+
+            return await query
+                .OrderByDescending(o => o.ClosedAt)
+                .AsNoTracking()
+                .ToListAsync();
+        }
     }
 }

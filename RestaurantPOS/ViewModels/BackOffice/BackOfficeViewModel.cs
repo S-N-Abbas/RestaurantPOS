@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using RestaurantPOS.ViewModels.BackOffice.Settings;
+using RestaurantPOS.ViewModels.Orders.History;
 
 namespace RestaurantPOS.ViewModels.BackOffice
 {
@@ -16,11 +17,8 @@ namespace RestaurantPOS.ViewModels.BackOffice
         private readonly INavigationService _navigationService;
         private readonly AuthorizationService _authorizationService;
         public IRelayCommand UsersCommand { get; }
-        public IRelayCommand CategoriesCommand { get; }
-        public IRelayCommand ProductsCommand { get; }
-        public IRelayCommand TablesCommand { get; }
-        public IRelayCommand CoversCommand { get; }
         public IRelayCommand SettingsCommand { get; }
+        public IRelayCommand OrderHistoryCommand { get; }
 
         public BackOfficeViewModel(INavigationService navigationService, AuthorizationService authorizationService)
         {
@@ -29,6 +27,9 @@ namespace RestaurantPOS.ViewModels.BackOffice
             UsersCommand = new RelayCommand(() =>
                 _navigationService.NavigateTo<UsersViewModel>());
             
+            OrderHistoryCommand = new RelayCommand(() =>
+                _navigationService.NavigateTo<OrderHistoryViewModel>());
+
             SettingsCommand = new RelayCommand(() =>
                 _navigationService.NavigateTo<SettingsViewModel>());
         }

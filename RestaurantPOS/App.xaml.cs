@@ -12,6 +12,7 @@ using RestaurantPOS.ViewModels.Cover;
 using RestaurantPOS.ViewModels.Home;
 using RestaurantPOS.ViewModels.Login;
 using RestaurantPOS.ViewModels.Orders;
+using RestaurantPOS.ViewModels.Orders.History;
 using RestaurantPOS.ViewModels.Payments;
 using RestaurantPOS.ViewModels.Shell;
 using RestaurantPOS.ViewModels.Tables;
@@ -100,6 +101,7 @@ namespace RestaurantPOS
             services.AddScoped<IZReportService, ZReportService>();
             services.AddTransient<ZReportBuilder>();
             services.AddTransient<ZReportViewModel>();
+            services.AddTransient<OrderHistoryViewModel>();
 
 
             // Shell

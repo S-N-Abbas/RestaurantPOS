@@ -104,37 +104,43 @@ namespace RestaurantPOS.Migrations
                         {
                             Id = 1,
                             IsActive = true,
-                            Name = "Drinks"
+                            Name = "Starters"
                         },
                         new
                         {
                             Id = 2,
                             IsActive = true,
-                            Name = "Starters"
+                            Name = "Main Course"
                         },
                         new
                         {
                             Id = 3,
                             IsActive = true,
-                            Name = "Main Course"
+                            Name = "Rice & Bread"
                         },
                         new
                         {
                             Id = 4,
                             IsActive = true,
-                            Name = "BBQ"
+                            Name = "Desserts"
                         },
                         new
                         {
                             Id = 5,
                             IsActive = true,
-                            Name = "Biryani & Rice"
+                            Name = "Milkshakes"
                         },
                         new
                         {
                             Id = 6,
                             IsActive = true,
-                            Name = "Desserts"
+                            Name = "Mocktails"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            IsActive = true,
+                            Name = "Daiquiris"
                         });
                 });
 
@@ -169,184 +175,304 @@ namespace RestaurantPOS.Migrations
                             Id = 1,
                             CategoryId = 1,
                             IsActive = true,
-                            Name = "Masala Chai",
-                            Price = 2.50m
+                            Name = "Samosa (3 pcs)",
+                            Price = 3.50m
                         },
                         new
                         {
                             Id = 2,
                             CategoryId = 1,
                             IsActive = true,
-                            Name = "Karak Chai",
-                            Price = 2.80m
+                            Name = "Pakora (4 pcs)",
+                            Price = 3.00m
                         },
                         new
                         {
                             Id = 3,
                             CategoryId = 1,
                             IsActive = true,
-                            Name = "Mango Lassi",
-                            Price = 3.50m
+                            Name = "Chicken Pakora (4 pcs)",
+                            Price = 4.00m
                         },
                         new
                         {
                             Id = 4,
                             CategoryId = 1,
                             IsActive = true,
-                            Name = "Soft Drink (Can)",
-                            Price = 1.50m
+                            Name = "Fish Pakora (4 pcs)",
+                            Price = 4.00m
                         },
                         new
                         {
                             Id = 5,
                             CategoryId = 1,
                             IsActive = true,
-                            Name = "Fresh Lime Soda",
-                            Price = 2.80m
-                        },
-                        new
-                        {
-                            Id = 6,
-                            CategoryId = 2,
-                            IsActive = true,
-                            Name = "Samosa (2 pcs)",
-                            Price = 3.00m
-                        },
-                        new
-                        {
-                            Id = 7,
-                            CategoryId = 2,
-                            IsActive = true,
-                            Name = "Chicken Pakora",
-                            Price = 5.50m
-                        },
-                        new
-                        {
-                            Id = 8,
-                            CategoryId = 2,
-                            IsActive = true,
-                            Name = "Chana Chaat",
-                            Price = 4.50m
-                        },
-                        new
-                        {
-                            Id = 9,
-                            CategoryId = 3,
-                            IsActive = true,
-                            Name = "Chicken Karahi",
-                            Price = 11.99m
-                        },
-                        new
-                        {
-                            Id = 10,
-                            CategoryId = 3,
-                            IsActive = true,
-                            Name = "Lamb Karahi",
-                            Price = 13.99m
-                        },
-                        new
-                        {
-                            Id = 11,
-                            CategoryId = 3,
-                            IsActive = true,
-                            Name = "Chicken Curry",
-                            Price = 9.99m
-                        },
-                        new
-                        {
-                            Id = 12,
-                            CategoryId = 3,
-                            IsActive = true,
-                            Name = "Daal Tarka",
-                            Price = 7.99m
-                        },
-                        new
-                        {
-                            Id = 13,
-                            CategoryId = 3,
-                            IsActive = true,
-                            Name = "Paneer Karahi",
-                            Price = 9.50m
-                        },
-                        new
-                        {
-                            Id = 14,
-                            CategoryId = 4,
-                            IsActive = true,
-                            Name = "Chicken Tikka (Full)",
-                            Price = 8.99m
-                        },
-                        new
-                        {
-                            Id = 15,
-                            CategoryId = 4,
-                            IsActive = true,
-                            Name = "Seekh Kebab (2 pcs)",
-                            Price = 7.50m
-                        },
-                        new
-                        {
-                            Id = 16,
-                            CategoryId = 4,
-                            IsActive = true,
-                            Name = "Mixed Grill",
-                            Price = 15.99m
-                        },
-                        new
-                        {
-                            Id = 17,
-                            CategoryId = 5,
-                            IsActive = true,
-                            Name = "Chicken Biryani",
-                            Price = 8.99m
-                        },
-                        new
-                        {
-                            Id = 18,
-                            CategoryId = 5,
-                            IsActive = true,
-                            Name = "Lamb Biryani",
-                            Price = 10.99m
-                        },
-                        new
-                        {
-                            Id = 19,
-                            CategoryId = 5,
-                            IsActive = true,
-                            Name = "Plain Rice",
-                            Price = 3.50m
-                        },
-                        new
-                        {
-                            Id = 20,
-                            CategoryId = 5,
-                            IsActive = true,
-                            Name = "Pilau Rice",
+                            Name = "Chapli Kabab (3 pcs)",
                             Price = 4.00m
                         },
                         new
                         {
-                            Id = 21,
-                            CategoryId = 6,
+                            Id = 6,
+                            CategoryId = 1,
                             IsActive = true,
-                            Name = "Gulab Jamun (2 pcs)",
-                            Price = 3.99m
-                        },
-                        new
-                        {
-                            Id = 22,
-                            CategoryId = 6,
-                            IsActive = true,
-                            Name = "Kheer",
+                            Name = "Seekh Kabab (4 pcs)",
                             Price = 3.50m
                         },
                         new
                         {
+                            Id = 7,
+                            CategoryId = 1,
+                            IsActive = true,
+                            Name = "Drum Stick (3 pcs)",
+                            Price = 4.00m
+                        },
+                        new
+                        {
+                            Id = 8,
+                            CategoryId = 1,
+                            IsActive = true,
+                            Name = "Wings (4 pcs)",
+                            Price = 4.00m
+                        },
+                        new
+                        {
+                            Id = 9,
+                            CategoryId = 2,
+                            IsActive = true,
+                            Name = "Dal",
+                            Price = 6.95m
+                        },
+                        new
+                        {
+                            Id = 10,
+                            CategoryId = 2,
+                            IsActive = true,
+                            Name = "Lamb Karahi",
+                            Price = 8.95m
+                        },
+                        new
+                        {
+                            Id = 11,
+                            CategoryId = 2,
+                            IsActive = true,
+                            Name = "Palak Chicken",
+                            Price = 7.95m
+                        },
+                        new
+                        {
+                            Id = 12,
+                            CategoryId = 2,
+                            IsActive = true,
+                            Name = "Mince Karahi",
+                            Price = 8.95m
+                        },
+                        new
+                        {
+                            Id = 13,
+                            CategoryId = 2,
+                            IsActive = true,
+                            Name = "Butter Chicken",
+                            Price = 8.95m
+                        },
+                        new
+                        {
+                            Id = 14,
+                            CategoryId = 2,
+                            IsActive = true,
+                            Name = "Chicken Manchurian",
+                            Price = 7.95m
+                        },
+                        new
+                        {
+                            Id = 15,
+                            CategoryId = 2,
+                            IsActive = true,
+                            Name = "Chicken Tikka Karahi",
+                            Price = 7.95m
+                        },
+                        new
+                        {
+                            Id = 16,
+                            CategoryId = 3,
+                            IsActive = true,
+                            Name = "Plain Rice",
+                            Price = 5.00m
+                        },
+                        new
+                        {
+                            Id = 17,
+                            CategoryId = 3,
+                            IsActive = true,
+                            Name = "Fried Egg Rice",
+                            Price = 5.95m
+                        },
+                        new
+                        {
+                            Id = 18,
+                            CategoryId = 3,
+                            IsActive = true,
+                            Name = "Pulao Rice",
+                            Price = 7.95m
+                        },
+                        new
+                        {
+                            Id = 19,
+                            CategoryId = 3,
+                            IsActive = true,
+                            Name = "Roti",
+                            Price = 0.75m
+                        },
+                        new
+                        {
+                            Id = 20,
+                            CategoryId = 3,
+                            IsActive = true,
+                            Name = "Naan",
+                            Price = 1.50m
+                        },
+                        new
+                        {
+                            Id = 21,
+                            CategoryId = 4,
+                            IsActive = true,
+                            Name = "Kheer",
+                            Price = 6.95m
+                        },
+                        new
+                        {
+                            Id = 22,
+                            CategoryId = 4,
+                            IsActive = true,
+                            Name = "Custard Trifle",
+                            Price = 5.95m
+                        },
+                        new
+                        {
                             Id = 23,
+                            CategoryId = 5,
+                            IsActive = true,
+                            Name = "GoGo Shake",
+                            Price = 4.95m
+                        },
+                        new
+                        {
+                            Id = 24,
+                            CategoryId = 5,
+                            IsActive = true,
+                            Name = "Millionaire Shake",
+                            Price = 4.95m
+                        },
+                        new
+                        {
+                            Id = 25,
+                            CategoryId = 5,
+                            IsActive = true,
+                            Name = "Hershey’s Shake",
+                            Price = 4.95m
+                        },
+                        new
+                        {
+                            Id = 26,
+                            CategoryId = 5,
+                            IsActive = true,
+                            Name = "Reese’s Peanut Butter Shake",
+                            Price = 4.95m
+                        },
+                        new
+                        {
+                            Id = 27,
+                            CategoryId = 5,
+                            IsActive = true,
+                            Name = "Oreo Shake",
+                            Price = 4.95m
+                        },
+                        new
+                        {
+                            Id = 28,
+                            CategoryId = 5,
+                            IsActive = true,
+                            Name = "Jaffa Cake Shake",
+                            Price = 4.95m
+                        },
+                        new
+                        {
+                            Id = 29,
+                            CategoryId = 5,
+                            IsActive = true,
+                            Name = "Berry Nice Shake",
+                            Price = 4.95m
+                        },
+                        new
+                        {
+                            Id = 30,
                             CategoryId = 6,
                             IsActive = true,
-                            Name = "Ras Malai",
-                            Price = 4.50m
+                            Name = "Miami Sunset",
+                            Price = 4.95m
+                        },
+                        new
+                        {
+                            Id = 31,
+                            CategoryId = 6,
+                            IsActive = true,
+                            Name = "Strawberry & Mint",
+                            Price = 4.95m
+                        },
+                        new
+                        {
+                            Id = 32,
+                            CategoryId = 6,
+                            IsActive = true,
+                            Name = "Lemon & Lime",
+                            Price = 4.95m
+                        },
+                        new
+                        {
+                            Id = 33,
+                            CategoryId = 6,
+                            IsActive = true,
+                            Name = "Pina Colada Mocktail",
+                            Price = 4.95m
+                        },
+                        new
+                        {
+                            Id = 34,
+                            CategoryId = 6,
+                            IsActive = true,
+                            Name = "Mango Mocktail",
+                            Price = 4.95m
+                        },
+                        new
+                        {
+                            Id = 35,
+                            CategoryId = 7,
+                            IsActive = true,
+                            Name = "Strawberry Daiquiri",
+                            Price = 4.95m
+                        },
+                        new
+                        {
+                            Id = 36,
+                            CategoryId = 7,
+                            IsActive = true,
+                            Name = "Mango Daiquiri",
+                            Price = 4.95m
+                        },
+                        new
+                        {
+                            Id = 37,
+                            CategoryId = 7,
+                            IsActive = true,
+                            Name = "Peach Daiquiri",
+                            Price = 4.95m
+                        },
+                        new
+                        {
+                            Id = 38,
+                            CategoryId = 7,
+                            IsActive = true,
+                            Name = "Blueberry Daiquiri",
+                            Price = 4.95m
                         });
                 });
 
@@ -559,6 +685,42 @@ namespace RestaurantPOS.Migrations
                             Id = 12,
                             IsActive = true,
                             Number = 12
+                        },
+                        new
+                        {
+                            Id = 13,
+                            IsActive = true,
+                            Number = 13
+                        },
+                        new
+                        {
+                            Id = 14,
+                            IsActive = true,
+                            Number = 14
+                        },
+                        new
+                        {
+                            Id = 15,
+                            IsActive = true,
+                            Number = 15
+                        },
+                        new
+                        {
+                            Id = 16,
+                            IsActive = true,
+                            Number = 16
+                        },
+                        new
+                        {
+                            Id = 17,
+                            IsActive = true,
+                            Number = 17
+                        },
+                        new
+                        {
+                            Id = 18,
+                            IsActive = true,
+                            Number = 18
                         });
                 });
 
@@ -586,6 +748,16 @@ namespace RestaurantPOS.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            IsActive = true,
+                            PasscodeHash = "1234",
+                            Role = "Admin",
+                            Username = "Admin"
+                        });
                 });
 
             modelBuilder.Entity("RestaurantPOS.Domain.Entities.Booking", b =>

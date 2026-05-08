@@ -39,6 +39,8 @@ namespace RestaurantPOS.Domain.Settings
         public bool PrintReceiptOnPayment { get; set; } = true;
         public string FooterMessage { get; set; } = "Thank you for dining with us!";
 
+        public string DefaultPrinter { get; set; } = "";
+
         [NotMapped]
         public string AdultCoverLabel { get; set; } = "Adults";
         

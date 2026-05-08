@@ -4,7 +4,9 @@ using RestaurantPOS.Services;
 using RestaurantPOS.ViewModels.Base;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.Printing;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -26,8 +28,13 @@ namespace RestaurantPOS.ViewModels.BackOffice.Settings
 
         public bool IsDirty => !AreEqual(EditableSettings, _settingsService.Settings);
 
+        // ─── Printer list ─────────────────────────────────────────────────────
+
+        public ObservableCollection<string> AvailablePrinters { get; } = new();
+
         public IRelayCommand SaveCommand { get; }
         public IRelayCommand ResetCommand { get; }
+        public IRelayCommand RefreshPrintersCommand { get; }
 
         public SettingsViewModel(SettingsService settingsService)
         {
@@ -37,8 +44,41 @@ namespace RestaurantPOS.ViewModels.BackOffice.Settings
 
             SaveCommand = new RelayCommand(OnSave);
             ResetCommand = new RelayCommand(OnReset);
+
+            RefreshPrintersCommand = new RelayCommand(LoadPrinters);
+
+            LoadPrinters();
         }
 
+        // ─── Printer loading ──────────────────────────────────────────────────
+
+        private void LoadPrinters()
+        {
+            AvailablePrinters.Clear();
+
+            // Blank entry = "use system default / show dialog each time"
+            AvailablePrinters.Add(string.Empty);
+
+            try
+            {
+                using var server = new LocalPrintServer();
+                foreach (var queue in server.GetPrintQueues())
+                    AvailablePrinters.Add(queue.Name);
+            }
+            catch
+            {
+                // On machines without the Print Spooler or in sandboxed
+                // environments, silently fall back to dialog-per-print.
+            }
+
+            // Make sure the currently saved printer is in the list
+            // (e.g. a network printer that is temporarily offline)
+            var saved = EditableSettings?.DefaultPrinter ?? string.Empty;
+            if (!string.IsNullOrEmpty(saved) && !AvailablePrinters.Contains(saved))
+                AvailablePrinters.Add(saved);
+        }
+
+        // Save or Reset
         private void OnSave()
         {
             _settingsService.Save(EditableSettings);

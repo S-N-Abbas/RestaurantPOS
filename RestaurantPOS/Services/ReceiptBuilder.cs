@@ -117,7 +117,7 @@ namespace RestaurantPOS.Services
 
             // 6. FOOTER
             doc.Blocks.Add(Spacer(10));
-            doc.Blocks.Add(CenterBold("THANK YOU FOR YOUR VISIT!"));
+            doc.Blocks.Add(CenterBold(_settingsService.Settings.FooterMessage));
             if(_settingsService.Settings.VatNo != null)
                 doc.Blocks.Add(Center($"VAT No: {_settingsService.Settings.VatNo}")); // Common in UK
             doc.Blocks.Add(Spacer(6));
