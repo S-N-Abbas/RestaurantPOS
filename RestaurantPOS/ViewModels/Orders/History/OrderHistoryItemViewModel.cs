@@ -1,17 +1,27 @@
 ﻿using RestaurantPOS.Domain.Entities;
 using RestaurantPOS.Services;
+using RestaurantPOS.ViewModels.Base;
 
 namespace RestaurantPOS.ViewModels.Orders.History
 {
     /// <summary>
     /// Read-only VM for a single order card in the history list.
     /// </summary>
-    public class OrderHistoryItemViewModel
+    public class OrderHistoryItemViewModel : ViewModelBase
     {
         private readonly Order _order;
         private readonly SettingsService _settingsService;
 
         // ─── Identity ─────────────────────────────────────────────────────────
+        // In OrderHistoryItemViewModel.cs — add this property
+
+        private bool _isSelected;
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set => SetProperty(ref _isSelected, value);  // needs ViewModelBase
+        }
+
 
         public int Id => _order.Id;
         public string OrderLabel => $"#{_order.Id:D4}";
@@ -98,8 +108,22 @@ namespace RestaurantPOS.ViewModels.Orders.History
         public decimal CoverTotal => _settingsService.CalculateCoverCharge(_order);
         public decimal GrandTotal => ItemsTotal + CoverTotal;
 
-        public decimal CashPaid => _order.Payments
-            .Where(p => p.Method == "Cash").Sum(p => p.Amount);
+        public decimal CashPaid
+        {
+            get
+            {
+                decimal rawCard = _order.Payments
+                    .Where(p => p.Method == "Card").Sum(p => p.Amount);
+                decimal rawDeposit = _order.Payments
+                    .Where(p => p.Method == "Deposit").Sum(p => p.Amount);
+                decimal rawCash = _order.Payments
+                    .Where(p => p.Method == "Cash").Sum(p => p.Amount);
+
+                decimal covered = rawCard + rawDeposit;
+                decimal netCash = Math.Max(GrandTotal - covered, 0m);
+                return Math.Min(netCash, rawCash);
+            }
+        }
         public decimal CardPaid => _order.Payments
             .Where(p => p.Method == "Card").Sum(p => p.Amount);
         public decimal DepositPaid => _order.Payments

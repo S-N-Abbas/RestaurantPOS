@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.DependencyInjection;
+using CommunityToolkit.Mvvm.Input;
 using RestaurantPOS.Repositories;
 using RestaurantPOS.Services;
 using RestaurantPOS.ViewModels.Base;
@@ -17,6 +18,7 @@ namespace RestaurantPOS.ViewModels.ZReport
     {
         private readonly IZReportService _reportService;
         private readonly ZReportBuilder _reportBuilder;
+        private readonly SettingsService _settingsService;
 
         // ─── Date range ───────────────────────────────────────────────────────
 
@@ -95,7 +97,8 @@ namespace RestaurantPOS.ViewModels.ZReport
         {
             _reportService = reportService;
             _reportBuilder = reportBuilder;
-            _currency = settingsService.Settings.CurrencySymbol;
+            _settingsService = settingsService;
+            _currency = _settingsService.Settings.CurrencySymbol;
 
             // Quick range commands
             SetTodayCommand = new RelayCommand(() => SetRange(DateTime.Today, DateTime.Today.AddDays(1).AddSeconds(-1)));
@@ -164,13 +167,39 @@ namespace RestaurantPOS.ViewModels.ZReport
         {
             if (Document == null) return;
 
-            var dialog = new PrintDialog();
+            var printerName = _settingsService.Settings.DefaultPrinter;
 
-            if (dialog.ShowDialog() == true)
+            // ✅ If a default printer is configured, print silently
+            if (!string.IsNullOrWhiteSpace(printerName))
             {
-                dialog.PrintDocument(
-                    ((IDocumentPaginatorSource)Document).DocumentPaginator,
-                    "Z-Report");
+                try
+                {
+                    var dialog = new PrintDialog();
+                    dialog.PrintQueue = new System.Printing.PrintQueue(
+                        new System.Printing.PrintServer(),
+                        printerName);
+
+                    dialog.PrintDocument(
+                        ((IDocumentPaginatorSource)Document).DocumentPaginator,
+                        "Z-Report");
+
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    // Printer not found or unavailable — fall through to dialog
+                    System.Diagnostics.Debug.WriteLine(
+                        $"Default printer '{printerName}' unavailable: {ex.Message}");
+                }
+
+                // ✅ Fallback — show dialog if no default printer or it failed
+                var fallbackDialog = new PrintDialog();
+                if (fallbackDialog.ShowDialog() == true)
+                {
+                    fallbackDialog.PrintDocument(
+                        ((IDocumentPaginatorSource)Document).DocumentPaginator,
+                        "Z-Report");
+                }
             }
         }
     }

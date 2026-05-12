@@ -210,7 +210,15 @@ namespace RestaurantPOS.ViewModels.Orders.History
 
         private void OnSelectOrder(OrderHistoryItemViewModel? order)
         {
+            // Clear previous selection
+            if (_selectedOrder != null)
+                _selectedOrder.IsSelected = false;
+
             SelectedOrder = order;
+
+            if (_selectedOrder != null)
+                _selectedOrder.IsSelected = true;
+
             OnPropertyChanged(nameof(HasSelection));
             ((RelayCommand)ReprintCommand).NotifyCanExecuteChanged();
         }

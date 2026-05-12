@@ -30,6 +30,7 @@ namespace RestaurantPOS.Services
         {
             // ── Load all closed orders in range ───────────────────────────────
             var orders = await _db.Orders
+                .Include(o => o.Items)
                 .Include(o => o.Payments)
                 .Where(o =>
                     o.IsClosed &&
@@ -61,26 +62,57 @@ namespace RestaurantPOS.Services
         // ─── Section Builders ─────────────────────────────────────────────────
 
         private ZReportSection BuildSection(
-            string label,
-            IEnumerable<Order> orders,
-            int cancelCount = 0)
+    string label,
+    IEnumerable<Order> orders,
+    int cancelCount = 0)
         {
             var list = orders.ToList();
+
+            decimal cashTotal = 0m;
+            decimal cardTotal = 0m;
+            decimal depositTotal = 0m;
+
+            foreach (var order in list)
+            {
+                // ── Actual grand total for this order ─────────────────────────────────
+                decimal coverTotal = _settingsService.CalculateCoverCharge(order);
+
+                decimal orderGrandTotal = order.ItemsTotal + coverTotal;
+
+                // ── Raw payment totals ────────────────────────────────────────────────
+                decimal rawCash = order.Payments
+                    .Where(p => p.Method == "Cash")
+                    .Sum(p => p.Amount);
+
+                decimal rawCard = order.Payments
+                    .Where(p => p.Method == "Card")
+                    .Sum(p => p.Amount);
+
+                decimal rawDeposit = order.Payments
+                    .Where(p => p.Method == "Deposit")
+                    .Sum(p => p.Amount);
+
+                // ── Card and deposit are always exact — never overpay ─────────────────
+                cardTotal += rawCard;
+                depositTotal += rawDeposit;
+
+                // ── Cash net revenue = grand total minus what card and deposit covered ─
+                // This strips out any change given back to the customer
+                decimal coveredByOther = rawCard + rawDeposit;
+                decimal cashRevenue = Math.Max(orderGrandTotal - coveredByOther, 0m);
+
+                // ✅ Cap at actual cash tendered in case order was partially paid
+                cashTotal += Math.Min(cashRevenue, rawCash);
+            }
 
             return new ZReportSection
             {
                 Label = label,
                 OrderCount = list.Count,
                 CancelCount = cancelCount,
-                CashTotal = list.SelectMany(o => o.Payments)
-                                   .Where(p => p.Method == "Cash")
-                                   .Sum(p => p.Amount),
-                CardTotal = list.SelectMany(o => o.Payments)
-                                   .Where(p => p.Method == "Card")
-                                   .Sum(p => p.Amount),
-                DepositTotal = list.SelectMany(o => o.Payments)
-                                   .Where(p => p.Method == "Deposit")
-                                   .Sum(p => p.Amount),
+                CashTotal = cashTotal,
+                CardTotal = cardTotal,
+                DepositTotal = depositTotal,
                 AdultCovers = list.Sum(o => o.AdultCovers),
                 ChildCovers = list.Sum(o => o.ChildCovers)
             };

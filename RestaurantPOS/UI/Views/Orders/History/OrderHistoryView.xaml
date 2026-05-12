@@ -380,14 +380,16 @@
                                                             CornerRadius="12"
                                                             BorderThickness="1.5"
                                                             Padding="14,12">
+                                                        <!-- ✅ Fix — bind to IsSelected bool on the item itself -->
                                                         <Border.Style>
                                                             <Style TargetType="Border">
                                                                 <Setter Property="BorderBrush"
                                                                         Value="{StaticResource BorderGray}" />
+                                                                <Setter Property="Background"
+                                                                        Value="White" />
                                                                 <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding DataContext.SelectedOrder.Id,
-                                                                                  RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                                                 Value="{Binding Id}">
+                                                                    <DataTrigger Binding="{Binding IsSelected}"
+                                                                                 Value="True">
                                                                         <Setter Property="BorderBrush"
                                                                                 Value="{StaticResource PrimaryAccent}" />
                                                                         <Setter Property="Background"

@@ -121,11 +121,37 @@ namespace RestaurantPOS.ViewModels.Payments
 
             var doc = _receiptBuilder.Build(_orderState.Order);
 
-            var dialog = new PrintDialog();
+            var printerName = _settingsService.Settings.DefaultPrinter;
 
-            if (dialog.ShowDialog() == true)
+            // ✅ If a default printer is configured, print silently
+            if (!string.IsNullOrWhiteSpace(printerName))
             {
-                dialog.PrintDocument(
+                try
+                {
+                    var dialog = new PrintDialog();
+                    dialog.PrintQueue = new System.Printing.PrintQueue(
+                        new System.Printing.PrintServer(),
+                        printerName);
+
+                    dialog.PrintDocument(
+                        ((IDocumentPaginatorSource)doc).DocumentPaginator,
+                        "Receipt");
+
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    // Printer not found or unavailable — fall through to dialog
+                    System.Diagnostics.Debug.WriteLine(
+                        $"Default printer '{printerName}' unavailable: {ex.Message}");
+                }
+            }
+
+            // ✅ Fallback — show dialog if no default printer or it failed
+            var fallbackDialog = new PrintDialog();
+            if (fallbackDialog.ShowDialog() == true)
+            {
+                fallbackDialog.PrintDocument(
                     ((IDocumentPaginatorSource)doc).DocumentPaginator,
                     "Receipt");
             }
