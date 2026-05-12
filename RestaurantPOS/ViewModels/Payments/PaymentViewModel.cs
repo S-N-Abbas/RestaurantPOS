@@ -30,7 +30,15 @@ namespace RestaurantPOS.ViewModels.Payments
         public OrderState _orderState { get; }
         public OrderStore _orderStore { get; }
 
-        
+        public decimal Change => IsCashSelected && EnteredAmount > Due
+    ? EnteredAmount - Due
+    : 0m;
+
+        public bool HasChange => Change > 0;
+
+        public bool IsCashSelected => SelectedMethod == PaymentMethod.Cash;
+
+
         public string TableLabel => _orderState.ContextId > 0 ? $"Table {_orderState.ContextId}" : $"{_orderState.Order?.OrderType.ToString()}";
 
         // Payment amounts
@@ -82,6 +90,8 @@ namespace RestaurantPOS.ViewModels.Payments
                     OnPropertyChanged(nameof(AlreadyPaid));
                     OnPropertyChanged(nameof(Due));
                     OnPropertyChanged(nameof(CanPay));
+                    OnPropertyChanged(nameof(Change));
+                    OnPropertyChanged(nameof(HasChange));
                     (PayCommand as RelayCommand)?.NotifyCanExecuteChanged();
                 }
             }
@@ -94,7 +104,12 @@ namespace RestaurantPOS.ViewModels.Payments
             set
             {
                 if (SetProperty(ref _selectedMethod, value))
+                {
                     OnPropertyChanged(nameof(CanPay));
+                    OnPropertyChanged(nameof(IsCashSelected));
+                    OnPropertyChanged(nameof(Change));
+                    OnPropertyChanged(nameof(HasChange));
+                }
                 (PayCommand as RelayCommand)?.NotifyCanExecuteChanged();
             }
         }
@@ -119,7 +134,9 @@ namespace RestaurantPOS.ViewModels.Payments
         public bool CanPay =>
             SelectedMethod != null &&
             EnteredAmount > 0 &&
-            EnteredAmount <= Due;
+            (IsCashSelected
+        ? EnteredAmount > 0          // ✅ cash: allow exact or over
+        : EnteredAmount <= Due);        // ✅ card: must not exceed remaining
 
         public PaymentViewModel(OrderState orderState, OrderService orderService, OrderStore orderStore, SettingsService settingsService, INavigationService navigationService, UserSessionService userSessionService)
         {
@@ -158,25 +175,28 @@ namespace RestaurantPOS.ViewModels.Payments
             await _orderService.RecordPaymentAsync(
                 _orderState.Order.Id,
                 EnteredAmount,
-                SelectedMethod.ToString() // convert enum to string for DB
+                SelectedMethod.ToString());
 
-            );
+            // Reload to get updated PaidAmount
+            var updatedOrder = await _orderService.GetByIdAsync(_orderState.Order.Id);
+            _orderState.UpdateFrom(updatedOrder);
 
             EnteredAmount = 0;
+            OnPropertyChanged(nameof(Change));
+            OnPropertyChanged(nameof(HasChange));
 
+            // ✅ PaidAmount now includes tendered cash — will be >= Total when paid in full
             if (_orderState.Order.PaidAmount >= Total)
             {
                 await _orderService.CloseOrderAsync(_orderState.Order.Id);
-                var updatedOrder = await _orderService.GetByIdAsync(_orderState.Order.Id);
-                _orderState.UpdateFrom(updatedOrder);
+                var closedOrder = await _orderService.GetByIdAsync(_orderState.Order.Id);
+                _orderState.UpdateFrom(closedOrder);
 
                 _orderStore.CloseOrder(_orderState.Order.ContextId);
 
-                if (_settingsService.Settings.PrintReceiptOnPayment)
-                {
-                    PrintReceipt();
-                    _navigationService.NavigateTo<TablesViewModel>();
-                }
+                PrintReceipt();
+
+                _navigationService.NavigateTo<TablesViewModel>();
             }
         }
 

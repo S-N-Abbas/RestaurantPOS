@@ -85,6 +85,8 @@ namespace RestaurantPOS.ViewModels.BackOffice.Settings
 
             // Refresh editor with clean persisted state
             EditableSettings = CloneSettings(_settingsService.Settings);
+
+           
         }
 
         private void OnReset()

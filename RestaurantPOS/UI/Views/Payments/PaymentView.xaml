@@ -161,6 +161,47 @@
                                         </TextBlock.Text>
                                     </TextBlock>
                                 </Grid>
+                                <Separator Background="{StaticResource BorderGray}"
+                                           Margin="0,4,0,12" />
+                                
+                                <!-- ✅ CHANGE DUE — only visible when customer overpays with cash -->
+                                <Border CornerRadius="12"
+                                        Padding="16,14"
+                                        Margin="0,0,0,16"
+                                        Visibility="{Binding HasChange,
+                     Converter={StaticResource BoolToVisibilityConverter}}">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background"
+                                                    Value="#D1FAE5" />
+                                        </Style>
+                                    </Border.Style>
+                                    <Grid>
+                                        <StackPanel Orientation="Horizontal"
+                                                    VerticalAlignment="Center">
+                                            <iconPacks:PackIconMaterial Kind="CashRefund"
+                                                                        Width="20"
+                                                                        Height="20"
+                                                                        Foreground="#065F46"
+                                                                        VerticalAlignment="Center"
+                                                                        Margin="0,0,10,0" />
+                                            <TextBlock Text="CHANGE DUE"
+                                                       FontSize="15"
+                                                       FontWeight="Bold"
+                                                       Foreground="#065F46"
+                                                       VerticalAlignment="Center" />
+                                        </StackPanel>
+                                        <TextBlock HorizontalAlignment="Right"
+                                                   FontSize="28"
+                                                   FontWeight="Black"
+                                                   Foreground="#065F46"
+                                                   VerticalAlignment="Center">
+            <Run Text="{Binding CurrencySymbol, Mode=OneWay}" />
+            <Run Text="{Binding Change, StringFormat={}{0:N2}, Mode=OneWay}" />
+                                        </TextBlock>
+                                    </Grid>
+                                </Border>
+
                             </StackPanel>
                         </Border>
 
@@ -346,10 +387,24 @@
                                                         Height="20"
                                                         Margin="0,0,12,0"
                                                         VerticalAlignment="Center" />
-                            <TextBlock Text="CONFIRM PAYMENT"
+                            <TextBlock VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"
                                        FontSize="18"
-                                       FontWeight="Black"
-                                       VerticalAlignment="Center" />
+                                       FontWeight="Black">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Text"
+                                                Value="CONFIRM PAYMENT" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding HasChange}"
+                                                         Value="True">
+                                                <Setter Property="Text"
+                                                        Value="TAKE PAYMENT &amp; GIVE CHANGE" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
                         </StackPanel>
                     </Button>
                 </Grid>

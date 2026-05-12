@@ -120,7 +120,7 @@ namespace RestaurantPOS.ViewModels.Orders
         public decimal CoversTotal =>
             _orderState.Order == null ? 0 :
             _settingsService.CalculateCoverCharge(_orderState.Order);
-        public bool CanPay => _orderState?.Order != null && OrderItems.Any();
+        public bool CanPay => _orderState?.Order != null && GrandTotal > 0;
         public decimal ItemsTotal =>
             OrderItems.Sum(i => i.Total);
         public decimal GrandTotal => 
@@ -235,7 +235,7 @@ namespace RestaurantPOS.ViewModels.Orders
 
             PayCommand = new RelayCommand(
                 ExecutePay,
-                () => _orderState?.Order != null && OrderItems.Any()
+                () => CanPay
             );
 
             OpenTableTransferCommand = new RelayCommand(
@@ -284,17 +284,6 @@ namespace RestaurantPOS.ViewModels.Orders
         {
             if (coverSelectorViewModel != null)
                 coverSelectorViewModel.Reload(_orderState);
-
-            if (_orderContextService.CurrentOrderType == OrderType.DineIn)
-            {
-                if (_orderState.Order == null ||
-                    (_orderState.Order.AdultCovers == 0 && _orderState.Order.ChildCovers == 0))
-                    IsCoverSelectorOpen = true;
-            }
-            else
-            {
-                IsCoverSelectorOpen = false;
-            }
 
             OnPropertyChanged(nameof(CoversDisplay));
             OnPropertyChanged(nameof(GrandTotal));

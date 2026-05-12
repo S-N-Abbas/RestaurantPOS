@@ -56,36 +56,33 @@ namespace RestaurantPOS.Services
 
 
         public async Task RecordPaymentAsync(
-            int orderId,
-            decimal amount,
-            string method)
+    int orderId,
+    decimal amount,
+    string method)
         {
             if (amount <= 0)
                 throw new ArgumentException("Invalid amount");
-
 
             var order = await LoadOrderAsync(orderId);
 
             if (order.IsClosed)
                 throw new InvalidOperationException("Order already closed");
 
-            var orderTotal = order.ItemsTotal + order.ChildCovers * _settingsService.Settings.ChildCoverPrice
-                + order.AdultCovers * _settingsService.Settings.AdultCoverPrice;
+            // ✅ Card must never exceed remaining balance
+            var orderTotal = order.ItemsTotal + _settingsService.CalculateCoverCharge(order);
 
             var remaining = orderTotal - order.PaidAmount;
 
-            //if (method == "Card" && amount != remaining)
-            //    throw new InvalidOperationException("Card must pay exact amount");
-
-            var applied = Math.Min(amount, remaining);
+            if (method == "Card" && amount > remaining)
+                throw new InvalidOperationException(
+                    "Card payment cannot exceed the remaining balance.");
 
             order.Payments.Add(new Payment
             {
                 OrderId = orderId,
-                Amount = applied,
+                Amount = amount,       // ✅ full tendered amount, not capped
                 Method = method,
                 PaidAt = DateTime.UtcNow
-                
             });
 
             await _db.SaveChangesAsync();

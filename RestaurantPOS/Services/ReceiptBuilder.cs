@@ -82,12 +82,12 @@ namespace RestaurantPOS.Services
                 if (order.AdultCovers > 0)
                     doc.Blocks.Add(TwoColumn(
                         $"{aLabel} (x{order.AdultCovers})",
-                        $"{_settingsService.Settings.CurrencySymbol}{aPrice * order.AdultCovers:F2}"));
+                        $"{_settingsService.Settings.CurrencySymbol}{aPrice:F2}"));
 
                 if (order.ChildCovers > 0)
                     doc.Blocks.Add(TwoColumn(
                         $"{bLabel} (x{order.ChildCovers})",
-                        $"{_settingsService.Settings.CurrencySymbol}{bPrice * order.ChildCovers:F2}"));
+                        $"{_settingsService.Settings.CurrencySymbol}{bPrice:F2}"));
 
                 doc.Blocks.Add(Spacer(4));
             }
