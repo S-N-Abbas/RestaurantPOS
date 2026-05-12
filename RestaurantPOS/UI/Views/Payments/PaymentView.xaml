@@ -309,7 +309,7 @@
                                        FontWeight="Bold"
                                        VerticalAlignment="Center"
                                        Foreground="{StaticResource PrimaryAccent}" />
-                            <TextBlock Text="{Binding EnteredAmount}"
+                            <TextBlock Text="{Binding EnteredAmount, StringFormat={}{0:F2}}"
                                        FontSize="42"
                                        FontWeight="Black"
                                        HorizontalAlignment="Right"
