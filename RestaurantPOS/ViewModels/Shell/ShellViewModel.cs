@@ -120,8 +120,7 @@ namespace RestaurantPOS.ViewModels.Shell
         private void OnLogout()
         {
             _userSessionService.Logout();
-            _navigationService.NavigateTo<LoginViewModel>();
-            _navigationService.ClearHistory(); // Clear history to prevent going back to authenticated views
+            _navigationService.ResetTo<LoginViewModel>();
         }
 
         private void OnClose()

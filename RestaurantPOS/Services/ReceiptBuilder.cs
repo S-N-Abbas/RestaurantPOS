@@ -50,6 +50,7 @@ namespace RestaurantPOS.Services
             AddLogo(doc);
             doc.Blocks.Add(Title(_settingsService.Settings.BusinessName));
             doc.Blocks.Add(Center(_settingsService.Settings.AddressLine1));
+            doc.Blocks.Add(Center($"{_settingsService.Settings.City} {_settingsService.Settings.Postcode}"));
             doc.Blocks.Add(Center("Tel: " + _settingsService.Settings.PhoneNo));
             doc.Blocks.Add(Spacer(8));
             doc.Blocks.Add(Line());

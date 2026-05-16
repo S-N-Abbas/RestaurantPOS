@@ -2,6 +2,7 @@
 using RestaurantPOS.Domain.Entities;
 using RestaurantPOS.Services;
 using RestaurantPOS.ViewModels.Base;
+using RestaurantPOS.ViewModels.Home;
 using RestaurantPOS.ViewModels.Orders;
 using RestaurantPOS.ViewModels.Tables;
 using System.Collections.ObjectModel;
@@ -222,7 +223,10 @@ namespace RestaurantPOS.ViewModels.Payments
 
                 PrintReceipt();
 
-                _navigationService.NavigateTo<TablesViewModel>();
+                if(_orderState.Order.OrderType == OrderType.TakeAway || _orderState.Order.OrderType == OrderType.Delivery)
+                    _navigationService.NavigateBackTo<HomeViewModel>();
+                else
+                    _navigationService.NavigateBackTo<TablesViewModel>();
             }
         }
 

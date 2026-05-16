@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Extensions.DependencyInjection;
 using RestaurantPOS.ViewModels.Base;
 using System;
 using System.Collections.Generic;
@@ -58,6 +59,30 @@ namespace RestaurantPOS.Services
                 // Logic to set CurrentViewModel to previous without pushing to history
                 CurrentViewModel = previous;
             }
+        }
+
+        public void NavigateBackTo<TViewModel>() where TViewModel : ViewModelBase
+        {
+            // Search history for an existing instance of the target ViewModel
+            while (_history.Count > 0)
+            {
+                var top = _history.Pop();
+                if (top is TViewModel)
+                {
+                    CurrentViewModel = top;
+                    return;
+                }
+            }
+
+            // If not found in history, just navigate to a fresh one
+            NavigateTo<TViewModel>();
+        }
+
+        public void ResetTo<TViewModel>() where TViewModel : ViewModelBase
+        {
+            // Clear everything and start fresh at a specific view
+            _history.Clear();
+            CurrentViewModel = _serviceProvider.GetRequiredService<TViewModel>();
         }
 
         public void ClearHistory()
