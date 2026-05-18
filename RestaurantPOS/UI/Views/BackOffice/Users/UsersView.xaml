@@ -478,24 +478,16 @@
                                        FontWeight="Bold"
                                        Foreground="{StaticResource TextMuted}"
                                        Margin="0,0,0,6" />
-
-                            <PasswordBox x:Name="UserPinBox"
-                                         Height="52"
-                                         FontSize="24"
-                                         FontWeight="Black"
-                                         Padding="12,0"
-                                         VerticalContentAlignment="Center"
-                                         HorizontalContentAlignment="Center"
-                                         Foreground="{StaticResource PrimaryAccent}"
-                                         Margin="0,0,0,6"
-                                         GotFocus="UserPinBox_GotFocus"
-                                         PasswordChanged="UserPinBox_PasswordChanged">
-                                <PasswordBox.Style>
-                                    <Style TargetType="PasswordBox">
-                                        <Setter Property="BorderThickness"
-                                                Value="2" />
+                            <Button
+                                Click="UserPinBox_GotFocus">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Background"
+                                                Value="#F8FAFC" />
                                         <Setter Property="BorderBrush"
                                                 Value="{StaticResource BorderGray}" />
+                                        <Setter Property="BorderThickness"
+                                                Value="1" />
                                         <Style.Resources>
                                             <Style TargetType="Border">
                                                 <Setter Property="CornerRadius"
@@ -510,8 +502,16 @@
                                             </Trigger>
                                         </Style.Triggers>
                                     </Style>
-                                </PasswordBox.Style>
-                            </PasswordBox>
+                                </Button.Style>
+                                <TextBlock  Text="{Binding PinDisplay}"
+                                            Height="52"
+                                            FontSize="24"
+                                            FontWeight="Black"
+                                            Padding="12,0"
+                                            TextAlignment="Center"
+                                            Foreground="{StaticResource PrimaryAccent}"
+                                            Margin="0,0,0,6"/>
+                            </Button>
 
                             <TextBlock Text="Leave empty to keep current PIN"
                                        FontSize="11"

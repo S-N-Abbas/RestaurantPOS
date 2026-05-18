@@ -1,4 +1,5 @@
 ﻿using RestaurantPOS.ViewModels.BackOffice.Users;
+using RestaurantPOS.ViewModels.Login;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,15 +25,9 @@ namespace RestaurantPOS.UI.Views.BackOffice.Users
         public UsersView()
         {
             InitializeComponent();
-        }
-
-        private void UserPinBox_PasswordChanged(object sender, RoutedEventArgs e)
-        {
-            // Since PasswordBox isn't bindable for security, update VM manually
-            if (this.DataContext is UsersViewModel vm)
-            {
-                vm.EditorPin = ((PasswordBox)sender).Password;
-            }
+            // Enable the control to receive direct global keyboard focus
+            Focusable = true;
+            Loaded += (s, e) => Focus(); // Automatically focus when the view displays
         }
 
         private void UserPinBox_GotFocus(object sender, RoutedEventArgs e)
@@ -58,5 +53,59 @@ namespace RestaurantPOS.UI.Views.BackOffice.Users
                 vm.FocusSearchCommand.Execute(null);
             }
         }
+
+        protected override void OnPreviewKeyDown(KeyEventArgs e)
+        {
+            // Check ensures commands match your ViewModel signature
+            if (DataContext is UsersViewModel vm)
+            {
+                // 1. Handle Letter Keys (A-Z)
+                if (e.Key >= Key.A && e.Key <= Key.Z)
+                {
+                    // Convert Key to corresponding character
+                    char letter = (char)('A' + (e.Key - Key.A));
+                    ExecuteCommand(vm.KeyCommand, letter.ToString());
+                    e.Handled = true;
+                }
+                // 2. Handle Top Row Number Keys (0-9)
+                else if (e.Key >= Key.D0 && e.Key <= Key.D9)
+                {
+                    string digit = (e.Key - Key.D0).ToString();
+                    ExecuteCommand(vm.KeyCommand, digit);
+                    e.Handled = true;
+                }
+                // 3. Handle Numpad Keys (0-9)
+                else if (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9)
+                {
+                    string digit = (e.Key - Key.NumPad0).ToString();
+                    ExecuteCommand(vm.KeyCommand, digit);
+                    e.Handled = true;
+                }
+                // 4. Handle Backspace (← Button)
+                else if (e.Key == Key.Back)
+                {
+                    ExecuteCommand(vm.BackspaceCommand, null);
+                    e.Handled = true;
+                }
+                // 5. Handle Escape or Delete (Clear "C" Button)
+                else if (e.Key == Key.Escape || e.Key == Key.Delete)
+                {
+                    ExecuteCommand(vm.ClearEditorCommand, null);
+                    e.Handled = true;
+                }
+                
+            }
+
+            base.OnPreviewKeyDown(e);
+        }
+
+        private void ExecuteCommand(ICommand command, object parameter)
+        {
+            if (command != null && command.CanExecute(parameter))
+            {
+                command.Execute(parameter);
+            }
+        }
+
     }
 }
