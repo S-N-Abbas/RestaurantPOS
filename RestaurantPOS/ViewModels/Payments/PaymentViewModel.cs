@@ -234,6 +234,10 @@ namespace RestaurantPOS.ViewModels.Payments
         private void AppendDigit(string digit)
         {
             string current = ((int)(EnteredAmount * 100)).ToString();
+            
+            if(current.Length >= 9) // Prevent overflow beyond 9999999.99
+                return;
+
             current += digit;
             if (long.TryParse(current, out var val))
             {

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RestaurantPOS.Domain.Entities;
 using RestaurantPOS.Infrastructure.Data;
+using System.Security.RightsManagement;
 
 namespace RestaurantPOS.Services
 {
@@ -24,7 +25,8 @@ namespace RestaurantPOS.Services
 
             if (id == null)
             {
-                category = new Category { Name = name.Trim(), IsActive = true };
+                int displayOrder = await _db.Categories.CountAsync() + 1; // New category goes to the end
+                category = new Category { Name = name.Trim(), IsActive = true, DisplayOrder = displayOrder };
                 _db.Categories.Add(category);
             }
             else
@@ -37,6 +39,37 @@ namespace RestaurantPOS.Services
             await _db.SaveChangesAsync();
             _menuDataService.InvalidateCache(); // ✅ order screen picks it up next load
             return category;
+        }
+
+        public async Task MoveCategoryAsync(int categoryId, bool moveUp)
+        {
+            // Load all active categories ordered by DisplayOrder
+            var categories = await _db.Categories
+                .Where(c => c.IsActive)
+                .OrderBy(c => c.DisplayOrder)
+                .ThenBy(c => c.Name)   // stable tiebreak
+                .ToListAsync();
+
+            var index = categories.FindIndex(c => c.Id == categoryId);
+
+            if (index < 0) return;  // not found
+
+            // Calculate neighbour index
+            int neighbourIndex = moveUp ? index - 1 : index + 1;
+
+            // Guard boundaries
+            if (neighbourIndex < 0 || neighbourIndex >= categories.Count)
+                return;
+
+            var current = categories[index];
+            var neighbour = categories[neighbourIndex];
+
+            // ✅ Swap DisplayOrder values
+            (current.DisplayOrder, neighbour.DisplayOrder) =
+                (neighbourIndex, index);
+
+            await _db.SaveChangesAsync();
+            _menuDataService.InvalidateCache();
         }
 
         public async Task<MenuProduct> SaveProductAsync(

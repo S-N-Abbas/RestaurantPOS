@@ -12,6 +12,8 @@ namespace RestaurantPOS.ViewModels.Orders
         public int Id { get; }
         public string Name { get; }
 
+        public int DisplayOrder { get; set; }
+
         private bool _isSelected;
         public bool IsSelected
         {
@@ -22,10 +24,11 @@ namespace RestaurantPOS.ViewModels.Orders
         public void RaiseIsSelected(int? selectedId)
             => IsSelected = selectedId == Id;
 
-        public CategoryViewModel(int id, string name)
+        public CategoryViewModel(int id, string name, int displayOrder)
         {
             Id = id;
             Name = name;
+            DisplayOrder = displayOrder;
         }
     }
 }

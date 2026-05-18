@@ -241,9 +241,25 @@
                                     <StackPanel Orientation="Horizontal"
                                                 HorizontalAlignment="Right"
                                                 VerticalAlignment="Center"
-                                                Visibility="{Binding DataContext.IsEditMenuMode, 
-                                         RelativeSource={RelativeSource AncestorType=UserControl}, 
-                                         Converter={StaticResource BoolToVisibilityConverter}}">
+                                                Visibility="{Binding DataContext.IsEditMenuMode, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibilityConverter}}">
+
+                                        <Button Style="{StaticResource IconButtonSmall}"
+                                                Command="{Binding DataContext.MoveCategoryUpCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}"
+                                                Margin="0,0,4,0">
+                                            <iconPacks:PackIconMaterial Kind="ArrowUp"
+                                                                        Foreground="#2563EB"
+                                                                        Width="12" />
+                                        </Button>
+
+                                        <Button Style="{StaticResource IconButtonSmall}"
+                                                Command="{Binding DataContext.MoveCategoryDownCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}"
+                                                Margin="0,0,12,0">
+                                            <iconPacks:PackIconMaterial Kind="ArrowDown"
+                                                                        Foreground="#2563EB"
+                                                                        Width="12" />
+                                        </Button>
 
                                         <Button Style="{StaticResource IconButtonSmall}"
                                                 Command="{Binding DataContext.EditCategoryCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
@@ -1630,7 +1646,8 @@
                                  Background="Transparent"
                                  VerticalContentAlignment="Center"
                                  HorizontalContentAlignment="Left"
-                                 GotFocus="NameBox_GotFocus"/>
+                                 GotFocus="NameBox_GotFocus"
+                                 TextChanged="NamePrice_TextChanged"/>
                     </Border>
 
                     <!-- Price field -->
@@ -1668,7 +1685,8 @@
                                  BorderThickness="0"
                                  Background="Transparent"
                                  VerticalContentAlignment="Center" 
-                                 GotFocus="PriceBox_GotFocus"/>
+                                 GotFocus="PriceBox_GotFocus"
+                                 TextChanged="NamePrice_TextChanged"/>
                     </Border>
 
                     <!-- On-screen keyboard -->

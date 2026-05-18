@@ -50,5 +50,11 @@ namespace RestaurantPOS.UI.Views.Orders
             if (this.DataContext is OrderViewModel vm)
                 vm.OpenItemEditor.FocusPriceCommand.Execute(null);
         }
+
+        private void NamePrice_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (this.DataContext is OrderViewModel vm)
+                vm.OpenItemEditor.OpenItemNamePriceChanged.Execute(null);
+        }
     }
 }

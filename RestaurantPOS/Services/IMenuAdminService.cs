@@ -13,6 +13,8 @@ namespace RestaurantPOS.Services
         Task<Category> SaveCategoryAsync(int? id, string name);
         Task DeleteCategoryAsync(int id);
 
+        Task MoveCategoryAsync(int categoryId, bool moveUp);
+
         Task<MenuProduct> SaveProductAsync(int? id, string name, decimal price, int categoryId);
         Task DeleteProductAsync(int id);
     }

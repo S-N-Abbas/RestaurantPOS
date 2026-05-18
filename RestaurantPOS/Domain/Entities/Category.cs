@@ -12,6 +12,8 @@ namespace RestaurantPOS.Domain.Entities
 
         public string Name { get; set; } = null!;
 
+        public int DisplayOrder { get; set; } = 0;
+
         public bool IsActive { get; set; } = true;
 
         public ICollection<MenuProduct> Products { get; set; } = new List<MenuProduct>();

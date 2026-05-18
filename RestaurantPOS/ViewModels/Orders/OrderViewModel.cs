@@ -146,6 +146,10 @@ namespace RestaurantPOS.ViewModels.Orders
         public ICommand ToggleEditMenuCommand { get; }
         public ICommand EditCategoryCommand { get; }
         public ICommand DeleteCategoryCommand { get; }
+
+        public ICommand MoveCategoryUpCommand { get; }
+        public ICommand MoveCategoryDownCommand { get; }
+
         public ICommand EditProductCommand { get; }
         public ICommand DeleteProductCommand { get; }
 
@@ -200,6 +204,12 @@ namespace RestaurantPOS.ViewModels.Orders
 
             DeleteCategoryCommand = new RelayCommand<CategoryViewModel>(
                 async c => await DeleteCategoryAsync(c));
+
+            MoveCategoryUpCommand = new RelayCommand<CategoryViewModel>(
+                async c => await MoveCategoryAsync(c, moveUp: true));
+
+            MoveCategoryDownCommand = new RelayCommand<CategoryViewModel>(
+                async c => await MoveCategoryAsync(c, moveUp: false));
 
             EditProductCommand = new RelayCommand<MenuItemViewModel>(
                 async p => await EditProductAsync(p));
@@ -357,16 +367,16 @@ namespace RestaurantPOS.ViewModels.Orders
         {
             var categories = await _menuService.GetCategoriesAsync();
             var products = await _menuService.GetProductsAsync();
-
+            var selected = SelectedCategory;
             Categories.Clear();
             foreach (var c in categories)
-                Categories.Add(new CategoryViewModel(c.Id, c.Name));
+                Categories.Add(new CategoryViewModel(c.Id, c.Name, c.DisplayOrder));
 
             AllItems.Clear();
             foreach (var p in products)
                 AllItems.Add(new MenuItemViewModel(p.Id, p.Name, p.Price, p.CategoryId, _settingsService));
 
-            SelectedCategory = Categories.FirstOrDefault();
+            SelectedCategory = selected;
             FilterItems();
         }
 
@@ -590,6 +600,22 @@ namespace RestaurantPOS.ViewModels.Orders
             {
                 await _menuAdmin.DeleteCategoryAsync(category.Id);
                 await ReloadMenuAsync();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private async Task MoveCategoryAsync(CategoryViewModel? category, bool moveUp)
+        {
+            if (category == null) return;
+
+            try
+            {
+                await _menuAdmin.MoveCategoryAsync(category.Id, moveUp);
+                await ReloadMenuAsync();   // ✅ cache already busted by MoveCategoryAsync
             }
             catch (Exception ex)
             {

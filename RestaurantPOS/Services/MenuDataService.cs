@@ -28,7 +28,8 @@ namespace RestaurantPOS.Services
 
             _categoriesCache = await _db.Categories
                 .Where(c => c.IsActive)
-                .OrderBy(c => c.Name)
+                .OrderBy(c => c.DisplayOrder)
+                .ThenBy(c => c.Name)
                 .AsNoTracking()
                 .ToListAsync();
 

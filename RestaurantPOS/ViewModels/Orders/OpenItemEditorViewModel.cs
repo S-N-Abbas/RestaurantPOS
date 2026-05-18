@@ -71,6 +71,8 @@ namespace RestaurantPOS.ViewModels.Orders
         public ICommand ConfirmCommand { get; }
         public ICommand CancelCommand { get; }
 
+        public ICommand OpenItemNamePriceChanged { get; }
+
         // ─── Constructor ──────────────────────────────────────────────────────
 
         public OpenItemEditorViewModel(SettingsService settingsService)
@@ -87,6 +89,11 @@ namespace RestaurantPOS.ViewModels.Orders
             ConfirmCommand = new RelayCommand(
                 OnConfirm,
                 () => !string.IsNullOrWhiteSpace(Name) && Price > 0);
+
+            OpenItemNamePriceChanged = new RelayCommand(() =>
+            {
+                ((RelayCommand)ConfirmCommand).NotifyCanExecuteChanged();
+            });
 
             CancelCommand = new RelayCommand(Close);
 
@@ -135,8 +142,6 @@ namespace RestaurantPOS.ViewModels.Orders
                 if (key != "." && !char.IsDigit(key[0])) return;
                 PriceDisplay += key;
             }
-
-            ((RelayCommand)ConfirmCommand).NotifyCanExecuteChanged();
         }
 
         private void Backspace()
@@ -145,16 +150,12 @@ namespace RestaurantPOS.ViewModels.Orders
                 Name = Name[..^1];
             else if (_activeField == OpenItemField.Price && PriceDisplay.Length > 0)
                 PriceDisplay = PriceDisplay[..^1];
-
-            ((RelayCommand)ConfirmCommand).NotifyCanExecuteChanged();
         }
 
         private void ClearActive()
         {
             if (_activeField == OpenItemField.Name) Name = string.Empty;
             else PriceDisplay = string.Empty;
-
-            ((RelayCommand)ConfirmCommand).NotifyCanExecuteChanged();
         }
 
         // ─── Confirm / Cancel ─────────────────────────────────────────────────
