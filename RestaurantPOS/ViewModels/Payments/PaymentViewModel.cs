@@ -24,6 +24,7 @@ namespace RestaurantPOS.ViewModels.Payments
         private readonly SettingsService _settingsService;
         private readonly INavigationService _navigationService;
         private readonly UserSessionService _userSessionService;
+        private readonly CashDrawerService _cashDrawerService;
 
         private readonly ReceiptBuilder _receiptBuilder;
         public ICommand PrintReceiptCommand => new RelayCommand(PrintReceipt);
@@ -76,6 +77,7 @@ namespace RestaurantPOS.ViewModels.Payments
         public ICommand ClearAmountCommand { get; }
         public ICommand SelectCashCommand { get; }
         public ICommand SelectCardCommand { get; }
+        public ICommand OpenDrawerCommand { get; }
 
 
         private decimal _enteredAmount;
@@ -165,7 +167,7 @@ namespace RestaurantPOS.ViewModels.Payments
         ? EnteredAmount > 0          // ✅ cash: allow exact or over
         : EnteredAmount <= Due);        // ✅ card: must not exceed remaining
 
-        public PaymentViewModel(OrderState orderState, OrderService orderService, OrderStore orderStore, SettingsService settingsService, INavigationService navigationService, UserSessionService userSessionService)
+        public PaymentViewModel(OrderState orderState, OrderService orderService, OrderStore orderStore, SettingsService settingsService, INavigationService navigationService, UserSessionService userSessionService, CashDrawerService cashDrawerService)
         {
             _orderState = orderState;
             _orderService = orderService;
@@ -173,6 +175,7 @@ namespace RestaurantPOS.ViewModels.Payments
             _settingsService = settingsService;
             _navigationService = navigationService;
             _userSessionService = userSessionService;
+            _cashDrawerService = cashDrawerService;
 
             _settingsService.SettingsChanged += () => OnPropertyChanged(nameof(CurrencySymbol));
 
@@ -192,6 +195,7 @@ namespace RestaurantPOS.ViewModels.Payments
 
             SelectCashCommand = new RelayCommand(() => SelectedMethod = PaymentMethod.Cash);
             SelectCardCommand = new RelayCommand(() => SelectedMethod = PaymentMethod.Card);
+            OpenDrawerCommand = new RelayCommand(OpenDrawer);
         }
 
         private async Task PayAsync()
@@ -204,6 +208,10 @@ namespace RestaurantPOS.ViewModels.Payments
                 EnteredAmount,
                 SelectedMethod.ToString());
 
+            // Auto-open drawer for cash payments
+            if (SelectedMethod == PaymentMethod.Cash)
+                _cashDrawerService.OpenDrawer();
+
             // Reload to get updated PaidAmount
             var updatedOrder = await _orderService.GetByIdAsync(_orderState.Order.Id);
             _orderState.UpdateFrom(updatedOrder);
@@ -212,7 +220,7 @@ namespace RestaurantPOS.ViewModels.Payments
             OnPropertyChanged(nameof(Change));
             OnPropertyChanged(nameof(HasChange));
 
-            // ✅ PaidAmount now includes tendered cash — will be >= Total when paid in full
+            // PaidAmount now includes tendered cash — will be >= Total when paid in full
             if (_orderState.Order.PaidAmount >= Total)
             {
                 await _orderService.CloseOrderAsync(_orderState.Order.Id);
@@ -258,6 +266,19 @@ namespace RestaurantPOS.ViewModels.Payments
             {
                 EnteredAmount = 0;
             }
+        }
+
+        private void OpenDrawer()
+        {
+            bool success = _cashDrawerService.OpenDrawer();
+
+            if (!success)
+                System.Windows.MessageBox.Show(
+                    "Could not open the cash drawer.\n" +
+                    "Please check the printer is connected and configured in Settings.",
+                    "Drawer Error",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Warning);
         }
     }
 }

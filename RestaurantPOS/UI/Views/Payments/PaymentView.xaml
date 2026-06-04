@@ -8,6 +8,11 @@
              mc:Ignorable="d"
              d:DesignHeight="600"
              d:DesignWidth="1300">
+    <UserControl.InputBindings>
+        <KeyBinding Key="D"
+                    Modifiers="Ctrl"
+                    Command="{Binding OpenDrawerCommand}" />
+    </UserControl.InputBindings>
     <Grid Background="{StaticResource BackgroundGray}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -24,6 +29,7 @@
             <Grid Margin="0,0,24,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
@@ -244,8 +250,26 @@
                         </ListView>
                     </DockPanel>
                 </Border>
-
+                <!-- Open Drawer button — manual trigger -->
                 <Button Grid.Row="1"
+                    Style="{StaticResource ModernButton}"
+                        Command="{Binding OpenDrawerCommand}"
+                        Height="44"
+                        Padding="16,0"
+                        Margin="0,12,12,0"
+                        ToolTip="Open Cash Drawer (Ctrl+D)">
+                    <StackPanel Orientation="Horizontal">
+                        <iconPacks:PackIconMaterial Kind="SafeSquareOutline"
+                                                    Width="16"
+                                                    Height="16"
+                                                    VerticalAlignment="Center"
+                                                    Margin="0,0,8,0" />
+                        <TextBlock Text="Open Drawer"
+                                   VerticalAlignment="Center"
+                                   FontWeight="SemiBold" />
+                    </StackPanel>
+                </Button>
+                <Button Grid.Row="2"
                         Margin="0,16,0,0"
                         Height="50"
                         Style="{StaticResource KeypadActionButton}"
@@ -367,7 +391,6 @@
                                       Style="{StaticResource PaymentMethodStyle}"
                                       IsChecked="{Binding SelectedMethod, Converter={StaticResource StringToBoolConverter}, ConverterParameter=Card}" />
                     </UniformGrid>
-
                     <Button Grid.Row="3"
                             Command="{Binding PayCommand}"
                             Height="70"

@@ -102,7 +102,7 @@ namespace RestaurantPOS
             services.AddTransient<ZReportBuilder>();
             services.AddTransient<ZReportViewModel>();
             services.AddTransient<OrderHistoryViewModel>();
-
+            services.AddSingleton<CashDrawerService>();
 
             // Shell
             services.AddSingleton<ShellViewModel>();
